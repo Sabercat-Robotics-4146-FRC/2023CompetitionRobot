@@ -1,0 +1,23 @@
+name: Spotless Check
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: wpilib/roborio-cross-ubuntu:2023-22.04
+    steps:
+    - name: Checkout project
+      uses: actions/checkout@v3
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+    - name: Add repository to git safe directories
+      run: git config --global --add safe.directory $GITHUB_WORKSPACE
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Compile code
+      run: ./gradlew build
+    - name: Run splotless check
+      run: ./gradlew spotlessCheck
