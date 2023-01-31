@@ -5,7 +5,10 @@ import org.frcteam4146.common.math.Rotation2;
 import org.frcteam4146.common.math.Vector2;
 import org.frcteam4146.common.math.spline.CubicBezierSpline;
 import org.frcteam4146.common.math.spline.CubicHermiteSpline;
+import org.frcteam4146.common.math.spline.QuinticHermiteSpline;
 import org.frcteam4146.common.math.spline.Spline;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public final class SplinePathBuilder {
   private List<PathSegment> segmentList = new ArrayList<>();
@@ -25,6 +28,10 @@ public final class SplinePathBuilder {
     segmentList.add(segment);
     lastState = segment.getEnd();
     length += segment.getLength();
+
+    SmartDashboard.putString("Last State", lastState.getPosition().x + " " + lastState.getPosition().y);
+    SmartDashboard.putString("First State", segment.getStart().getPosition().x + " " +  segment.getStart().getPosition().y);
+
   }
 
   public Path build() {
@@ -52,6 +59,13 @@ public final class SplinePathBuilder {
   public SplinePathBuilder hermite(Vector2 position, Rotation2 heading, Rotation2 rotation) {
     hermite(position, heading);
     rotationMap.put(length, rotation);
+    return this;
+  }
+
+  public SplinePathBuilder quinticHermite(Vector2 start, Vector2 startTangent, Vector2 end, Vector2 endTangent) {
+    addSpline(
+      new QuinticHermiteSpline(start, startTangent, end, endTangent)
+    );
     return this;
   }
 }

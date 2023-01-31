@@ -15,19 +15,30 @@ class HermiteSplineHelper {
    * @return The basis weights for the spline.
    */
   public static SimpleMatrix createBasisWeightMatrix(
-      Vector2 start, Vector2 startTangent, Vector2 end, Vector2 endTangent) {
-    // The basis weight matrix for hermite cubic splines is the following:
+      Vector2 start, Vector2 startTangent, Vector2 end, Vector2 endTangent, int degree) {
+    // The basis weight matrix for hermite quintic splines is the following:
     // [x0  y0 ]
     // [x1  y1 ]
     // [dx0 dy0]
     // [dx1 dy1]
-    return new SimpleMatrix(
+    return
+      (degree == 3) ? new SimpleMatrix(
         new double[][] {
           new double[] {start.x, start.y},
           new double[] {end.x, end.y},
           new double[] {startTangent.x, startTangent.y},
           new double[] {endTangent.x, endTangent.y}
-        });
+        }): 
+        new SimpleMatrix(
+          new double[][] {
+            new double[] {start.x, start.y},
+            new double[] {startTangent.x, startTangent.y},
+            new double[] {0, 0},
+            new double[] {end.x, end.y},
+            new double[] {endTangent.x, endTangent.y},
+            new double[] {0, 0}
+          }
+        );
   }
 
   /**
@@ -40,11 +51,11 @@ class HermiteSplineHelper {
    * @return The basis weights for the spline.
    */
   public static SimpleMatrix createBasisWeightMatrix(
-      Vector2 start, Rotation2 startHeading, Vector2 end, Rotation2 endHeading) {
+      Vector2 start, Rotation2 startHeading, Vector2 end, Rotation2 endHeading, int degree) {
     double scale = 2.0 * end.subtract(start).length;
 
     return createBasisWeightMatrix(
         start, Vector2.fromAngle(startHeading).scale(scale),
-        end, Vector2.fromAngle(endHeading).scale(scale));
+        end, Vector2.fromAngle(endHeading).scale(scale), degree);
   }
 }

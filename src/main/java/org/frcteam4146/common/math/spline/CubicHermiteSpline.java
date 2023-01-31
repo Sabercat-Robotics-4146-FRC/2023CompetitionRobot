@@ -16,12 +16,12 @@ public class CubicHermiteSpline extends Spline {
   private static final SimpleMatrix INVERSE_BASIS_MATRIX = BASIS_MATRIX.invert();
 
   public CubicHermiteSpline(Vector2 start, Vector2 startTangent, Vector2 end, Vector2 endTangent) {
-    this(HermiteSplineHelper.createBasisWeightMatrix(start, startTangent, end, endTangent));
+    this(HermiteSplineHelper.createBasisWeightMatrix(start, startTangent, end, endTangent, 3));
   }
 
   public CubicHermiteSpline(
       Vector2 start, Rotation2 startHeading, Vector2 end, Rotation2 endHeading) {
-    this(HermiteSplineHelper.createBasisWeightMatrix(start, startHeading, end, endHeading));
+    this(HermiteSplineHelper.createBasisWeightMatrix(start, startHeading, end, endHeading, 3));
   }
 
   private CubicHermiteSpline(SimpleMatrix basisWeightMatrix) {

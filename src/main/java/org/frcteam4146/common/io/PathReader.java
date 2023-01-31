@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import org.ejml.simple.SimpleMatrix;
 import org.frcteam4146.common.control.Path;
 import org.frcteam4146.common.control.PathSegment;
+import org.frcteam4146.common.control.SplinePathSegment;
 import org.frcteam4146.common.io.json.InterpolatingDoubleJsonHandler;
 import org.frcteam4146.common.io.json.PathSegmentJsonHandler;
 import org.frcteam4146.common.io.json.Rotation2JsonHandler;
@@ -43,6 +44,9 @@ public final class PathReader implements AutoCloseable {
       if (!root.has("segments") || !root.has("rotations")) {
         throw new IOException("Path is not valid");
       }
+
+      PathSegment[] p = new SplinePathSegment[4];
+      p[0] = new SplinePathSegment(null);
 
       PathSegment[] pathSegments = gson.fromJson(root.get("segments"), PathSegment[].class);
 
