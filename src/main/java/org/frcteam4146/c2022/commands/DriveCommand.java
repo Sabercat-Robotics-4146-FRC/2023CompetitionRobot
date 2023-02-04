@@ -1,5 +1,6 @@
 package org.frcteam4146.c2022.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.frcteam4146.c2022.subsystems.DrivetrainSubsystem;
 import org.frcteam4146.common.math.Vector2;
@@ -27,6 +28,8 @@ public class DriveCommand extends CommandBase {
   @Override
   public void execute() {
     // TODO: add sensitivity customization in SmartDashboard
+    SmartDashboard.putNumber("num", -forward.get(true)/2);
+
     drivetrainSubsystem.drive(
         new Vector2(-forward.get(true) / 2, strafe.get(true) / 2), rotation.get(true) / 3);
   }

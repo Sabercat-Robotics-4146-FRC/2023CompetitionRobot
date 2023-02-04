@@ -3,10 +3,8 @@ package org.frcteam4146.c2022;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.frcteam4146.c2022.commands.DriveCommand;
-import org.frcteam4146.c2022.commands.auto.AutonomousFactory;
 import org.frcteam4146.c2022.commands.auto.AutonomousSelector;
 import org.frcteam4146.c2022.commands.auto.AutonomousTab;
-import org.frcteam4146.c2022.commands.auto.TrajectoryTest;
 import org.frcteam4146.c2022.subsystems.*;
 import org.frcteam4146.common.robot.input.XboxController;
 
@@ -34,9 +32,7 @@ public class RobotContainer {
                 primaryController.getRightXAxis()));
 
     autoSelector = new AutonomousSelector(this);
-
     AutonomousTab tab = new AutonomousTab(this);
-
     configureButtonBindings();
   }
 

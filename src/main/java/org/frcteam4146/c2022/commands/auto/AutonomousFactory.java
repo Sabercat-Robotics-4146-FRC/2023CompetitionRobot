@@ -1,38 +1,29 @@
 package org.frcteam4146.c2022.commands.auto;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.frcteam4146.c2022.RobotContainer;
 import org.frcteam4146.c2022.commands.FollowTrajectoryCommand;
 import org.frcteam4146.c2022.subsystems.DrivetrainSubsystem;
 import org.frcteam4146.common.control.Path;
 import org.frcteam4146.common.control.SplinePathBuilder;
 import org.frcteam4146.common.control.Trajectory;
-import org.frcteam4146.common.io.PathReader;
 import org.frcteam4146.common.math.Rotation2;
 import org.frcteam4146.common.math.Vector2;
 
@@ -153,17 +144,9 @@ public class AutonomousFactory {
             Vector2 v1 = new Vector2(waypoint2.tx, waypoint2.ty);
             Vector2 v2 = new Vector2(waypoint.tx, waypoint.ty);
             Vector2 end = new Vector2(waypoint.x, waypoint.y);
-            Rotation2 r = new Rotation2(Math.cos(waypoint.heading), Math.sin(waypoint.heading), true);
+            // Rotation2 r = new Rotation2(Math.cos(waypoint.heading), Math.sin(waypoint.heading), true);
 
-            tab.add("Start Point", "("+ start.x + ", " + start.y + ")");
-            tab.add("Control Point 1", "(" + v1.x + ", " + v1.y + ")");
-            tab.add("Control Point 2", "(" + v2.x + ", " + v2.y + ")");
-            tab.add("End Point", "(" + end.x + ", " + end.y + ")");
-
-            //splinePath.bezier(v1, v2, end, r);
             splinePath.quinticHermite(start, v1, end, v2);
-
-            tab.add("ITERATION" , j);
           }
 
           Path path = splinePath.build();

@@ -5,6 +5,8 @@ import org.frcteam4146.common.math.Vector2;
 import org.frcteam4146.common.util.HolonomicDriveSignal;
 import org.frcteam4146.common.util.HolonomicFeedforward;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class HolonomicMotionProfiledTrajectoryFollower
     extends TrajectoryFollower<HolonomicDriveSignal> {
   private PidController forwardController;
@@ -14,6 +16,7 @@ public class HolonomicMotionProfiledTrajectoryFollower
   private HolonomicFeedforward feedforward;
 
   private Trajectory.State lastState = null;
+  private Trajectory.State previousState = null;
 
   private boolean finished = false;
 
@@ -44,24 +47,20 @@ public class HolonomicMotionProfiledTrajectoryFollower
     }
 
     lastState = trajectory.calculate(time);
+    if(previousState == null) {
+      previousState = trajectory.calculate(0.0);
+    }
 
-    Vector2 segmentVelocity =
-        Vector2.fromAngle(lastState.getPathState().getHeading()).scale(lastState.getVelocity());
-    Vector2 segmentAcceleration =
-        Vector2.fromAngle(lastState.getPathState().getHeading()).scale(lastState.getAcceleration());
+    double translationx = ((lastState.getPathState().getPosition().x - previousState.getPathState().getPosition().x) * 50) / 2;
+    double translationy = ((lastState.getPathState().getPosition().y - previousState.getPathState().getPosition().y) * 50) / 2;
+    double rotation = lastState.getPathState().getRotation().toRadians() - previousState.getPathState().getRotation().toRadians();
 
-    Vector2 feedforwardVector =
-        feedforward.calculateFeedforward(segmentVelocity, segmentAcceleration);
-
-    forwardController.setSetpoint(lastState.getPathState().getPosition().x);
-    strafeController.setSetpoint(lastState.getPathState().getPosition().y);
-    rotationController.setSetpoint(lastState.getPathState().getRotation().toRadians());
+    previousState = lastState;
 
     return new HolonomicDriveSignal(
         new Vector2(
-            forwardController.calculate(currentPose.translation.x, dt) + feedforwardVector.x,
-            strafeController.calculate(currentPose.translation.y, dt) + feedforwardVector.y),
-        rotationController.calculate(currentPose.rotation.toRadians(), dt),
+            -translationx, -translationy),
+        -rotation,
         true);
   }
 

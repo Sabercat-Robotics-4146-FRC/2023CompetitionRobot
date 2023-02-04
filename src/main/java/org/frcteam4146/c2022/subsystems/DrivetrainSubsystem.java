@@ -7,7 +7,6 @@ import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -273,7 +272,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     }
 
     Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
-    SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 0.5); // maximumVelocity 1 -> 0.5
+    SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1); // maximumVelocity 1 -> 0.5
     for (int i = 0; i < moduleOutputs.length; i++) {
       var module = modules[i];
       // As maximum velocity is normalized to 1, the maximum voltage passed to a

@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.frcteam4146.common.control.Path;
-import org.frcteam4146.common.control.SimplePathBuilder;
 import org.frcteam4146.common.control.SplinePathBuilder;
 import org.frcteam4146.common.io.PathWriter;
 import org.frcteam4146.common.math.Rotation2;
