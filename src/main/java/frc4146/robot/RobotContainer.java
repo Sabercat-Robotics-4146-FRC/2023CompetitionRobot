@@ -2,10 +2,8 @@ package frc4146.robot;
 
 import common.drivers.Gyroscope;
 import common.robot.input.XboxController;
-
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.subsystems.*;
 
@@ -29,18 +27,23 @@ public class RobotContainer {
                 primaryController.getRightXAxis()));
 
     configureButtonBindings();
-
   }
 
   private void configureButtonBindings() {
     // TODO: Configure Button Bindings
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
 
-    primaryController.getYButton().onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
+    primaryController
+        .getYButton()
+        .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
     primaryController.getXButton().onTrue(Commands.runOnce(drivetrainSubsystem::toggleDriveFlag));
+  }
 
-    }
-  public DrivetrainSubsystem getDrivetrainSubsystem() {return drivetrainSubsystem;}
-  public Gyroscope getGyroscope() {return gyroscope;}
+  public DrivetrainSubsystem getDrivetrainSubsystem() {
+    return drivetrainSubsystem;
+  }
 
+  public Gyroscope getGyroscope() {
+    return gyroscope;
+  }
 }
