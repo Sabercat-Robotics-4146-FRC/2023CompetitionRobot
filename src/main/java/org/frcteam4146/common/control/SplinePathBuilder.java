@@ -62,9 +62,9 @@ public final class SplinePathBuilder {
     return this;
   }
 
-  public SplinePathBuilder quinticHermite(Vector2 start, Vector2 startTangent, Vector2 end, Vector2 endTangent) {
+  public SplinePathBuilder quinticHermite(Vector2 v1, Vector2 position, Vector2 v2) {
     addSpline(
-      new QuinticHermiteSpline(start, startTangent, end, endTangent)
+      new QuinticHermiteSpline(lastState.getPosition(), v1, position, v2)
     );
     return this;
   }

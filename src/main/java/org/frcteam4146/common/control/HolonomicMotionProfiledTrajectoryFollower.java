@@ -13,12 +13,17 @@ public class HolonomicMotionProfiledTrajectoryFollower
   private PidController strafeController;
   private PidController rotationController;
 
-  private HolonomicFeedforward feedforward;
-
   private Trajectory.State lastState = null;
   private Trajectory.State previousState = null;
 
   private boolean finished = false;
+
+  private double duration = 0;
+  private double lastTime = 0;
+
+  private double scale;
+  private double maxSpeed = .5;
+  private double reduction = 0;
 
   public HolonomicMotionProfiledTrajectoryFollower(
       PidConstants translationConstants,
@@ -30,7 +35,7 @@ public class HolonomicMotionProfiledTrajectoryFollower
     this.rotationController.setContinuous(true);
     this.rotationController.setInputRange(0.0, 2.0 * Math.PI);
 
-    this.feedforward = feedforward;
+    this.scale = 1;
   }
 
   @Override
@@ -41,7 +46,14 @@ public class HolonomicMotionProfiledTrajectoryFollower
       Trajectory trajectory,
       double time,
       double dt) {
-    if (time > trajectory.getDuration()) {
+
+    duration = Math.max(trajectory.getDuration(), duration);
+
+    if(lastTime == 0) lastTime = time;
+
+    time -= reduction;
+
+    if (time > duration) {
       finished = true;
       return new HolonomicDriveSignal(Vector2.ZERO, 0.0, false);
     }
@@ -51,9 +63,30 @@ public class HolonomicMotionProfiledTrajectoryFollower
       previousState = trajectory.calculate(0.0);
     }
 
-    double translationx = ((lastState.getPathState().getPosition().x - previousState.getPathState().getPosition().x) * 50) / 2;
-    double translationy = ((lastState.getPathState().getPosition().y - previousState.getPathState().getPosition().y) * 50) / 2;
-    double rotation = lastState.getPathState().getRotation().toRadians() - previousState.getPathState().getRotation().toRadians();
+    double translationx = (lastState.getPathState().getPosition().x - previousState.getPathState().getPosition().x) * 50;
+    double translationy = (lastState.getPathState().getPosition().y - previousState.getPathState().getPosition().y) * 50;
+
+    if(translationx > maxSpeed || translationx < -maxSpeed) {
+      scale = Math.abs(translationx / maxSpeed);
+      translationx /= scale;
+      translationy /= scale;
+      duration += (time - lastTime) - ((time - lastTime) / scale);
+      reduction += (time - lastTime) - ((time - lastTime) / scale);
+    }
+
+    if(translationy > maxSpeed || translationy < -maxSpeed) {
+      scale = Math.abs(translationy / maxSpeed);
+      translationy /= scale;
+      translationx /= scale;
+      duration += (time - lastTime) - ((time - lastTime) / scale);
+      reduction += (time - lastTime) - ((time - lastTime) / scale);
+    }
+
+    SmartDashboard.putNumber("x", translationx);
+
+    
+    double rotation = 0;
+    lastTime = time;
 
     previousState = lastState;
 

@@ -144,9 +144,9 @@ public class AutonomousFactory {
             Vector2 v1 = new Vector2(waypoint2.tx, waypoint2.ty);
             Vector2 v2 = new Vector2(waypoint.tx, waypoint.ty);
             Vector2 end = new Vector2(waypoint.x, waypoint.y);
-            // Rotation2 r = new Rotation2(Math.cos(waypoint.heading), Math.sin(waypoint.heading), true);
+            Rotation2 r = new Rotation2(Math.cos(waypoint.heading), Math.sin(waypoint.heading), true);
 
-            splinePath.quinticHermite(start, v1, end, v2);
+            splinePath.quinticHermite(v1, end, v2);
           }
 
           Path path = splinePath.build();

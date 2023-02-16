@@ -63,7 +63,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         FEEDFORWARD_CONSTANTS.getVelocityConstant(),
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
         false),
-    new MaxAccelerationConstraint(5), // originally 12.5 * 12.0
+    new MaxAccelerationConstraint(2.5), // originally 12.5 * 12.0
     new CentripetalAccelerationConstraint(15 * 12.0)
   };
 
@@ -270,6 +270,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
       chassisVelocity =
           new ChassisVelocity(driveSignal.getTranslation(), driveSignal.getRotation());
     }
+
+    SmartDashboard.putNumber("value", chassisVelocity.getTranslationalVelocity().y);
 
     Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
     SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1); // maximumVelocity 1 -> 0.5
