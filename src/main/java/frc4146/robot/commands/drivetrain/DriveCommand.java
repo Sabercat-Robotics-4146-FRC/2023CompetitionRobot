@@ -26,8 +26,16 @@ public class DriveCommand extends CommandBase {
 
   @Override
   public void execute() {
+    double th = 0.01;
+    double f = forward.get(true);
+    double s = strafe.get(true);
+    double r = rotation.get(true);
+    if(Math.abs(f) < th) f = 0;
+    if(Math.abs(s) < th) s = 0;
+    if(Math.abs(r) < th) r = 0;
+
     drivetrainSubsystem.drive(
-        new Vector2(-forward.get(true) / 2, strafe.get(true) / 2), rotation.get(true) / 3);
+        new Vector2(-f / 2, s / 2), r / 3);
   }
 
   @Override
