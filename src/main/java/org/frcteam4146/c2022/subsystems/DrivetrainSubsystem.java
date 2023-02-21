@@ -168,13 +168,13 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
           new TalonSRX(DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR)
         };
 
-    for (var talon : talons) {
-      talon.configPeakCurrentLimit(20); // max. current (amps)
-      talon.configPeakCurrentDuration(
-          5); // # milliseconds after peak reached before regulation starts
-      talon.configContinuousCurrentLimit(10); // continuous current (amps) after regulation
-      talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
-    }
+    // for (var talon : talons) {
+    //   talon.configPeakCurrentLimit(20); // max. current (amps)
+    //   talon.configPeakCurrentDuration(
+    //       5); // # milliseconds after peak reached before regulation starts
+    //   talon.configContinuousCurrentLimit(10); // continuous current (amps) after regulation
+    //   talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
+    // }
 
     odometryXEntry = tab.add("X", 0.0).withPosition(0, 0).withSize(1, 1).getEntry();
     odometryYEntry = tab.add("Y", 0.0).withPosition(0, 1).withSize(1, 1).getEntry();
@@ -271,7 +271,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
           new ChassisVelocity(driveSignal.getTranslation(), driveSignal.getRotation());
     }
 
-    SmartDashboard.putNumber("value", chassisVelocity.getTranslationalVelocity().y);
+    SmartDashboard.putNumber("value", chassisVelocity.getTranslationalVelocity().x);
 
     Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
     SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1); // maximumVelocity 1 -> 0.5

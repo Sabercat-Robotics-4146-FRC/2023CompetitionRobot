@@ -49,11 +49,15 @@ public class HolonomicMotionProfiledTrajectoryFollower
 
     duration = Math.max(trajectory.getDuration(), duration);
 
+    if(trajectory.getDuration() - time < 0.1) {
+      maxSpeed /= 1.5;
+    }
+
     if(lastTime == 0) lastTime = time;
 
     time -= reduction;
 
-    if (time > duration) {
+    if (time > trajectory.getDuration()) {
       finished = true;
       return new HolonomicDriveSignal(Vector2.ZERO, 0.0, false);
     }
@@ -68,7 +72,7 @@ public class HolonomicMotionProfiledTrajectoryFollower
 
     if(translationx > maxSpeed || translationx < -maxSpeed) {
       scale = Math.abs(translationx / maxSpeed);
-      translationx /= scale;
+      translationx = Math.copySign(maxSpeed, translationx);
       translationy /= scale;
       duration += (time - lastTime) - ((time - lastTime) / scale);
       reduction += (time - lastTime) - ((time - lastTime) / scale);
@@ -76,13 +80,13 @@ public class HolonomicMotionProfiledTrajectoryFollower
 
     if(translationy > maxSpeed || translationy < -maxSpeed) {
       scale = Math.abs(translationy / maxSpeed);
-      translationy /= scale;
+      translationy = Math.copySign(maxSpeed, translationy);
       translationx /= scale;
       duration += (time - lastTime) - ((time - lastTime) / scale);
       reduction += (time - lastTime) - ((time - lastTime) / scale);
     }
 
-    SmartDashboard.putNumber("x", translationx);
+    SmartDashboard.putNumber("x", trajectory.calculate(time).getPathState().getPosition().y);
 
     
     double rotation = 0;
