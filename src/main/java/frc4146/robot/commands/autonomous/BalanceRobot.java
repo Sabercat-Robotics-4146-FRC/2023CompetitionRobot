@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc4146.robot.subsystems.DrivetrainSubsystem;
 import frc4146.robot.subsystems.Pigeon;
+// Not tested
 
 public class BalanceRobot extends CommandBase {
   private final DrivetrainSubsystem drivetrain;
@@ -14,8 +15,6 @@ public class BalanceRobot extends CommandBase {
   public double kP = 0.03;
   public double kI = 0;
   public double kD = 0;
-
-  public double inc_roll = 15;
 
   public PIDController pid;
 
@@ -34,7 +33,7 @@ public class BalanceRobot extends CommandBase {
     double mag = MathUtil.clamp(pid.calculate(pigeon.getRoll(), 0), -0.5, 0.5);
     drivetrain.drive(
         new Vector2(drivetrain.getPose().rotation.cos, drivetrain.getPose().rotation.sin)
-            .scale(mag),
+            .scale(-mag),
         0);
   }
 
