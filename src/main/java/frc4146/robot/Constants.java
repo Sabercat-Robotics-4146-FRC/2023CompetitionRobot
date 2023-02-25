@@ -51,6 +51,12 @@ public class Constants {
   public static class ClawConstants {
     public static final int CLAW_ID = 24;
     public static final int CLAW_POT_CHANNEL = 0;
+
+    public static final double CLAW_CONE_MID = 796.0/1024.0;
+    public static final double CLAW_CUBE = 0;
+    public static final double CLAW_FULLY_OPENED = 0;
+    public static final double CLAW_FULLY_CLOSED = 0;
+
   }
 
   public static class LimelightConstants {
