@@ -2,28 +2,29 @@ package frc4146.robot;
 
 public class Constants {
   public static final int PRIMARY_CONTROLLER_PORT = 0;
+  public static final int SECONDARY_CONTROLLER_PORT = 1;
 
   public static class DriveConstants {
 
     public static final int DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR = 2;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_MOTOR = 3;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_ENCODER = 12;
-    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(357.871);
+    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(251.982);
 
     public static final int DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR = 4;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_MOTOR = 5;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_ENCODER = 14;
-    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(188.374);
+    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(232.0313);
 
     public static final int DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR = 6;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_MOTOR = 7;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_ENCODER = 16;
-    public static final double DRIVETRAIN_BACK_LEFT_STEER_OFFSET = -Math.toRadians(130.724);
+    public static final double DRIVETRAIN_BACK_LEFT_STEER_OFFSET = -Math.toRadians(329.766);
 
     public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 8;
     public static final int DRIVETRAIN_BACK_RIGHT_STEER_MOTOR = 9;
     public static final int DRIVETRAIN_BACK_RIGHT_STEER_ENCODER = 18;
-    public static final double DRIVETRAIN_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(180.766);
+    public static final double DRIVETRAIN_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(335.48);
 
     public static final int PIGEON_PORT = 20;
 
@@ -37,7 +38,6 @@ public class Constants {
     public static final int ROTATION_POT_CHANNEl = 0;
 
     public static final int EXTENSION_ID = 23;
-    public static final int EXTENSION_POT_CHANNEL = 0;
     public static final int LOWER_LIMIT_CHANNEL = 9;
     public static final int UPPER_LIMIT_CHANNEL = 1;
 

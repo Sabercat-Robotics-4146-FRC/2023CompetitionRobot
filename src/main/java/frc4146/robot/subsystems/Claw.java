@@ -9,11 +9,12 @@ import frc4146.robot.Constants.ClawConstants;
 
 public class Claw implements Subsystem {
   public TalonSRX clawMotor;
-  public AnalogPotentiometer pot = new AnalogPotentiometer(0);
+  public AnalogPotentiometer pot;
 
   public Claw() {
     clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
-    Shuffleboard.getTab("Drivetrain").addNumber("Pot", () -> pot.get());
+    Shuffleboard.getTab("Subsystems")
+        .addNumber("Claw Motor Rotation Encoder", () -> clawMotor.getSelectedSensorPosition());
   }
 
   public void manuallySetClaw(double p) {

@@ -21,8 +21,8 @@ public class ArmCommand extends CommandBase {
 
   @Override
   public void execute() {
-    arm.manuallyRotateArm(rotate.get());
-    arm.manuallyExtendArm(extend.get() - retract.get());
+    arm.manuallyRotateArm(-rotate.get() / 2);
+    arm.manuallyExtendArm(extend.get() / 3 - retract.get() / 3);
   }
 
   @Override
