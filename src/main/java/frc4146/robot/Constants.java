@@ -28,8 +28,8 @@ public class Constants {
 
     public static final int PIGEON_PORT = 20;
 
-    public static final double TRACKWIDTH = 24.0; // width
-    public static final double WHEELBASE = 34.0; // front to rear wheels
+    public static final double TRACKWIDTH = 20.0; // width
+    public static final double WHEELBASE = 21.0; // front to rear wheels
   }
 
   public static class ArmConstants {
@@ -40,6 +40,7 @@ public class Constants {
     public static final int EXTENSION_ID = 23;
     public static final int LOWER_LIMIT_CHANNEL = 9;
     public static final int UPPER_LIMIT_CHANNEL = 1;
+    public static final int TICKS_PER_REVOLUTION = 2048;
 
     public static final double MAX_LENGTH = 63; // inches
     public static final double MIN_LENGTH = 39; // inches
@@ -50,5 +51,11 @@ public class Constants {
   public static class ClawConstants {
     public static final int CLAW_ID = 24;
     public static final int CLAW_POT_CHANNEL = 0;
+  }
+
+  public static class LimelightConstants {
+    public static final double LIMELIGHT_HEIGHT = 49.25;
+    public static final double LIMELIGHT_X_OFFSET = 7; // to the right is positive
+    public static final double LIMELIGHT_Y_OFFSET = 4; // forward is positive
   }
 }

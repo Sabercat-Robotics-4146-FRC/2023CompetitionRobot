@@ -46,14 +46,7 @@ public class Arm implements Subsystem {
     extensionMotor.config_kD(0, 3);
 
     Shuffleboard.getTab("Subsystems").addNumber("Arm Rotation Pot", () -> pot.get());
-    Shuffleboard.getTab("Subsystems")
-        .addNumber("Arm Extension Encoder", () -> extensionMotor.getSelectedSensorPosition());
-    Shuffleboard.getTab("Subsystems")
-        .addNumber(
-            "Left Arm Rotation Encoder", () -> rotationMotorLeft.getSelectedSensorPosition());
-    Shuffleboard.getTab("Subsystems")
-        .addNumber(
-            "Right Arm Rotation Encoder", () -> rotationMotorRight.getSelectedSensorPosition());
+    Shuffleboard.getTab("Subsystems").addNumber("Arm Extension Encoder", () -> getPos());
   }
 
   public void manuallyRotateArm(double p) {
@@ -68,10 +61,10 @@ public class Arm implements Subsystem {
   }
 
   public void extendArm(double setpoint) {
-    extensionMotor.set(ControlMode.Position, setpoint);
+    extensionMotor.set(ControlMode.Position, setpoint * 2048);
   }
 
   public double getPos() {
-    return extensionMotor.getSelectedSensorPosition();
+    return extensionMotor.getSelectedSensorPosition() / 2048;
   }
 }
