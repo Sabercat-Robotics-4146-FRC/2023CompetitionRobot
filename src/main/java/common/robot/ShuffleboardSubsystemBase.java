@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class ShuffleboardSubsystemBase extends SubsystemBase {
 
-  String tab;
+  String tab; //tab name
 
   GenericEntry m_kP;
   GenericEntry m_kI;
