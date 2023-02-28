@@ -2,6 +2,7 @@ package frcteam4146.robot.autonomous;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frcteam4146.robot.RobotContainer;
@@ -37,17 +38,17 @@ public class AutonomousSelector {
     pathChooser = new SendableChooser[5];
     for(int i = 0; i < 5; i++) pathChooser[i] = new SendableChooser<>();
 
-    pathChooser[0].addOption("Blue", "Blue");
     pathChooser[0].setDefaultOption("Red", "Red");
-
-    pathChooser[1].addOption("Yes", "Default");
-    pathChooser[2].addOption("Yes", "PickUp");
-    pathChooser[3].addOption("Yes", "Engage");
-    pathChooser[4].addOption("Yes", "OnlyLeave");
 
     for(int i = 1; i < 5; i++) {
       pathChooser[i].setDefaultOption("No", "");
     }
+  
+    pathChooser[0].addOption("Blue", "Blue");
+    pathChooser[1].addOption("Yes", "Default");
+    pathChooser[2].addOption("Yes", "PickUp");
+    pathChooser[3].addOption("Yes", "Engage");
+    pathChooser[4].addOption("Yes", "OnlyLeave");
 
     return pathChooser;
   }
@@ -61,10 +62,12 @@ public class AutonomousSelector {
       path += c.getSelected();
     }
 
-    if(path.contains("OnlyLeave")) path = "OnlyLeave";
+    if(path.contains("OnlyLeave")) path = pathChooser[0].getSelected() + "OnlyLeave";
+
+    SmartDashboard.putString("Trajectory File", path);
 
     command.addCommands(
-      auto.createPath(paths.get(path)) // creates path command
+      //auto.createPath(paths.get(path)) // creates path command
     );
 
     return command;

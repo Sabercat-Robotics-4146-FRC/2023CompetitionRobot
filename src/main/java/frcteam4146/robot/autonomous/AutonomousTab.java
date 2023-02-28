@@ -7,15 +7,15 @@ import frcteam4146.robot.RobotContainer;
 
 public class AutonomousTab {
   public AutonomousTab(RobotContainer container) {
-    ShuffleboardTab tab = Shuffleboard.getTab("Driver Readout");
+    ShuffleboardTab tab = Shuffleboard.getTab("Autonomous Chooser");
 
     SendableChooser<String>[] chooser = container.getAutoSelector().getChooser();
     String[] titles = {"Team", "Default", "Pick Up", "Engage", "Only Leave"};
     for(int i = 0; i < chooser.length; i++) {
       tab.add(titles[i], chooser[i])
-      .withSize(1, 2)
-      .withPosition(i+1, 0);
-    }
-    
+        .withSize(1, 2)
+        .withPosition(i, 0);
+
+    }    
   }
 }
