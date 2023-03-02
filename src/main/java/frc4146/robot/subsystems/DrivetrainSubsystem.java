@@ -54,14 +54,14 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
         false),
     new MaxAccelerationConstraint(12.5),
-    new CentripetalAccelerationConstraint(15.0)
+    new CentripetalAccelerationConstraint(5.0)
   };
 
   /** follower uses PID, feedforward control to create trajectories */
   private final HolonomicMotionProfiledTrajectoryFollower follower =
       new HolonomicMotionProfiledTrajectoryFollower(
-          new PidConstants(0.035597, 0.0, 0.0015618),
-          new PidConstants(0.035597, 0.0, 0.0015618),
+          new PidConstants(2.0, 0.0, 0.001),
+          new PidConstants(0.005, 0.0, 0.0015618),
           new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
 
   /* swerveKinematics contains a set of vectors,
