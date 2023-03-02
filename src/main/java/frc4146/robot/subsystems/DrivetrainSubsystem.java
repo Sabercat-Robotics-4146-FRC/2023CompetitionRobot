@@ -61,7 +61,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private final HolonomicMotionProfiledTrajectoryFollower follower =
       new HolonomicMotionProfiledTrajectoryFollower(
           new PidConstants(2.0, 0.0, 0.001),
-          new PidConstants(0.005, 0.0, 0.0015618),
+          new PidConstants(0.005, 0.0, 0.001),
           new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
 
   /* swerveKinematics contains a set of vectors,
