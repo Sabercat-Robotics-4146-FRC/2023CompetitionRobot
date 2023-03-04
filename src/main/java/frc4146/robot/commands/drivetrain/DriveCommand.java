@@ -28,9 +28,9 @@ public class DriveCommand extends CommandBase {
   public void execute() {
     double th = 0.01;
 
-    double f = forward.get(true);
-    double s = strafe.get(true);
-    double r = rotation.get(true);
+    double f = forward.get();
+    double s = strafe.get();
+    double r = rotation.get();
     if (Math.abs(f) < th) f = 0;
     if (Math.abs(s) < th) s = 0;
     if (Math.abs(r) < th) r = 0;
