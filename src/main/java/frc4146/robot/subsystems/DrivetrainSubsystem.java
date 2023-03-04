@@ -45,7 +45,6 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
    */
   public static final DrivetrainFeedforwardConstants FEEDFORWARD_CONSTANTS =
       new DrivetrainFeedforwardConstants(0.70067, 2.2741, 0.16779);
-  // TODO ^^ recalculate these using SysID
 
   public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
     new FeedforwardConstraint(
@@ -81,6 +80,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
           );
 
   private final SwerveModule[] modules;
+  private final SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
   private final TalonSRX[] talons;
 
   private final Gyroscope gyroscope;
@@ -115,7 +115,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
     ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
 
-    SwerveModule frontLeftModule =
+    frontLeftModule =
         Mk4SwerveModuleHelper.createFalcon500(
             tab.getLayout("Front Left Module", BuiltInLayouts.kList)
                 .withPosition(2, 0)
@@ -125,7 +125,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
             DriveConstants.DRIVETRAIN_FRONT_LEFT_STEER_MOTOR,
             DriveConstants.DRIVETRAIN_FRONT_LEFT_STEER_ENCODER,
             DriveConstants.DRIVETRAIN_FRONT_LEFT_STEER_OFFSET);
-    SwerveModule frontRightModule =
+    frontRightModule =
         Mk4SwerveModuleHelper.createFalcon500(
             tab.getLayout("Front Right Module", BuiltInLayouts.kList)
                 .withPosition(4, 0)
@@ -135,7 +135,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
             DriveConstants.DRIVETRAIN_FRONT_RIGHT_STEER_MOTOR,
             DriveConstants.DRIVETRAIN_FRONT_RIGHT_STEER_ENCODER,
             DriveConstants.DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET);
-    SwerveModule backLeftModule =
+    backLeftModule =
         Mk4SwerveModuleHelper.createFalcon500(
             tab.getLayout("Back Left Module", BuiltInLayouts.kList)
                 .withPosition(6, 0)
@@ -145,7 +145,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
             DriveConstants.DRIVETRAIN_BACK_LEFT_STEER_MOTOR,
             DriveConstants.DRIVETRAIN_BACK_LEFT_STEER_ENCODER,
             DriveConstants.DRIVETRAIN_BACK_LEFT_STEER_OFFSET);
-    SwerveModule backRightModule =
+    backRightModule =
         Mk4SwerveModuleHelper.createFalcon500(
             tab.getLayout("Back Right Module", BuiltInLayouts.kList)
                 .withPosition(8, 0)
@@ -286,6 +286,15 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     odometryXEntry.setDouble(pose.translation.x);
     odometryYEntry.setDouble(pose.translation.y);
     odometryAngleEntry.setDouble(pose.rotation.toDegrees());
+  }
+
+  public void zeroWheels() {
+    if (getAverageAbsoluteValueVelocity() < 5.0) {
+      frontLeftModule.set(0, 0);
+      frontRightModule.set(0, 0);
+      backLeftModule.set(0, 0);
+      backRightModule.set(0, 0);
+    }
   }
 
   public double getAverageAbsoluteValueVelocity() {

@@ -5,9 +5,8 @@ import common.robot.input.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc4146.robot.commands.drivetrain.DriveCommand;
-import frc4146.robot.commands.subsystems.ArmCommand;
-import frc4146.robot.commands.subsystems.ClawCommand;
+import frc4146.robot.commands.drivetrain.*;
+import frc4146.robot.commands.subsystems.*;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -54,8 +53,8 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    // TODO: Configure Button Bindings
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
+    primaryController.getStartButton().onTrue(Commands.runOnce(drivetrainSubsystem::zeroWheels));
     primaryController
         .getYButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
