@@ -34,12 +34,13 @@ public class Arm implements Subsystem {
 
     extensionMotor = new TalonFX(ArmConstants.EXTENSION_ID);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
-    extensionMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    extensionMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, ArmConstants.kPIDSlot, ArmConstants.kTimeoutMs);
+    extensionMotor.configFeedbackNotContinuous(false, ArmConstants.kTimeoutMs);
 
-    closedLimit = new DigitalInput(ArmConstants.LOWER_LIMIT_CHANNEL);
-    openedLimit = new DigitalInput(ArmConstants.UPPER_LIMIT_CHANNEL);
+    closedLimit = new DigitalInput(ArmConstants.CLOSED_LIMIT_CHANNEL);
+    openedLimit = new DigitalInput(ArmConstants.OPEN_LIMIT_CHANNEL);
 
-    pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEl);
+    pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEL);
 
     Shuffleboard.getTab("Subsystems").addNumber("Arm Rotation Pot", () -> pot.get());
     Shuffleboard.getTab("Subsystems")
