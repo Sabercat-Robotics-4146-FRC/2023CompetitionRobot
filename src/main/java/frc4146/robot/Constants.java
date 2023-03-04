@@ -46,22 +46,30 @@ public class Constants {
     public static final double MIN_LENGTH = 39; // inches
     public static final double MAX_ANGLE = 1.05; // radians
     public static final double MIN_ANGLE = -1.57; // raidans
+
+    public static final double POT_MAX_ROTATION = 0.35;
+    public static final double POT_MIN_ROTATION = 0.623;
   }
 
   public static class ClawConstants {
     public static final int CLAW_ID = 24;
     public static final int CLAW_POT_CHANNEL = 0;
 
-    public static final double CLAW_CONE_MID = 796.0/1024.0;
+    public static final double CLAW_CONE_MID = 796.0 / 1024.0;
     public static final double CLAW_CUBE = 0;
     public static final double CLAW_FULLY_OPENED = 0;
     public static final double CLAW_FULLY_CLOSED = 0;
-
   }
 
   public static class LimelightConstants {
+    public static final double LIMELIGHT_ANGLE = 0;
     public static final double LIMELIGHT_HEIGHT = 49.25;
     public static final double LIMELIGHT_X_OFFSET = 7; // to the right is positive
     public static final double LIMELIGHT_Y_OFFSET = 4; // forward is positive
+
+    public static final double DESIRED_FIDUCIAL_AREA = 1.29;
+
+    public static final double D_Z = 1.1; // Alligned forward backward
+    public static final double D_X = 0.0; // Alligned left right
   }
 }

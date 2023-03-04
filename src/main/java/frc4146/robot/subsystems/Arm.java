@@ -41,17 +41,28 @@ public class Arm implements Subsystem {
 
     pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEl);
 
-    extensionMotor.config_kP(0, 3);
-    extensionMotor.config_kI(0, 3);
-    extensionMotor.config_kD(0, 3);
-
     Shuffleboard.getTab("Subsystems").addNumber("Arm Rotation Pot", () -> pot.get());
-    Shuffleboard.getTab("Subsystems").addNumber("Arm Extension Encoder", () -> getPos());
+    Shuffleboard.getTab("Subsystems")
+        .addNumber(
+            "Arm Left Rotation Encoder",
+            () -> rotationMotorLeft.getSelectedSensorPosition() / 2048);
+    Shuffleboard.getTab("Subsystems")
+        .addNumber(
+            "Arm Right Rotation Encoder",
+            () -> rotationMotorRight.getSelectedSensorPosition() / 2048);
+
+    Shuffleboard.getTab("Subsystems").addNumber("Arm Extension Encoder", () -> getExtension());
   }
 
   public void manuallyRotateArm(double p) {
-    rotationMotorLeft.set(ControlMode.PercentOutput, p);
-    rotationMotorRight.set(ControlMode.PercentOutput, p);
+    if (!((getRotation() < ArmConstants.POT_MAX_ROTATION && p < 0)
+        || (getRotation() > ArmConstants.POT_MIN_ROTATION && p > 0))) {
+      rotationMotorLeft.set(ControlMode.PercentOutput, p);
+      rotationMotorRight.set(ControlMode.PercentOutput, p);
+    } else {
+      rotationMotorLeft.set(ControlMode.PercentOutput, 0);
+      rotationMotorRight.set(ControlMode.PercentOutput, 0);
+    }
   }
 
   public void manuallyExtendArm(double p) {
@@ -60,11 +71,14 @@ public class Arm implements Subsystem {
     else extensionMotor.set(ControlMode.PercentOutput, 0);
   }
 
-  public void extendArm(double setpoint) {
-    extensionMotor.set(ControlMode.Position, setpoint * 2048);
-  }
-
-  public double getPos() {
+  public double getExtension() {
     return extensionMotor.getSelectedSensorPosition() / 2048;
   }
+
+  public double getRotation() {
+    return pot.get();
+  }
+
+  @Override
+  public void periodic() {}
 }

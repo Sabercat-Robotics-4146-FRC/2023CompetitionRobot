@@ -13,7 +13,7 @@ public class Pigeon extends Gyroscope {
     Shuffleboard.getTab("Drivetrain")
         .addNumber("Pigeon Offset", () -> getAdjustmentAngle().toDegrees());
     // Shuffleboard.getTab("Drivetrain").addNumber("Roll", () -> getRoll());
-    Shuffleboard.getTab("Drivetrain").addNumber("Pigeon Pitch", () -> getRoll());
+    Shuffleboard.getTab("Drivetrain").addNumber("Pigeon Roll", () -> getRoll());
   }
 
   @Override
@@ -32,7 +32,7 @@ public class Pigeon extends Gyroscope {
   }
 
   public double getPitch() {
-    return pigeon.getPitch();
+    return pigeon.getRoll();
   }
 
   public double getRoll() {
