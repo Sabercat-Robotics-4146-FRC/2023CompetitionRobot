@@ -6,6 +6,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.subsystems.AlignWithFiducial;
 import frc4146.robot.commands.subsystems.ArmCommand;
@@ -65,8 +66,8 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    // TODO: Configure Button Bindings
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
+    primaryController.getStartButton().onTrue(Commands.runOnce(drivetrainSubsystem::zeroWheels));
     primaryController
         .getYButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));

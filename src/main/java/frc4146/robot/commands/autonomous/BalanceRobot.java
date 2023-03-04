@@ -13,9 +13,9 @@ public class BalanceRobot extends CommandBase {
   private final DrivetrainSubsystem drivetrain;
   public final Pigeon pigeon;
   // To be tuned
-  public double kP = 0.3;
+  public double kP = 0.05;
   public double kI = 0;
-  public double kD = 0;
+  public double kD = 0.05;
 
   public PIDController pid;
 

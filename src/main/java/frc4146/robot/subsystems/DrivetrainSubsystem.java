@@ -44,8 +44,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
    *                        contains FEEDFORWARD_CONSTANTS, other acceleration limits
    */
   public static final DrivetrainFeedforwardConstants FEEDFORWARD_CONSTANTS =
-      new DrivetrainFeedforwardConstants(0.70067, 2.2741, 0.16779);
-  // TODO ^^ recalculate these using SysID
+      new DrivetrainFeedforwardConstants(0.8198, 0.27975, -0.28894);
 
   public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
     new FeedforwardConstraint(
@@ -54,14 +53,14 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
         false),
     new MaxAccelerationConstraint(12.5),
-    new CentripetalAccelerationConstraint(15.0)
+    new CentripetalAccelerationConstraint(5.0)
   };
 
   /** follower uses PID, feedforward control to create trajectories */
   private final HolonomicMotionProfiledTrajectoryFollower follower =
       new HolonomicMotionProfiledTrajectoryFollower(
-          new PidConstants(0.035597, 0.0, 0.0015618),
-          new PidConstants(0.035597, 0.0, 0.0015618),
+          new PidConstants(2.0, 0.0, 0.001),
+          new PidConstants(0.005, 0.0, 0.001),
           new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
 
   /* swerveKinematics contains a set of vectors,
@@ -81,6 +80,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
           );
 
   private final SwerveModule[] modules;
+  private final SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
   private final TalonSRX[] talons;
 
   private final Gyroscope gyroscope;
@@ -115,7 +115,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
     ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
 
-    SwerveModule frontLeftModule =
+    frontLeftModule =
         Mk4SwerveModuleHelper.createFalcon500(
             tab.getLayout("Front Left Module", BuiltInLayouts.kList)
                 .withPosition(2, 0)
@@ -125,7 +125,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
             DriveConstants.DRIVETRAIN_FRONT_LEFT_STEER_MOTOR,
             DriveConstants.DRIVETRAIN_FRONT_LEFT_STEER_ENCODER,
             DriveConstants.DRIVETRAIN_FRONT_LEFT_STEER_OFFSET);
-    SwerveModule frontRightModule =
+    frontRightModule =
         Mk4SwerveModuleHelper.createFalcon500(
             tab.getLayout("Front Right Module", BuiltInLayouts.kList)
                 .withPosition(4, 0)
@@ -135,7 +135,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
             DriveConstants.DRIVETRAIN_FRONT_RIGHT_STEER_MOTOR,
             DriveConstants.DRIVETRAIN_FRONT_RIGHT_STEER_ENCODER,
             DriveConstants.DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET);
-    SwerveModule backLeftModule =
+    backLeftModule =
         Mk4SwerveModuleHelper.createFalcon500(
             tab.getLayout("Back Left Module", BuiltInLayouts.kList)
                 .withPosition(6, 0)
@@ -145,7 +145,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
             DriveConstants.DRIVETRAIN_BACK_LEFT_STEER_MOTOR,
             DriveConstants.DRIVETRAIN_BACK_LEFT_STEER_ENCODER,
             DriveConstants.DRIVETRAIN_BACK_LEFT_STEER_OFFSET);
-    SwerveModule backRightModule =
+    backRightModule =
         Mk4SwerveModuleHelper.createFalcon500(
             tab.getLayout("Back Right Module", BuiltInLayouts.kList)
                 .withPosition(8, 0)
@@ -224,8 +224,14 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   /** updates driveSignal with desired translational, rotational velocities */
   public void drive(
       Vector2 translationalVelocity, double rotationalVelocity, boolean isFieldOriented) {
-    driveSignal =
-        new HolonomicDriveSignal(translationalVelocity, rotationalVelocity, isFieldOriented);
+        double tx = translationalVelocity.x;
+        double ty = translationalVelocity.y;
+        if(Math.abs(tx) < 0.02) {tx = 0;}
+        if(Math.abs(ty) < 0.02) {ty = 0;}
+        if(Math.abs(rotationalVelocity) < 0.02) {rotationalVelocity = 0;}
+    
+        driveSignal =
+            new HolonomicDriveSignal(new Vector2(tx, ty), rotationalVelocity, isFieldOriented);
   }
 
   public void drive(Vector2 translationalVelocity, double rotationalVelocity) {
@@ -286,6 +292,15 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     odometryXEntry.setDouble(pose.translation.x);
     odometryYEntry.setDouble(pose.translation.y);
     odometryAngleEntry.setDouble(pose.rotation.toDegrees());
+  }
+
+  public void zeroWheels() {
+    if (getAverageAbsoluteValueVelocity() < 5.0) {
+      frontLeftModule.set(0, 0);
+      frontRightModule.set(0, 0);
+      backLeftModule.set(0, 0);
+      backRightModule.set(0, 0);
+    }
   }
 
   public double getAverageAbsoluteValueVelocity() {
