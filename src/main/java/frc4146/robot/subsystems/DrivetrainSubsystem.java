@@ -44,7 +44,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
    *                        contains FEEDFORWARD_CONSTANTS, other acceleration limits
    */
   public static final DrivetrainFeedforwardConstants FEEDFORWARD_CONSTANTS =
-      new DrivetrainFeedforwardConstants(0.70067, 2.2741, 0.16779);
+      new DrivetrainFeedforwardConstants(0.8198, 0.27975, -0.28894);
 
   public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
     new FeedforwardConstraint(
