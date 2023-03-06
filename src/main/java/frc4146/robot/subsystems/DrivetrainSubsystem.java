@@ -35,6 +35,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public boolean fieldOriented;
 
+  public boolean locked = false;
+
   /* The following objects are used to create accurate trajectory for the specific robot
    *
    * FEEDFORWARD_CONSTANTS informs TrajectoryConstraints, HolonomicTrajectoryFollower
@@ -52,15 +54,15 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         FEEDFORWARD_CONSTANTS.getVelocityConstant(),
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
         false),
-    new MaxAccelerationConstraint(12.5),
-    new CentripetalAccelerationConstraint(5.0)
+    new MaxAccelerationConstraint(12.5 * 12.0),
+    new CentripetalAccelerationConstraint(5.0 * 12.0)
   };
 
   /** follower uses PID, feedforward control to create trajectories */
   private final HolonomicMotionProfiledTrajectoryFollower follower =
       new HolonomicMotionProfiledTrajectoryFollower(
           new PidConstants(2.0, 0.0, 0.001),
-          new PidConstants(0.005, 0.0, 0.001),
+          new PidConstants(0.0005, 0.0, 0.01),
           new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
 
   /* swerveKinematics contains a set of vectors,
@@ -224,14 +226,24 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   /** updates driveSignal with desired translational, rotational velocities */
   public void drive(
       Vector2 translationalVelocity, double rotationalVelocity, boolean isFieldOriented) {
-        double tx = translationalVelocity.x;
-        double ty = translationalVelocity.y;
-        if(Math.abs(tx) < 0.02) {tx = 0;}
-        if(Math.abs(ty) < 0.02) {ty = 0;}
-        if(Math.abs(rotationalVelocity) < 0.02) {rotationalVelocity = 0;}
-    
-        driveSignal =
-            new HolonomicDriveSignal(new Vector2(tx, ty), rotationalVelocity, isFieldOriented);
+    double tx = translationalVelocity.x;
+    double ty = translationalVelocity.y;
+
+    if (Math.abs(tx) < 0.005) {
+      tx = 0;
+    }
+    if (Math.abs(ty) < 0.005) {
+      ty = 0;
+    }
+    double mag = Math.hypot(tx, ty);
+    double rotDeadband = 0.002;
+    if (mag <= 0.005) rotDeadband = 0.005;
+    if (Math.abs(rotationalVelocity) < rotDeadband) {
+      rotationalVelocity = 0;
+    }
+
+    driveSignal =
+        new HolonomicDriveSignal(new Vector2(tx, ty), rotationalVelocity, isFieldOriented);
   }
 
   public void drive(Vector2 translationalVelocity, double rotationalVelocity) {
@@ -264,7 +276,11 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
     SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1);
     for (int i = 0; i < moduleOutputs.length; i++) {
-      modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
+      if (locked) {
+        modules[i].set(moduleOutputs[i].length * 12.0, 0);
+      } else {
+        modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
+      }
     }
   }
 
@@ -335,6 +351,10 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public double getAngularVelocity() {
     return angularVelocity;
+  }
+
+  public void toggleLockedRotation() {
+    locked = !locked;
   }
 
   public void toggleFieldOriented() {
