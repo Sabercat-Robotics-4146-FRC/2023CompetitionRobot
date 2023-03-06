@@ -52,15 +52,15 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         FEEDFORWARD_CONSTANTS.getVelocityConstant(),
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
         false),
-    new MaxAccelerationConstraint(12.5),
-    new CentripetalAccelerationConstraint(5.0)
+    new MaxAccelerationConstraint(12.5 * 12.0),
+    new CentripetalAccelerationConstraint(5.0 * 12.0)
   };
 
   /** follower uses PID, feedforward control to create trajectories */
   private final HolonomicMotionProfiledTrajectoryFollower follower =
       new HolonomicMotionProfiledTrajectoryFollower(
           new PidConstants(2.0, 0.0, 0.001),
-          new PidConstants(0.005, 0.0, 0.001),
+          new PidConstants(0.0005, 0.0, 0.01),
           new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
 
   /* swerveKinematics contains a set of vectors,
@@ -171,10 +171,10 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         };
 
     for (var talon : talons) {
-      talon.configPeakCurrentLimit(30); // max current (amps)
+      talon.configPeakCurrentLimit(40); // max current (amps)
       talon.configPeakCurrentDuration(
-          5); // # milliseconds after peak reached before regulation starts
-      talon.configContinuousCurrentLimit(20); // continuous current (amps) after regulation
+          10); // # milliseconds after peak reached before regulation starts
+      talon.configContinuousCurrentLimit(30); // continuous current (amps) after regulation
       talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
     }
 
@@ -224,14 +224,24 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   /** updates driveSignal with desired translational, rotational velocities */
   public void drive(
       Vector2 translationalVelocity, double rotationalVelocity, boolean isFieldOriented) {
-        double tx = translationalVelocity.x;
-        double ty = translationalVelocity.y;
-        if(Math.abs(tx) < 0.02) {tx = 0;}
-        if(Math.abs(ty) < 0.02) {ty = 0;}
-        if(Math.abs(rotationalVelocity) < 0.02) {rotationalVelocity = 0;}
-    
-        driveSignal =
-            new HolonomicDriveSignal(new Vector2(tx, ty), rotationalVelocity, isFieldOriented);
+    double tx = translationalVelocity.x;
+    double ty = translationalVelocity.y;
+
+    if (Math.abs(tx) < 0.005) {
+      tx = 0;
+    }
+    if (Math.abs(ty) < 0.005) {
+      ty = 0;
+    }
+    double mag = Math.hypot(tx, ty);
+    double rotDeadband = 0.002;
+    if (mag <= 0.005) rotDeadband = 0.005;
+    if (Math.abs(rotationalVelocity) < rotDeadband) {
+      rotationalVelocity = 0;
+    }
+
+    driveSignal =
+        new HolonomicDriveSignal(new Vector2(tx, ty), rotationalVelocity, isFieldOriented);
   }
 
   public void drive(Vector2 translationalVelocity, double rotationalVelocity) {
