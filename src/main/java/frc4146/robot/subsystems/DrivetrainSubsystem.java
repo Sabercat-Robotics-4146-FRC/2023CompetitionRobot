@@ -221,6 +221,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     tab.addNumber("Average Velocity", this::getAverageAbsoluteValueVelocity);
     tab.addBoolean("Drive Enabled", () -> driveFlag);
     tab.addBoolean("Field Oriented", () -> fieldOriented);
+    tab.addBoolean("Rotation Locked", () -> locked);
   }
 
   /** updates driveSignal with desired translational, rotational velocities */
@@ -277,7 +278,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1);
     for (int i = 0; i < moduleOutputs.length; i++) {
       if (locked) {
-        modules[i].set(moduleOutputs[i].length * 12.0, 0);
+        modules[i].set(-moduleOutputs[i].length * 12.0, 0);
       } else {
         modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
       }
