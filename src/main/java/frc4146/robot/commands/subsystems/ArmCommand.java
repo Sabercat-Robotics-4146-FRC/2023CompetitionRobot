@@ -21,13 +21,13 @@ public class ArmCommand extends CommandBase {
 
   @Override
   public void execute() {
-    arm.rotate(-rotate.get() / 2);
-    arm.extend(extend.get() / 4 - retract.get() / 4);
+    arm.manually_rotate(-rotate.get() / 2);
+    arm.manually_extend(extend.get() / 4 - retract.get() / 4);
   }
 
   @Override
   public void end(boolean interrupted) {
-    arm.rotate(0);
-    arm.extend(0);
+    arm.manually_rotate(0);
+    arm.manually_extend(0);
   }
 }

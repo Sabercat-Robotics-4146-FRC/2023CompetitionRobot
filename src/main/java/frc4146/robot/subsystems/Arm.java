@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import common.math.MathUtils;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -23,9 +24,12 @@ public class Arm extends SubsystemBase {
   public AnalogPotentiometer pot;
 
   private double extPosSetpoint = 45;
+  private GenericEntry extPosEntry;
   public boolean extPosMode = false;
 
   private double rotPosSetpoint = 0.35;
+  private GenericEntry rotPosEntry;
+
   public boolean rotPosMode = false;
 
   public Arm() {
@@ -52,12 +56,18 @@ public class Arm extends SubsystemBase {
     Shuffleboard.getTab("Subsystems").addNumber("Rotation", () -> getRotation());
     Shuffleboard.getTab("Subsystems").addBoolean("RotPosMode", () -> rotPosMode);
     Shuffleboard.getTab("Subsystems").addNumber("RotError", () -> getRotationError());
+
+    extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP", extPosSetpoint).getEntry();
+    rotPosEntry = Shuffleboard.getTab("Subsystems").add("Rotation SP", rotPosSetpoint).getEntry();
+  }
+
+  public void manually_extend(double p) {
+    if (!extPosMode) extend(p);
   }
 
   public void extend(double p) {
     if (canExtendArm(p)) extensionMotor.set(ControlMode.PercentOutput, p);
     else extensionMotor.set(ControlMode.PercentOutput, 0);
-    extPosMode = false;
   }
 
   public void setExtensionPos(double encSetpoint) {
@@ -72,6 +82,10 @@ public class Arm extends SubsystemBase {
     extPosMode = !extPosMode;
   }
 
+  public void manually_rotate(double p) {
+    if (!rotPosMode) rotate(p);
+  }
+
   public void rotate(double p) {
     if (canRotateArm(p)) {
       rotationMotorLeft.set(ControlMode.PercentOutput, p);
@@ -80,7 +94,6 @@ public class Arm extends SubsystemBase {
       rotationMotorLeft.set(ControlMode.PercentOutput, 0);
       rotationMotorRight.set(ControlMode.PercentOutput, 0);
     }
-    rotPosMode = false;
   }
 
   public void setRotationPos(double potSetpoint) {
@@ -97,25 +110,17 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // extPosSetpoint =
-    //     Shuffleboard.getTab("Subsystems")
-    //         .add("Extension SP", 0)
-    //         .getEntry()
-    //         .getDouble(extPosSetpoint);
-    // rotPosSetpoint =
-    //     Shuffleboard.getTab("Subsystems")
-    //         .add("Rotation SP", 0)
-    //         .getEntry()
-    //         .getDouble(rotPosSetpoint);
+
+    extPosSetpoint = extPosEntry.getDouble(extPosSetpoint);
+    rotPosSetpoint = rotPosEntry.getDouble(rotPosSetpoint);
 
     if (extPosMode) {
       double error = getExtensionError();
-      if (Math.abs(error) < 0.2) {
+      if (Math.abs(error) < 0.1) {
         extPosMode = false;
         extend(0);
       } else {
-        extend(Math.copySign(MathUtils.clamp(0.1 * Math.abs(error), 0.1, 0.4), error));
-        extPosMode = true;
+        extend(Math.copySign(MathUtils.clamp(0.15 * Math.abs(error), 0.05, 0.2), error));
       }
     }
     if (rotPosMode) {
@@ -124,8 +129,7 @@ public class Arm extends SubsystemBase {
         rotPosMode = false;
         rotate(0);
       } else {
-        rotate(Math.copySign(MathUtils.clamp(2 * Math.abs(error), 0.1, 0.4), error));
-        rotPosMode = true;
+        rotate(Math.copySign(MathUtils.clamp(2 * Math.abs(error), 0.1, 0.15), error));
       }
     }
   }

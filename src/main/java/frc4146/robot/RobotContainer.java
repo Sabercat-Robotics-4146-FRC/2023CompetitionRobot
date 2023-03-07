@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc4146.robot.commands.drivetrain.AlignWithFiducial;
 import frc4146.robot.commands.drivetrain.DriveCommand;
+import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.subsystems.*;
 
@@ -45,14 +46,14 @@ public class RobotContainer {
                 primaryController.getLeftXAxis(),
                 primaryController.getRightXAxis()));
 
-    // CommandScheduler.getInstance()
-    //     .setDefaultCommand(
-    //         arm,
-    //         new ArmCommand(
-    //             arm,
-    //             secondaryController.getLeftTriggerAxis(),
-    //             secondaryController.getRightTriggerAxis(),
-    //             secondaryController.getRightYAxis()));
+    CommandScheduler.getInstance()
+        .setDefaultCommand(
+            arm,
+            new ArmCommand(
+                arm,
+                secondaryController.getLeftTriggerAxis(),
+                secondaryController.getRightTriggerAxis(),
+                secondaryController.getRightYAxis()));
     CommandScheduler.getInstance()
         .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
 
