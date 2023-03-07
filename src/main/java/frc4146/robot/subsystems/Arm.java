@@ -25,7 +25,7 @@ public class Arm extends SubsystemBase {
   private double extPosSetpoint = 45;
   public boolean extPosMode = false;
 
-  private double rotPosSetpoint = 0.3;
+  private double rotPosSetpoint = 0.35;
   public boolean rotPosMode = false;
 
   public Arm() {
