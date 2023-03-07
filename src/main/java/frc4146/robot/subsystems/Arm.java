@@ -34,11 +34,6 @@ public class Arm extends SubsystemBase {
   private GenericEntry extPosEntry;
   public boolean extPosMode = false;
 
-
-
-  public TalonSRX clawMotor;
-  
-
  
 
   public Arm() {
@@ -74,10 +69,6 @@ public class Arm extends SubsystemBase {
 
 
 
-
-
-  
-
   public void extend(double p) {
     if (canExtendArm(p)) extensionMotor.set(ControlMode.PercentOutput, p);
     else extensionMotor.set(ControlMode.PercentOutput, 0);
@@ -88,7 +79,7 @@ public class Arm extends SubsystemBase {
   public double getExtensionError() {return (extPosSetpoint - getExtension());}
   public void toggleExtensionMode() {extPosMode = !extPosMode;}
 
-  
+
 
   public void rotate(double p) {
     if (canRotateArm(p)) {
