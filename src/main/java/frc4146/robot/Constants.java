@@ -37,6 +37,9 @@ public class Constants {
     public static final int ROTATION_RIGHT_ID = 22;
     public static final int ROTATION_POT_CHANNEl = 0;
 
+    public static final int CLOSED_LIMIT_CHANNEL = 9;
+    public static final int OPEN_LIMIT_CHANNEL = 1;
+
     public static final int EXTENSION_ID = 23;
     public static final int LOWER_LIMIT_CHANNEL = 9;
     public static final int UPPER_LIMIT_CHANNEL = 1;
@@ -49,6 +52,11 @@ public class Constants {
 
     public static final double POT_MAX_ROTATION = 0.35;
     public static final double POT_MIN_ROTATION = 0.623;
+
+    public static final int CLAW_ID = 24;
+
+    public static final int kPIDSlot = 0;
+    public static final int kTimeoutMs = 30;
   }
 
   public static class ClawConstants {
@@ -69,7 +77,18 @@ public class Constants {
 
     public static final double DESIRED_FIDUCIAL_AREA = 1.29;
 
-    public static final double D_Z = 1.1; // Alligned forward backward
+    public static final double D_Z = 1.0; // Alligned forward backward
     public static final double D_X = 0.0; // Alligned left right
+  }
+
+  public static class Setpoints {
+    // TODO measure
+    public static final double[] intake_pos = {0, 0}; // rotation, extension
+    public static final double[] cone_low = {0, 0};
+    public static final double[] cone_mid = {0, 0};
+    public static final double[] cone_high = {0, 0};
+    public static final double[] cube_low = {0, 0};
+    public static final double[] cube_mid = {0, 0};
+    public static final double[] cube_high = {0, 0};
   }
 }

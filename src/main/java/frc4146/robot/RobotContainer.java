@@ -1,12 +1,12 @@
 package frc4146.robot;
 
 import common.drivers.Gyroscope;
+import common.robot.input.DPadButton.Direction;
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.subsystems.AlignWithFiducial;
 import frc4146.robot.commands.subsystems.ArmCommand;
@@ -54,7 +54,14 @@ public class RobotContainer {
                 arm,
                 secondaryController.getLeftTriggerAxis(),
                 secondaryController.getRightTriggerAxis(),
-                secondaryController.getRightYAxis()));
+                secondaryController.getRightYAxis(),
+                secondaryController.getLeftBumperButton(),
+                secondaryController.getRightBumperButton(),
+                secondaryController.getDPadButton(Direction.CENTER),
+                secondaryController.getAButton(),
+                secondaryController.getBButton(),
+                secondaryController.getYButton()));
+
     CommandScheduler.getInstance()
         .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
 
@@ -73,17 +80,24 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
     primaryController.getXButton().onTrue(Commands.runOnce(drivetrainSubsystem::toggleDriveFlag));
 
+    // primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::lockWheels));
+
     // primaryController.getBButton().toggleOnTrue(new BalanceRobot(drivetrainSubsystem,
     // gyroscope));
 
     primaryController.getBButton().onTrue(new AlignWithFiducial(drivetrainSubsystem, limelight));
+
+    secondaryController.getAButton().onTrue(Commands.runOnce(arm::toggleExtensionMode));
+    secondaryController.getBButton().onTrue(Commands.runOnce(arm::toggleRotationMode));
+
     // secondaryController.getBButton().toggleOnTrue(new ArmRotate(arm));
 
     // secondaryController
     //    .getBButton().onTrue(new InstantCommand(() -> arm.rotateArm()));
     // .toggleOnTrue(new InstantCommand(() -> arm.extendArm(arm.getPos())));
 
-    // secondaryControlelr.get
+    // secondaryController.getLeftBumperButton().whileTrue()
+
   }
 
   public Arm getArmSubsystem() {

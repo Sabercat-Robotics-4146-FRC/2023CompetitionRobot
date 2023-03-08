@@ -13,7 +13,7 @@ public class Claw implements Subsystem {
 
   public Claw() {
     clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
-    Shuffleboard.getTab("Subsystems").addNumber("Claw Motor Rotation Encoder", () -> getPos());
+    Shuffleboard.getTab("Subsystems").addNumber("Claw", () -> getPos());
   }
 
   public void manuallySetClaw(double p) {
