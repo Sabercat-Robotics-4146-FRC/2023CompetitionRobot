@@ -1,18 +1,21 @@
 package frc4146.robot;
 
 import common.drivers.Gyroscope;
+import common.robot.DriverReadout;
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc4146.robot.commands.drivetrain.AlignWithFiducial;
 import frc4146.robot.commands.drivetrain.DriveCommand;
+import frc4146.robot.commands.subsystems.AlignWithFiducial;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
+
+  public static DriverReadout driverInterface = new DriverReadout();
 
   private PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
@@ -72,7 +75,7 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
     primaryController.getXButton().onTrue(Commands.runOnce(drivetrainSubsystem::toggleDriveFlag));
 
-    primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::lockWheels));
+    // primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::lockWheels));
 
     // primaryController.getBButton().toggleOnTrue(new BalanceRobot(drivetrainSubsystem,
     // gyroscope));

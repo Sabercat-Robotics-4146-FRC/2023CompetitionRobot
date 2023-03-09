@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import common.math.MathUtils;
+import common.robot.DriverReadout;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -13,6 +14,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc4146.robot.Constants.ArmConstants;
 
 public class Arm extends SubsystemBase {
+  public boolean ExtendEnabled;
+  public boolean RotationEnabled;
+
+  public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
+
   public TalonFX rotationMotorLeft;
   public TalonFX rotationMotorRight;
 
@@ -33,6 +39,8 @@ public class Arm extends SubsystemBase {
   public boolean rotPosMode = false;
 
   public Arm() {
+    // enabled = _driverInterface.m_ArmSubsystemEnabled.getBoolean(true);
+
     rotationMotorLeft = new TalonFX(ArmConstants.ROTATION_LEFT_ID);
     rotationMotorLeft.setNeutralMode(NeutralMode.Brake);
 
@@ -66,7 +74,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void extend(double p) {
-    if (canExtendArm(p)) extensionMotor.set(ControlMode.PercentOutput, p);
+    if (canExtendArm(p) && ExtendEnabled) extensionMotor.set(ControlMode.PercentOutput, p);
     else extensionMotor.set(ControlMode.PercentOutput, 0);
   }
 
@@ -87,7 +95,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void rotate(double p) {
-    if (canRotateArm(p)) {
+    if (canRotateArm(p) && RotationEnabled) {
       rotationMotorLeft.set(ControlMode.PercentOutput, p);
       rotationMotorRight.set(ControlMode.PercentOutput, p);
     } else {
@@ -110,6 +118,8 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
+    ExtendEnabled = _driverInterface.m_ArmExtSubsystemEnabled.getBoolean(true);
+    RotationEnabled = _driverInterface.m_ArmRotSubsystemEnabled.getBoolean(true);
 
     extPosSetpoint = extPosEntry.getDouble(extPosSetpoint);
     rotPosSetpoint = rotPosEntry.getDouble(rotPosSetpoint);

@@ -13,6 +13,7 @@ import common.kinematics.SwerveOdometry;
 import common.math.RigidTransform2;
 import common.math.Rotation2;
 import common.math.Vector2;
+import common.robot.DriverReadout;
 import common.robot.UpdateManager;
 import common.util.*;
 import edu.wpi.first.networktables.GenericEntry;
@@ -26,6 +27,8 @@ import java.util.*;
 
 public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   public boolean driveFlag = true;
+
+  public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
 
   // This value is used to turn the robot back to its initialPosition
 
@@ -219,6 +222,12 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     tab.addNumber("Average Velocity", this::getAverageAbsoluteValueVelocity);
     tab.addBoolean("Drive Enabled", () -> driveFlag);
     tab.addBoolean("Field Oriented", () -> fieldOriented);
+
+    _driverInterface
+        .primaryLayout
+        .addBoolean("Field Oriented", () -> fieldOriented)
+        .withPosition(0, 3);
+    _driverInterface.primaryLayout.addBoolean("Drive Enabled", () -> driveFlag).withPosition(0, 2);
   }
 
   /** updates driveSignal with desired translational, rotational velocities */
