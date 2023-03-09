@@ -21,6 +21,7 @@ public class Arm extends SubsystemBase {
   private double rotPosSetpoint = 0.6;
   private GenericEntry rotPosEntry;
   public boolean rotPosMode = false;
+  public boolean rotFlag = true;
 
   public TalonFX extensionMotor;
   public DigitalInput closedLimit;
@@ -29,6 +30,7 @@ public class Arm extends SubsystemBase {
   private double extPosSetpoint = 0;
   private GenericEntry extPosEntry;
   public boolean extPosMode = false;
+  public boolean extFlag = true;
 
   public Arm() {
     rotationMotorLeft = new TalonFX(ArmConstants.ROTATION_LEFT_ID);
@@ -142,11 +144,15 @@ public class Arm extends SubsystemBase {
     }
 
     resetExtensionEncoder();
+
+    /*changeRotFlag();
+    changeExtFlag();*/
   }
 
   public boolean canRotateArm(double p) {
     return (!((getRotation() < ArmConstants.POT_MAX_ROTATION && p < 0)
-        || (getRotation() > ArmConstants.POT_MIN_ROTATION && p > 0)));
+            || (getRotation() > ArmConstants.POT_MIN_ROTATION && p > 0))
+        && (rotFlag));
   }
 
   public boolean canExtendArm(double p) {
@@ -159,4 +165,8 @@ public class Arm extends SubsystemBase {
           0); // make sure arm isn't traveling too far past limit switch
     }
   }
+
+  /*public void changeRotFlag() {
+    if (Shuffleboard.getTab("Driver Readout").)
+  }*/
 }

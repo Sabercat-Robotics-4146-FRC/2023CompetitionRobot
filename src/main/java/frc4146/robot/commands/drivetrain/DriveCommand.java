@@ -30,12 +30,12 @@ public class DriveCommand extends CommandBase {
 
     double f = forward.get();
     double s = strafe.get();
-    double r = rotation.get();
+    double r = rotation.get(true);
     if (Math.abs(f) < th) f = 0;
     if (Math.abs(s) < th) s = 0;
     if (Math.abs(r) < th) r = 0;
 
-    drivetrainSubsystem.drive(new Vector2(-f / 2.0, s / 2.0), r / 3.0);
+    drivetrainSubsystem.drive(new Vector2(-f / 2.0, s / 2.0), r / 6.0);
   }
 
   @Override

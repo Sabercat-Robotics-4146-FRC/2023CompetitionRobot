@@ -47,29 +47,22 @@ public class ArmCommand extends CommandBase {
   @Override
   public void execute() {
     if (intake) {
-      arm.setRotationPos(intake_pos[0]);
-      arm.setExtensionPos(intake_pos[1]);
+      new SetArmPosition(arm, intake_pos[0], intake_pos[1]);
     } else if (cone) {
       if (low) {
-        arm.setRotationPos(cone_low[0]);
-        arm.setExtensionPos(cone_low[1]);
+        new SetArmPosition(arm, cone_low[0], cone_low[1]);
       } else if (mid) {
-        arm.setRotationPos(cone_mid[0]);
-        arm.setExtensionPos(cone_mid[1]);
+        new SetArmPosition(arm, cone_mid[0], cone_mid[1]);
       } else if (high) {
-        arm.setRotationPos(cone_high[0]);
-        arm.setExtensionPos(cone_high[1]);
+        new SetArmPosition(arm, cone_high[0], cone_high[1]);
       }
     } else if (cube) {
       if (low) {
-        arm.setRotationPos(cube_low[0]);
-        arm.setExtensionPos(cube_low[1]);
+        new SetArmPosition(arm, cube_low[0], cube_low[1]);
       } else if (mid) {
-        arm.setRotationPos(cube_mid[0]);
-        arm.setExtensionPos(cube_mid[1]);
+        new SetArmPosition(arm, cube_mid[0], cube_mid[1]);
       } else if (high) {
-        arm.setRotationPos(cube_high[0]);
-        arm.setExtensionPos(cube_high[1]);
+        new SetArmPosition(arm, cube_high[0], cube_high[1]);
       }
     } else {
       //     if (Math.abs(retract.get()) > 0.10 || Math.abs(extend.get()) > 0.10) {

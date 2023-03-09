@@ -9,22 +9,22 @@ public class Constants {
     public static final int DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR = 2;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_MOTOR = 3;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_ENCODER = 12;
-    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(251.982);
+    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(101.78);
 
     public static final int DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR = 4;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_MOTOR = 5;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_ENCODER = 14;
-    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(232.0313);
+    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(99.40);
 
     public static final int DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR = 6;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_MOTOR = 7;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_ENCODER = 16;
-    public static final double DRIVETRAIN_BACK_LEFT_STEER_OFFSET = -Math.toRadians(329.766);
+    public static final double DRIVETRAIN_BACK_LEFT_STEER_OFFSET = -Math.toRadians(149.23);
 
     public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 8;
     public static final int DRIVETRAIN_BACK_RIGHT_STEER_MOTOR = 9;
     public static final int DRIVETRAIN_BACK_RIGHT_STEER_ENCODER = 18;
-    public static final double DRIVETRAIN_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(335.48);
+    public static final double DRIVETRAIN_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(333.46);
 
     public static final int PIGEON_PORT = 20;
 

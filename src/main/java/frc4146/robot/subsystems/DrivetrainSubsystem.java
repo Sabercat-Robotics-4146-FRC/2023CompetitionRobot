@@ -55,7 +55,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
         false),
     new MaxAccelerationConstraint(12.5 * 12.0),
-    new CentripetalAccelerationConstraint(5.0 * 12.0)
+    new CentripetalAccelerationConstraint(5.0)
   };
 
   /** follower uses PID, feedforward control to create trajectories */
@@ -373,5 +373,9 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public void resetGyroAngle(Rotation2 angle) {
     gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle().rotateBy(angle.inverse()));
+  }
+
+  public Gyroscope getGyroscope() {
+    return gyroscope;
   }
 }
