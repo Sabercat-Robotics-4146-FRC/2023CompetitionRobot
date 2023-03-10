@@ -82,13 +82,13 @@ public class Constants {
   }
 
   public static class Setpoints {
-    // TODO measure
-    public static final double[] intake_pos = {0, 0}; // rotation, extension
-    public static final double[] cone_low = {0, 0};
-    public static final double[] cone_mid = {0, 0};
-    public static final double[] cone_high = {0, 0};
-    public static final double[] cube_low = {0, 0};
-    public static final double[] cube_mid = {0, 0};
-    public static final double[] cube_high = {0, 0};
+    public static final double[] intake_cone = {0.58, 2.26}; // rotation, extension
+    public static final double[] cone_low = {0.55, 0.27};
+    public static final double[] cone_mid = {0.42, 11.42};
+    public static final double[] cone_high = {0.39, 52.99};
+    public static final double[] intake_cube = {0.61, 2.18};
+    public static final double[] cube_low = {0.54, 44.47}; // NOTE: must be 1ft back
+    public static final double[] cube_mid = {0.47, 25.84};
+    public static final double[] cube_high = {0.42, 52.99};
   }
 }

@@ -3,17 +3,16 @@ package frc4146.robot;
 import static frc4146.robot.Constants.Setpoints.*;
 
 import common.drivers.Gyroscope;
-import common.robot.input.DPadButton.Direction;
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.subsystems.AlignWithFiducial;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
-import frc4146.robot.commands.subsystems.SetArmPosition;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -60,15 +59,13 @@ public class RobotContainer {
                 secondaryController.getRightYAxis(),
                 secondaryController.getLeftBumperButton(),
                 secondaryController.getRightBumperButton(),
-                secondaryController.getDPadButton(Direction.CENTER),
+                secondaryController.getXButton(),
                 secondaryController.getAButton(),
                 secondaryController.getBButton(),
                 secondaryController.getYButton()));
 
     CommandScheduler.getInstance()
         .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
-
-    // enables drive using controller
 
     CameraServer.startAutomaticCapture();
 
@@ -77,7 +74,9 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
-    primaryController.getStartButton().onTrue(Commands.runOnce(drivetrainSubsystem::zeroWheels));
+    primaryController
+        .getStartButton()
+        .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
     primaryController
         .getYButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
@@ -94,45 +93,6 @@ public class RobotContainer {
     // secondaryController.getBButton().onTrue(Commands.runOnce(arm::toggleRotationMode));
     // secondaryController.getBButton().toggleOnTrue(new ArmRotate(arm));
 
-    // secondaryController
-    //    .getBButton().onTrue(new InstantCommand(() -> arm.rotateArm()));
-    // .toggleOnTrue(new InstantCommand(() -> arm.extendArm(arm.getPos())));
-
-    secondaryController
-        .getLeftBumperButton()
-        .or(secondaryController.getRightBumperButton())
-        .and(secondaryController.getDPadButton(Direction.CENTER))
-        .onTrue(new SetArmPosition(arm, intake_pos[0], intake_pos[1]));
-
-    secondaryController
-        .getLeftBumperButton()
-        .and(secondaryController.getAButton())
-        .onTrue(new SetArmPosition(arm, cone_low[0], cone_low[1]));
-
-    secondaryController
-        .getLeftBumperButton()
-        .and(secondaryController.getBButton())
-        .onTrue(new SetArmPosition(arm, cone_mid[0], cone_mid[1]));
-
-    secondaryController
-        .getLeftBumperButton()
-        .and(secondaryController.getYButton())
-        .onTrue(new SetArmPosition(arm, cone_high[0], cone_high[1]));
-
-    secondaryController
-        .getRightBumperButton()
-        .and(secondaryController.getAButton())
-        .onTrue(new SetArmPosition(arm, cube_low[0], cube_low[1]));
-
-    secondaryController
-        .getRightBumperButton()
-        .and(secondaryController.getBButton())
-        .onTrue(new SetArmPosition(arm, cube_mid[0], cube_mid[1]));
-
-    secondaryController
-        .getRightBumperButton()
-        .and(secondaryController.getYButton())
-        .onTrue(new SetArmPosition(arm, cube_high[0], cube_high[1]));
   }
 
   public Arm getArmSubsystem() {

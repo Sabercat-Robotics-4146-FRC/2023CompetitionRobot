@@ -12,12 +12,12 @@ public class ArmCommand extends CommandBase {
   private final Axis extend;
   private final Axis retract;
   private final Axis rotate;
-  private final boolean cone;
-  private final boolean cube;
-  private final boolean intake;
-  private final boolean low;
-  private final boolean mid;
-  private final boolean high;
+  private final Trigger cone;
+  private final Trigger cube;
+  private final Trigger intake;
+  private final Trigger low;
+  private final Trigger mid;
+  private final Trigger high;
 
   public ArmCommand(
       Arm arm,
@@ -34,34 +34,36 @@ public class ArmCommand extends CommandBase {
     this.extend = extend;
     this.retract = retract;
     this.rotate = rotate;
-    this.cone = cone.getAsBoolean();
-    this.cube = cube.getAsBoolean();
-    this.intake = intake.getAsBoolean();
-    this.low = low.getAsBoolean();
-    this.mid = mid.getAsBoolean();
-    this.high = high.getAsBoolean();
+    this.cone = cone;
+    this.cube = cube;
+    this.intake = intake;
+    this.low = low;
+    this.mid = mid;
+    this.high = high;
 
     addRequirements(arm);
   }
 
   @Override
   public void execute() {
-    if (intake) {
-      new SetArmPosition(arm, intake_pos[0], intake_pos[1]);
-    } else if (cone) {
-      if (low) {
+    if (cone.getAsBoolean()) {
+      if (intake.getAsBoolean()) {
+        new SetArmPosition(arm, intake_cone[0], intake_cone[1]);
+      } else if (low.getAsBoolean()) {
         new SetArmPosition(arm, cone_low[0], cone_low[1]);
-      } else if (mid) {
+      } else if (mid.getAsBoolean()) {
         new SetArmPosition(arm, cone_mid[0], cone_mid[1]);
-      } else if (high) {
+      } else if (high.getAsBoolean()) {
         new SetArmPosition(arm, cone_high[0], cone_high[1]);
       }
-    } else if (cube) {
-      if (low) {
+    } else if (cube.getAsBoolean()) {
+      if (intake.getAsBoolean()) {
+        new SetArmPosition(arm, intake_cube[0], intake_cube[1]);
+      } else if (low.getAsBoolean()) {
         new SetArmPosition(arm, cube_low[0], cube_low[1]);
-      } else if (mid) {
+      } else if (mid.getAsBoolean()) {
         new SetArmPosition(arm, cube_mid[0], cube_mid[1]);
-      } else if (high) {
+      } else if (high.getAsBoolean()) {
         new SetArmPosition(arm, cube_high[0], cube_high[1]);
       }
     } else {

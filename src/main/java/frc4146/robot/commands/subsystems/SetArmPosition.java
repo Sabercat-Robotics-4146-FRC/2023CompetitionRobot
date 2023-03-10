@@ -22,10 +22,4 @@ public class SetArmPosition extends CommandBase {
     arm.setRotationPos(rotation);
     arm.setExtensionPos(extension);
   }
-
-  @Override
-  public void end(boolean interrupted) {
-    arm.manually_rotate(0);
-    arm.manually_extend(0);
-  }
 }

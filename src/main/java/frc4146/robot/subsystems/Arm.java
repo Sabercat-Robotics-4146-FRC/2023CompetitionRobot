@@ -38,6 +38,7 @@ public class Arm extends SubsystemBase {
     rotationMotorRight = new TalonFX(ArmConstants.ROTATION_RIGHT_ID);
     rotationMotorRight.setNeutralMode(NeutralMode.Brake);
     rotationMotorRight.setInverted(true);
+    // TODO current limit, max accel.
 
     pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEl);
 
@@ -144,9 +145,6 @@ public class Arm extends SubsystemBase {
     }
 
     resetExtensionEncoder();
-
-    /*changeRotFlag();
-    changeExtFlag();*/
   }
 
   public boolean canRotateArm(double p) {
@@ -165,8 +163,4 @@ public class Arm extends SubsystemBase {
           0); // make sure arm isn't traveling too far past limit switch
     }
   }
-
-  /*public void changeRotFlag() {
-    if (Shuffleboard.getTab("Driver Readout").)
-  }*/
 }
