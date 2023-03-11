@@ -6,10 +6,12 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc4146.robot.commands.drivetrain.AlignWithFiducial;
+import frc4146.robot.commands.autonomous.AlignRobotFiducial;
+import frc4146.robot.commands.autonomous.BalanceRobot;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
+import frc4146.robot.commands.subsystems.PositionPiece;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -66,29 +68,55 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
-    primaryController.getStartButton().onTrue(Commands.runOnce(drivetrainSubsystem::zeroWheels));
+
     primaryController
-        .getYButton()
+        .getLeftBumperButton()
+        .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(false)));
+    primaryController
+        .getRightBumperButton()
+        .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(true)));
+
+    primaryController.getAButton().onTrue(new BalanceRobot(drivetrainSubsystem, gyroscope));
+    primaryController
+        .getBButton()
+        .toggleOnTrue(new AlignRobotFiducial(drivetrainSubsystem, limelight));
+    primaryController
+        .getXButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
-    primaryController.getXButton().onTrue(Commands.runOnce(drivetrainSubsystem::toggleDriveFlag));
+        
+    secondaryController
+        .getLeftBumperButton()
+        .and(secondaryController.getXButton())
+        .toggleOnTrue(new PositionPiece(arm, "cone", "intake"));
+    secondaryController
+        .getLeftBumperButton()
+        .and(secondaryController.getAButton())
+        .toggleOnTrue(new PositionPiece(arm, "cone", "low"));
+    secondaryController
+        .getLeftBumperButton()
+        .and(secondaryController.getBButton())
+        .toggleOnTrue(new PositionPiece(arm, "cone", "mid"));
+    secondaryController
+        .getLeftBumperButton()
+        .and(secondaryController.getYButton())
+        .toggleOnTrue(new PositionPiece(arm, "cone", "high"));
 
-    primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::lockWheels));
-
-    // primaryController.getBButton().toggleOnTrue(new BalanceRobot(drivetrainSubsystem,
-    // gyroscope));
-
-    primaryController.getBButton().onTrue(new AlignWithFiducial(drivetrainSubsystem, limelight));
-
-    secondaryController.getAButton().onTrue(Commands.runOnce(arm::toggleExtensionMode));
-    secondaryController.getBButton().onTrue(Commands.runOnce(arm::toggleRotationMode));
-
-    // secondaryController.getBButton().toggleOnTrue(new ArmRotate(arm));
-
-    // secondaryController
-    //    .getBButton().onTrue(new InstantCommand(() -> arm.rotateArm()));
-    // .toggleOnTrue(new InstantCommand(() -> arm.extendArm(arm.getPos())));
-
-    // secondaryControlelr.get
+    secondaryController
+        .getRightBumperButton()
+        .and(secondaryController.getXButton())
+        .toggleOnTrue(new PositionPiece(arm, "cube", "intake"));
+    secondaryController
+        .getRightBumperButton()
+        .and(secondaryController.getAButton())
+        .toggleOnTrue(new PositionPiece(arm, "cube", "low"));
+    secondaryController
+        .getRightBumperButton()
+        .and(secondaryController.getBButton())
+        .toggleOnTrue(new PositionPiece(arm, "cube", "mid"));
+    secondaryController
+        .getRightBumperButton()
+        .and(secondaryController.getYButton())
+        .toggleOnTrue(new PositionPiece(arm, "cube", "high"));
   }
 
   public Arm getArmSubsystem() {

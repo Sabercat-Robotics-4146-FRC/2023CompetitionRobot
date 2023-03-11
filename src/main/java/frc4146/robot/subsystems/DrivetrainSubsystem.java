@@ -2,7 +2,9 @@ package frc4146.robot.subsystems;
 
 import static frc4146.robot.Constants.DriveConstants;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import common.control.*;
@@ -81,7 +83,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   private final SwerveModule[] modules;
   private final SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
-  private final TalonSRX[] talons;
+  private final TalonFX[] talons;
 
   private final Gyroscope gyroscope;
 
@@ -103,6 +105,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   private final GenericEntry odometryYEntry; // robot's y position
   private final GenericEntry odometryAngleEntry; // robot's heading/angle
+
+  private boolean brake_mode = false;
 
   public DrivetrainSubsystem(Gyroscope gyro) {
 
@@ -158,23 +162,20 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
     modules =
         new SwerveModule[] {frontLeftModule, frontRightModule, backLeftModule, backRightModule};
-    TalonSRX leftb = new TalonSRX(DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR);
+    TalonFX leftb = new TalonFX(DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR);
     leftb.setInverted(true);
-    TalonSRX leftf = new TalonSRX(DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR);
+    TalonFX leftf = new TalonFX(DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR);
     leftf.setInverted(true);
     talons =
-        new TalonSRX[] {
+        new TalonFX[] {
           leftf,
-          new TalonSRX(DriveConstants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR),
+          new TalonFX(DriveConstants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR),
           leftb,
-          new TalonSRX(DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR)
+          new TalonFX(DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR)
         };
 
     for (var talon : talons) {
-      talon.configPeakCurrentLimit(40); // max current (amps)
-      talon.configPeakCurrentDuration(
-          10); // # milliseconds after peak reached before regulation starts
-      talon.configContinuousCurrentLimit(30); // continuous current (amps) after regulation
+      talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 30, 0.5));
       talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
     }
 
@@ -234,7 +235,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
       ty = 0;
     }
     double mag = Math.hypot(tx, ty);
-    double rotDeadband = 0.002;
+    double rotDeadband = 0.0025;
     if (mag <= 0.005) rotDeadband = 0.005;
     if (Math.abs(rotationalVelocity) < rotDeadband) {
       rotationalVelocity = 0;
@@ -304,13 +305,25 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     odometryAngleEntry.setDouble(pose.rotation.toDegrees());
   }
 
-  public void zeroWheels() {
+  public void lockWheelsAngle(double angle) {
     if (getAverageAbsoluteValueVelocity() < 5.0) {
-      frontLeftModule.set(0, 0);
-      frontRightModule.set(0, 0);
-      backLeftModule.set(0, 0);
-      backRightModule.set(0, 0);
+      frontLeftModule.set(0, angle * 2 * Math.PI / 180);
+      frontRightModule.set(0, angle * 2 * Math.PI / 180);
+      backLeftModule.set(0, angle * 2 * Math.PI / 180);
+      backRightModule.set(0, angle * 2 * Math.PI / 180);
     }
+  }
+
+  public void setMode(boolean brake) {
+    brake_mode = brake;
+    for (TalonFX talon : talons) {
+      if (brake) talon.setNeutralMode(NeutralMode.Brake);
+      else talon.setNeutralMode(NeutralMode.Coast);
+    }
+  }
+
+  public void toggleMode() {
+    setMode(!brake_mode);
   }
 
   public double getAverageAbsoluteValueVelocity() {
