@@ -21,11 +21,7 @@ public class Arm extends SubsystemBase {
 
   public TalonFX rotationMotorLeft;
   public TalonFX rotationMotorRight;
-  public AnalogPotentiometer pot;
 
-  private double rotPosSetpoint = 0.6;
-  private GenericEntry rotPosEntry;
-  public boolean rotPosMode = false;
   public boolean rotFlag = true;
 
   public TalonFX extensionMotor;
@@ -75,35 +71,6 @@ public class Arm extends SubsystemBase {
     Shuffleboard.getTab("Subsystems").addNumber("ExtError", () -> getExtensionError());
 
     extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP", extPosSetpoint).getEntry();
-  }
-
-  public void extend(double p) {
-    if (canExtendArm(p)) extensionMotor.set(ControlMode.PercentOutput, p);
-    else extensionMotor.set(ControlMode.PercentOutput, 0);
-  }
-
-  public void manually_extend(double p) {
-    if (!extPosMode) extend(p);
-  }
-
-  public double getExtension() {
-    return extensionMotor.getSelectedSensorPosition() / 2048;
-  }
-
-  public void setExtensionPos(double encSetpoint) {
-    extPosSetpoint = encSetpoint;
-  }
-
-    Shuffleboard.getTab("Subsystems").addNumber("Extension", () -> getExtension());
-    Shuffleboard.getTab("Subsystems").addBoolean("ExtPosMode", () -> extPosMode);
-    Shuffleboard.getTab("Subsystems").addNumber("ExtError", () -> getExtensionError());
-
-    Shuffleboard.getTab("Subsystems").addNumber("Rotation", () -> getRotation());
-    Shuffleboard.getTab("Subsystems").addBoolean("RotPosMode", () -> rotPosMode);
-    Shuffleboard.getTab("Subsystems").addNumber("RotError", () -> getRotationError());
-
-    extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP", extPosSetpoint).getEntry();
-    rotPosEntry = Shuffleboard.getTab("Subsystems").add("Rotation SP", rotPosSetpoint).getEntry();
   }
 
   public void manually_extend(double p) {
