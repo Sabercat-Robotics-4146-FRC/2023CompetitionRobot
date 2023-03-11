@@ -15,7 +15,6 @@ public class DriveCommand extends CommandBase {
   private Axis strafe;
   private Axis rotation;
 
-  // TODO: Tune these values based on driver preferences
   public SlewRateLimiter ff = new SlewRateLimiter(2.5);
   public SlewRateLimiter sf = new SlewRateLimiter(2.5);
   public SlewRateLimiter rf = new SlewRateLimiter(2);
@@ -43,12 +42,11 @@ public class DriveCommand extends CommandBase {
                 -Math.copySign(Math.tan(Math.abs(f)) * (Math.sin(Math.abs(f)) + 0.5) / 3.25, f)),
             sf.calculate(
                 Math.copySign(Math.tan(Math.abs(s)) * (Math.sin(Math.abs(s)) + 0.5) / 3.25, s))),
-        rf.calculate(Math.copySign(Math.tan(Math.abs(r)) * (Math.sin(Math.abs(r)) + 1) / 60.0, r)),
-        false);
+        rf.calculate(Math.copySign(Math.tan(Math.abs(r)) * (Math.sin(Math.abs(r)) + 1) / 60.0, r)), false);
   }
 
   @Override
   public void end(boolean interrupted) {
-    drivetrainSubsystem.drive(Vector2.ZERO, 0, false);
+    drivetrainSubsystem.drive(Vector2.ZERO, 0);
   }
 }

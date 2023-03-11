@@ -19,7 +19,6 @@ public class Arm extends SubsystemBase {
   public AnalogPotentiometer pot;
 
   private double rotPosSetpoint = 0.6;
-  private GenericEntry rotPosEntry;
   public boolean rotPosMode = false;
 
   public TalonFX extensionMotor;
@@ -27,7 +26,6 @@ public class Arm extends SubsystemBase {
   public DigitalInput openedLimit;
 
   private double extPosSetpoint = 0;
-  private GenericEntry extPosEntry;
   public boolean extPosMode = false;
 
   public Arm() {

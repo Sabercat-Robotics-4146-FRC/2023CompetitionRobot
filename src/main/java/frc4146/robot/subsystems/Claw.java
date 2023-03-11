@@ -14,6 +14,11 @@ public class Claw extends SubsystemBase {
   public Claw() {
     clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
 
+    clawMotor.config_kP(3,0.3, 30);
+    clawMotor.config_kI(3,0, 30);
+    clawMotor.config_kD(3,0, 30);
+
+
     Shuffleboard.getTab("Subsystems").addNumber("Claw", () -> getPos());
   }
 

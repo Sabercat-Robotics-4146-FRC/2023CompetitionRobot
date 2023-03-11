@@ -49,7 +49,6 @@ public class AlignRobotFiducial extends CommandBase {
           Vector2.ZERO, MathUtils.clamp(pid_rot.calculate(getRotationError()), -0.01, 0.01));
       if (pid_rot.atSetpoint()) {
         stage += 1;
-        pid_rot.reset();
       }
     } else if (stage == 1) {
       drivetrain.drive(
@@ -58,8 +57,6 @@ public class AlignRobotFiducial extends CommandBase {
           false);
       if (pid_lr.atSetpoint() && pid_rot.atSetpoint()) {
         stage += 1;
-        pid_rot.reset();
-        pid_lr.reset();
       }
     } else if (stage == 2) {
       drivetrain.drive(
@@ -84,7 +81,7 @@ public class AlignRobotFiducial extends CommandBase {
   }
 
   public double getRotationError() {
-    return -limelight.getHorizontalOffset()/27;
+    return limelight.getHorizontalOffset()/27;
   }
 
   public void end(boolean interrupted) {
