@@ -21,9 +21,14 @@ public class Arm extends SubsystemBase {
 
   public TalonFX rotationMotorLeft;
   public TalonFX rotationMotorRight;
+  public AnalogPotentiometer pot;
+
+  private double rotPosSetpoint = 0.6;
+  private GenericEntry rotPosEntry;
+  public boolean rotPosMode = false;
+  public boolean rotFlag = true;
 
   public TalonFX extensionMotor;
-
   public DigitalInput closedLimit;
   public DigitalInput openedLimit;
 
@@ -35,27 +40,59 @@ public class Arm extends SubsystemBase {
 
   private double rotPosSetpoint = 0.35;
   private GenericEntry rotPosEntry;
-
   public boolean rotPosMode = false;
+
 
   public Arm() {
     // enabled = _driverInterface.m_ArmSubsystemEnabled.getBoolean(true);
 
     rotationMotorLeft = new TalonFX(ArmConstants.ROTATION_LEFT_ID);
     rotationMotorLeft.setNeutralMode(NeutralMode.Brake);
-
     rotationMotorRight = new TalonFX(ArmConstants.ROTATION_RIGHT_ID);
     rotationMotorRight.setNeutralMode(NeutralMode.Brake);
     rotationMotorRight.setInverted(true);
+    // TODO current limit, max accel.
+
+    pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEl);
+
+    Shuffleboard.getTab("Subsystems").addNumber("Rotation", () -> getRotation());
+    Shuffleboard.getTab("Subsystems").addBoolean("RotPosMode", () -> rotPosMode);
+    Shuffleboard.getTab("Subsystems").addNumber("RotError", () -> getRotationError());
+
+    rotPosEntry = Shuffleboard.getTab("Subsystems").add("Rotation SP", rotPosSetpoint).getEntry();
 
     extensionMotor = new TalonFX(ArmConstants.EXTENSION_ID);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
-    extensionMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    extensionMotor.configSelectedFeedbackSensor(
+        TalonFXFeedbackDevice.IntegratedSensor, ArmConstants.kPIDSlot, ArmConstants.kTimeoutMs);
+    extensionMotor.configFeedbackNotContinuous(false, ArmConstants.kTimeoutMs);
 
-    closedLimit = new DigitalInput(ArmConstants.LOWER_LIMIT_CHANNEL);
-    openedLimit = new DigitalInput(ArmConstants.UPPER_LIMIT_CHANNEL);
+    closedLimit = new DigitalInput(ArmConstants.CLOSED_LIMIT_CHANNEL);
+    openedLimit = new DigitalInput(ArmConstants.OPEN_LIMIT_CHANNEL);
 
-    pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEl);
+    Shuffleboard.getTab("Subsystems").addNumber("Extension", () -> getExtension());
+    Shuffleboard.getTab("Subsystems").addBoolean("ExtPosMode", () -> extPosMode);
+    Shuffleboard.getTab("Subsystems").addNumber("ExtError", () -> getExtensionError());
+
+    extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP", extPosSetpoint).getEntry();
+  }
+
+  public void extend(double p) {
+    if (canExtendArm(p)) extensionMotor.set(ControlMode.PercentOutput, p);
+    else extensionMotor.set(ControlMode.PercentOutput, 0);
+  }
+
+  public void manually_extend(double p) {
+    if (!extPosMode) extend(p);
+  }
+
+  public double getExtension() {
+    return extensionMotor.getSelectedSensorPosition() / 2048;
+  }
+
+  public void setExtensionPos(double encSetpoint) {
+    extPosSetpoint = encSetpoint;
+  }
 
     Shuffleboard.getTab("Subsystems").addNumber("Extension", () -> getExtension());
     Shuffleboard.getTab("Subsystems").addBoolean("ExtPosMode", () -> extPosMode);
@@ -142,6 +179,7 @@ public class Arm extends SubsystemBase {
         rotate(Math.copySign(MathUtils.clamp(2 * Math.abs(error), 0.1, 0.15), error));
       }
     }
+    resetExtensionEncoder();
   }
 
   public double getExtension() {
@@ -159,5 +197,12 @@ public class Arm extends SubsystemBase {
 
   public boolean canExtendArm(double p) {
     return (!((closedLimit.get() && p < 0) || (openedLimit.get() && p > 0)));
+  }
+
+  public void resetExtensionEncoder() {
+    if (closedLimit.get()) {
+      extensionMotor.setSelectedSensorPosition(
+          0); // anytime  arm hits limit switch, encoder position = 0
+    }
   }
 }

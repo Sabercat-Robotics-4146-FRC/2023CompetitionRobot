@@ -1,5 +1,7 @@
 package frc4146.robot;
 
+import static frc4146.robot.Constants.Setpoints.*;
+
 import common.drivers.Gyroscope;
 import common.robot.DriverReadout;
 import common.robot.input.XboxController;
@@ -57,10 +59,9 @@ public class RobotContainer {
                 secondaryController.getLeftTriggerAxis(),
                 secondaryController.getRightTriggerAxis(),
                 secondaryController.getRightYAxis()));
+
     CommandScheduler.getInstance()
         .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
-
-    // enables drive using controller
 
     CameraServer.startAutomaticCapture();
 
@@ -69,7 +70,9 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
-    primaryController.getStartButton().onTrue(Commands.runOnce(drivetrainSubsystem::zeroWheels));
+    primaryController
+        .getStartButton()
+        .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
     primaryController
         .getYButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
@@ -81,17 +84,12 @@ public class RobotContainer {
     // gyroscope));
 
     primaryController.getBButton().onTrue(new AlignWithFiducial(drivetrainSubsystem, limelight));
-
+    
     secondaryController.getAButton().onTrue(Commands.runOnce(arm::toggleExtensionMode));
     secondaryController.getBButton().onTrue(Commands.runOnce(arm::toggleRotationMode));
 
     // secondaryController.getBButton().toggleOnTrue(new ArmRotate(arm));
 
-    // secondaryController
-    //    .getBButton().onTrue(new InstantCommand(() -> arm.rotateArm()));
-    // .toggleOnTrue(new InstantCommand(() -> arm.extendArm(arm.getPos())));
-
-    // secondaryControlelr.get
   }
 
   public Arm getArmSubsystem() {
