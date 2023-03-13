@@ -2,6 +2,7 @@ package common.robot.drivers;
 
 import common.drivers.Gyroscope;
 import common.math.Rotation2;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogGyro;
 
 public final class AnalogGyroscope extends Gyroscope {
@@ -29,5 +30,11 @@ public final class AnalogGyroscope extends Gyroscope {
   @Override
   public double getUnadjustedRate() {
     return gyro.getRate();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Gyro");
+    builder.addDoubleProperty("Value", () -> -getUnadjustedAngle().toDegrees(), null);
   }
 }

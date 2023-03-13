@@ -3,6 +3,7 @@ package frc4146.robot.subsystems;
 import static frc4146.robot.Constants.DriveConstants;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -30,8 +31,6 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   public boolean driveFlag = true;
 
   public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
-
-  // This value is used to turn the robot back to its initialPosition
 
   public ArrayList<Double> speeds;
 
@@ -113,8 +112,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   public DrivetrainSubsystem(Gyroscope gyro) {
 
     gyroscope = gyro;
-
     gyroscope.setInverted(false);
+
     driveSignal = new HolonomicDriveSignal(new Vector2(0, 0), 0.0, true);
 
     timer = new Timer();
@@ -176,11 +175,11 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
           new TalonFX(DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR)
         };
 
-    /*for (var talon : talons) {
+    for (var talon : talons) {
       talon.configSupplyCurrentLimit(
           new SupplyCurrentLimitConfiguration(true, 30, 35, 1)); // max current (amps), 30
       talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
-    }*/
+    }
 
     // sets up Shuffleboard to receive odometry data
     odometryXEntry = tab.add("X", 0.0).withPosition(0, 0).withSize(1, 1).getEntry();
@@ -228,10 +227,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         .primaryLayout
         .addBoolean("Field Oriented", () -> fieldOriented)
         .withPosition(0, 3);
-    _driverInterface
-        .primaryLayout
-        .addBoolean("Drive Enabled", () -> driveFlag)
-        .withPosition(0, 2);
+    _driverInterface.primaryLayout.addBoolean("Drive Enabled", () -> driveFlag).withPosition(0, 2);
+    _driverInterface.primaryLayout.add("Drive Heading", gyroscope).withPosition(0, 0);
   }
 
   /** updates driveSignal with desired translational, rotational velocities */

@@ -1,8 +1,9 @@
 package common.drivers;
 
 import common.math.Rotation2;
+import edu.wpi.first.util.sendable.Sendable;
 
-public abstract class Gyroscope {
+public abstract class Gyroscope implements Sendable {
   private Rotation2 adjustmentAngle = Rotation2.ZERO;
   private boolean inverted;
 
