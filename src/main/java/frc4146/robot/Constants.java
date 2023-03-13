@@ -55,6 +55,7 @@ public class Constants {
 
     public static final int CLAW_ID = 24;
 
+    // hashmap for arm setpoints, {"gamepiece":{"position":{rotation,extension}}}, allows for easy access
     public static final Map<String, HashMap> SETPOINTS =
         new HashMap<String, HashMap>() {
           {

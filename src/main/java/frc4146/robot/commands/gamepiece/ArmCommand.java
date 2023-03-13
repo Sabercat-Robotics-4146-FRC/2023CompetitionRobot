@@ -1,4 +1,4 @@
-package frc4146.robot.commands.subsystems;
+package frc4146.robot.commands.gamepiece;
 
 import common.robot.input.Axis;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -21,8 +21,8 @@ public class ArmCommand extends CommandBase {
 
   @Override
   public void execute() {
-    arm.manually_rotate(-rotate.get() / 2);
-    arm.manually_extend(extend.get() / 4 - retract.get() / 4);
+    arm.manually_rotate(-rotate.get(true));
+    arm.manually_extend(extend.get(true) / 2 - retract.get(true) / 2);
   }
 
   @Override

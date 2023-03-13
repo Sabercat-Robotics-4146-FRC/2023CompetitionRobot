@@ -22,10 +22,12 @@ public class Claw extends SubsystemBase {
     Shuffleboard.getTab("Subsystems").addNumber("Claw", () -> getPos());
   }
 
+  /* percent output control mode */
   public void manuallySetClaw(double p) {
     clawMotor.set(ControlMode.PercentOutput, p);
   }
 
+  /* in full potentiometer revolutions */
   public double getPos() {
     return clawMotor.getSelectedSensorPosition() / 1024;
   }

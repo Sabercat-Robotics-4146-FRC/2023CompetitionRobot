@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc4146.robot.commands.autonomous.AlignRobotFiducial;
 import frc4146.robot.commands.autonomous.BalanceRobot;
 import frc4146.robot.commands.drivetrain.DriveCommand;
-import frc4146.robot.commands.subsystems.ArmCommand;
-import frc4146.robot.commands.subsystems.ClawCommand;
-import frc4146.robot.commands.subsystems.PositionPiece;
+import frc4146.robot.commands.gamepiece.ArmCommand;
+import frc4146.robot.commands.gamepiece.ClawCommand;
+import frc4146.robot.commands.gamepiece.PositionPiece;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -56,10 +56,9 @@ public class RobotContainer {
                 secondaryController.getLeftTriggerAxis(),
                 secondaryController.getRightTriggerAxis(),
                 secondaryController.getRightYAxis()));
+                
     CommandScheduler.getInstance()
         .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
-
-    // enables drive using controller
 
     CameraServer.startAutomaticCapture();
 
@@ -67,6 +66,8 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
+
+    // re-centers robot orientation so that current heading = default heading
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
 
     primaryController
@@ -84,6 +85,7 @@ public class RobotContainer {
         .getXButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
         
+    // while holding LEFT bumper, press other button to go to setpoint for CONE
     secondaryController
         .getLeftBumperButton()
         .and(secondaryController.getXButton())
@@ -101,6 +103,7 @@ public class RobotContainer {
         .and(secondaryController.getYButton())
         .toggleOnTrue(new PositionPiece(arm, "cone", "high"));
 
+    // while holding RIGHT bumper, press other button to go to setpoint for CUBE
     secondaryController
         .getRightBumperButton()
         .and(secondaryController.getXButton())

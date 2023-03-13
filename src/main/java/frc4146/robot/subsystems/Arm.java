@@ -62,6 +62,7 @@ public class Arm extends SubsystemBase {
     // extPosSetpoint).getEntry();
   }
 
+  /* percent output control mode */
   public void extend(double p) {
     if (canExtendArm(p)) extensionMotor.set(ControlMode.PercentOutput, p);
     else extensionMotor.set(ControlMode.PercentOutput, 0);
@@ -72,6 +73,7 @@ public class Arm extends SubsystemBase {
     if (!extPosMode) extend(p);
   }
 
+  /* in full encoder revolutions */
   public double getExtension() {
     return extensionMotor.getSelectedSensorPosition() / 2048;
   }
@@ -92,6 +94,7 @@ public class Arm extends SubsystemBase {
     extPosMode = e;
   }
 
+  /* percent output control mode */
   public void rotate(double p) {
     if (canRotateArm(p)) {
       rotationMotorLeft.set(ControlMode.PercentOutput, p);
@@ -107,6 +110,7 @@ public class Arm extends SubsystemBase {
     if (!rotPosMode) rotate(p);
   }
 
+  /* in full potentiometer revolutions */
   public double getRotation() {
     return pot.get();
   }
@@ -151,19 +155,22 @@ public class Arm extends SubsystemBase {
     resetExtensionEncoder();
   }
 
+  /* software limit for arm rotation */
   public boolean canRotateArm(double p) {
     return (!((getRotation() < ArmConstants.POT_MAX_ROTATION && p < 0)
         || (getRotation() > ArmConstants.POT_MIN_ROTATION && p > 0)));
   }
 
+  /* logic for limit switch limit for arm extension */
   public boolean canExtendArm(double p) {
     return (!((closedLimit.get() && p < 0) || (openedLimit.get() && p > 0)));
   }
 
+  /* when arm is fully retracted, reset encoder value to 0 */
   public void resetExtensionEncoder() {
     if (closedLimit.get()) {
       extensionMotor.setSelectedSensorPosition(
-          0); // make sure arm isn't traveling too far past limit switch
+          0);
     }
   }
 }
