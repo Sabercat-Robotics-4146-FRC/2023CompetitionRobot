@@ -35,7 +35,7 @@ public class Constants {
   public static class ArmConstants {
     public static final int ROTATION_LEFT_ID = 21;
     public static final int ROTATION_RIGHT_ID = 22;
-    public static final int ROTATION_POT_CHANNEl = 0;
+    public static final int ROTATION_POT_CHANNEL = 0;
 
     public static final int CLOSED_LIMIT_CHANNEL = 9;
     public static final int OPEN_LIMIT_CHANNEL = 1;
@@ -45,10 +45,11 @@ public class Constants {
     public static final int UPPER_LIMIT_CHANNEL = 1;
     public static final int TICKS_PER_REVOLUTION = 2048;
 
-    public static final double MAX_LENGTH = 63; // inches
-    public static final double MIN_LENGTH = 39; // inches
+    public static final double MAX_LENGTH = 71; // inches
+    public static final double MIN_LENGTH = 47; // inches
     public static final double MAX_ANGLE = 1.05; // radians
-    public static final double MIN_ANGLE = -1.57; // raidans
+    public static final double MIN_ANGLE = -1.57; // radians
+    public static final int SUPERSTRUCTURE_HEIGHT = 47;
 
     public static final double POT_MAX_ROTATION = 0.35;
     public static final double POT_MIN_ROTATION = 0.623;
@@ -90,5 +91,6 @@ public class Constants {
     public static final double[] cube_low = {0.54, 44.47}; // NOTE: must be 1ft back
     public static final double[] cube_mid = {0.47, 25.84};
     public static final double[] cube_high = {0.42, 52.99};
+    public static final double[] drive_pos = {0.58, 0.27};
   }
 }

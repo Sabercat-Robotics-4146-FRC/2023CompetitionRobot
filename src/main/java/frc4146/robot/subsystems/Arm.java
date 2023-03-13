@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc4146.robot.Constants.ArmConstants;
 
@@ -38,7 +39,6 @@ public class Arm extends SubsystemBase {
   private GenericEntry rotPosEntry;
   public boolean rotPosMode = false;
 
-
   public Arm() {
     // enabled = _driverInterface.m_ArmSubsystemEnabled.getBoolean(true);
 
@@ -49,7 +49,7 @@ public class Arm extends SubsystemBase {
     rotationMotorRight.setInverted(true);
     // TODO current limit, max accel.
 
-    pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEl);
+    pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEL);
 
     Shuffleboard.getTab("Subsystems").addNumber("Rotation", () -> getRotation());
     Shuffleboard.getTab("Subsystems").addBoolean("RotPosMode", () -> rotPosMode);
@@ -147,10 +147,11 @@ public class Arm extends SubsystemBase {
       }
     }
     resetExtensionEncoder();
+    checkArmForDrive();
   }
 
   public double getExtension() {
-    return extensionMotor.getSelectedSensorPosition() / 2048;
+    return extensionMotor.getSelectedSensorPosition() / ArmConstants.TICKS_PER_REVOLUTION;
   }
 
   public double getRotation() {
@@ -171,5 +172,26 @@ public class Arm extends SubsystemBase {
       extensionMotor.setSelectedSensorPosition(
           0); // anytime  arm hits limit switch, encoder position = 0
     }
+  }
+
+  /* if necessary, move arm to a safe position to drive */
+  public void checkArmForDrive() {
+    double current_angle = getRotation() * 2 * Math.PI; // + offset
+    double current_length = (getExtension() * 2 * Math.PI * .75) / 25 + ArmConstants.MIN_LENGTH;
+
+    double max_angle = Math.PI / 3;
+    double max_length = ArmConstants.SUPERSTRUCTURE_HEIGHT / Math.cos(current_angle);
+
+    // arm not too high
+    /*if (current_angle >= max_angle) {
+      setRotationPos(Setpoints.drive_pos[0]);
+    }
+    // claw not dragging on ground
+    if (current_length >= max_length) {
+      setExtensionPos(Setpoints.drive_pos[1]);
+    }*/
+
+    SmartDashboard.putNumber("arm length", current_length);
+    SmartDashboard.putNumber("arm angle", current_angle);
   }
 }

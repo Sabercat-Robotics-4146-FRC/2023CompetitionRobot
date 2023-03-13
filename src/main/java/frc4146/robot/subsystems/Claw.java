@@ -36,4 +36,8 @@ public class Claw implements Subsystem {
   public double getPos() {
     return clawMotor.getSelectedSensorPosition() / 1024;
   }
+
+  public boolean hasObject() {
+    return clawMotor.getStatorCurrent() > 12; // TODO test
+  }
 }
