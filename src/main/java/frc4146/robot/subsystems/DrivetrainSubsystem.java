@@ -2,7 +2,9 @@ package frc4146.robot.subsystems;
 
 import static frc4146.robot.Constants.DriveConstants;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import common.control.*;
@@ -13,6 +15,7 @@ import common.kinematics.SwerveOdometry;
 import common.math.RigidTransform2;
 import common.math.Rotation2;
 import common.math.Vector2;
+import common.robot.DriverReadout;
 import common.robot.UpdateManager;
 import common.util.*;
 import edu.wpi.first.networktables.GenericEntry;
@@ -27,13 +30,15 @@ import java.util.*;
 public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   public boolean driveFlag = true;
 
-  // This value is used to turn the robot back to its initialPosition
+  public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
 
   public ArrayList<Double> speeds;
 
   public Timer timer;
 
   public boolean fieldOriented;
+
+  public boolean locked = false;
 
   /* The following objects are used to create accurate trajectory for the specific robot
    *
@@ -53,7 +58,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
         false),
     new MaxAccelerationConstraint(12.5 * 12.0),
-    new CentripetalAccelerationConstraint(5.0 * 12.0)
+    new CentripetalAccelerationConstraint(5.0)
   };
 
   /** follower uses PID, feedforward control to create trajectories */
@@ -81,7 +86,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   private final SwerveModule[] modules;
   private final SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
-  private final TalonSRX[] talons;
+  private final TalonFX[] talons;
 
   private final Gyroscope gyroscope;
 
@@ -107,8 +112,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   public DrivetrainSubsystem(Gyroscope gyro) {
 
     gyroscope = gyro;
-
     gyroscope.setInverted(false);
+
     driveSignal = new HolonomicDriveSignal(new Vector2(0, 0), 0.0, true);
 
     timer = new Timer();
@@ -158,23 +163,21 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
     modules =
         new SwerveModule[] {frontLeftModule, frontRightModule, backLeftModule, backRightModule};
-    TalonSRX leftb = new TalonSRX(DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR);
+    TalonFX leftb = new TalonFX(DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR);
     leftb.setInverted(true);
-    TalonSRX leftf = new TalonSRX(DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR);
+    TalonFX leftf = new TalonFX(DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR);
     leftf.setInverted(true);
     talons =
-        new TalonSRX[] {
+        new TalonFX[] {
           leftf,
-          new TalonSRX(DriveConstants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR),
+          new TalonFX(DriveConstants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR),
           leftb,
-          new TalonSRX(DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR)
+          new TalonFX(DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR)
         };
 
     for (var talon : talons) {
-      talon.configPeakCurrentLimit(40); // max current (amps)
-      talon.configPeakCurrentDuration(
-          10); // # milliseconds after peak reached before regulation starts
-      talon.configContinuousCurrentLimit(30); // continuous current (amps) after regulation
+      talon.configSupplyCurrentLimit(
+          new SupplyCurrentLimitConfiguration(true, 30, 35, 1)); // max current (amps), 30
       talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
     }
 
@@ -219,6 +222,13 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     tab.addNumber("Average Velocity", this::getAverageAbsoluteValueVelocity);
     tab.addBoolean("Drive Enabled", () -> driveFlag);
     tab.addBoolean("Field Oriented", () -> fieldOriented);
+
+    _driverInterface
+        .primaryLayout
+        .addBoolean("Field Oriented", () -> fieldOriented)
+        .withPosition(0, 3);
+    _driverInterface.primaryLayout.addBoolean("Drive Enabled", () -> driveFlag).withPosition(0, 2);
+    _driverInterface.primaryLayout.add("Drive Heading", gyroscope).withPosition(0, 0);
   }
 
   /** updates driveSignal with desired translational, rotational velocities */
@@ -274,7 +284,11 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
     SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1);
     for (int i = 0; i < moduleOutputs.length; i++) {
-      modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
+      if (locked) {
+        modules[i].set(-moduleOutputs[i].length * 12.0, 0);
+      } else {
+        modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
+      }
     }
   }
 
@@ -304,12 +318,19 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     odometryAngleEntry.setDouble(pose.rotation.toDegrees());
   }
 
-  public void zeroWheels() {
+  /* lock wheels to a particular angle, in degrees */
+  public void lockWheelsAngle(double angle) {
     if (getAverageAbsoluteValueVelocity() < 5.0) {
-      frontLeftModule.set(0, 0);
-      frontRightModule.set(0, 0);
-      backLeftModule.set(0, 0);
-      backRightModule.set(0, 0);
+      frontLeftModule.set(0, angle * 2 * Math.PI / 180);
+      frontRightModule.set(0, angle * 2 * Math.PI / 180);
+      backLeftModule.set(0, angle * 2 * Math.PI / 180);
+      backRightModule.set(0, angle * 2 * Math.PI / 180);
+    }
+  }
+
+  public void enableBrakeMode() {
+    for (var talon : talons) {
+      talon.setNeutralMode(NeutralMode.Brake);
     }
   }
 
@@ -347,6 +368,10 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     return angularVelocity;
   }
 
+  public void toggleLockedRotation() {
+    locked = !locked;
+  }
+
   public void toggleFieldOriented() {
     fieldOriented = !fieldOriented;
   }
@@ -362,5 +387,9 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public void resetGyroAngle(Rotation2 angle) {
     gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle().rotateBy(angle.inverse()));
+  }
+
+  public Gyroscope getGyroscope() {
+    return gyroscope;
   }
 }

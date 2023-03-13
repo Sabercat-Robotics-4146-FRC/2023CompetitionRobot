@@ -9,22 +9,22 @@ public class Constants {
     public static final int DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR = 2;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_MOTOR = 3;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_ENCODER = 12;
-    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(251.982);
+    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(101.78);
 
     public static final int DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR = 4;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_MOTOR = 5;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_ENCODER = 14;
-    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(232.0313);
+    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(99.40);
 
     public static final int DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR = 6;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_MOTOR = 7;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_ENCODER = 16;
-    public static final double DRIVETRAIN_BACK_LEFT_STEER_OFFSET = -Math.toRadians(329.766);
+    public static final double DRIVETRAIN_BACK_LEFT_STEER_OFFSET = -Math.toRadians(149.23);
 
     public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 8;
     public static final int DRIVETRAIN_BACK_RIGHT_STEER_MOTOR = 9;
     public static final int DRIVETRAIN_BACK_RIGHT_STEER_ENCODER = 18;
-    public static final double DRIVETRAIN_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(335.48);
+    public static final double DRIVETRAIN_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(333.46);
 
     public static final int PIGEON_PORT = 20;
 
@@ -36,6 +36,9 @@ public class Constants {
     public static final int ROTATION_LEFT_ID = 21;
     public static final int ROTATION_RIGHT_ID = 22;
     public static final int ROTATION_POT_CHANNEl = 0;
+
+    public static final int CLOSED_LIMIT_CHANNEL = 9;
+    public static final int OPEN_LIMIT_CHANNEL = 1;
 
     public static final int EXTENSION_ID = 23;
     public static final int LOWER_LIMIT_CHANNEL = 9;
@@ -52,6 +55,8 @@ public class Constants {
 
     public static final int CLAW_ID = 24;
 
+    public static final int kPIDSlot = 0;
+    public static final int kTimeoutMs = 30;
   }
 
   public static class ClawConstants {
@@ -74,5 +79,16 @@ public class Constants {
 
     public static final double D_Z = 1.0; // Alligned forward backward
     public static final double D_X = 0.0; // Alligned left right
+  }
+
+  public static class Setpoints {
+    public static final double[] intake_cone = {0.58, 2.26}; // rotation, extension
+    public static final double[] cone_low = {0.55, 0.27};
+    public static final double[] cone_mid = {0.42, 11.42};
+    public static final double[] cone_high = {0.39, 52.99};
+    public static final double[] intake_cube = {0.61, 2.18};
+    public static final double[] cube_low = {0.54, 44.47}; // NOTE: must be 1ft back
+    public static final double[] cube_mid = {0.47, 25.84};
+    public static final double[] cube_high = {0.42, 52.99};
   }
 }

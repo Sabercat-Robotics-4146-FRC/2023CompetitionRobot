@@ -3,6 +3,7 @@ package frc4146.robot.subsystems;
 import com.ctre.phoenix.sensors.Pigeon2;
 import common.drivers.Gyroscope;
 import common.math.Rotation2;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 public class Pigeon extends Gyroscope {
@@ -14,6 +15,12 @@ public class Pigeon extends Gyroscope {
         .addNumber("Pigeon Offset", () -> getAdjustmentAngle().toDegrees());
     // Shuffleboard.getTab("Drivetrain").addNumber("Roll", () -> getRoll());
     Shuffleboard.getTab("Drivetrain").addNumber("Pigeon Roll", () -> getRoll());
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Gyro");
+    builder.addDoubleProperty("Value", () -> -getUnadjustedAngle().toDegrees(), null);
   }
 
   @Override

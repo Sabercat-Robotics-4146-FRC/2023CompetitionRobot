@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import common.math.MathUtils;
+import common.robot.DriverReadout;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -15,6 +16,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc4146.robot.Constants.ArmConstants;
 
 public class Arm extends SubsystemBase {
+  public boolean ExtendEnabled;
+  public boolean RotationEnabled;
+
+  public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
 
   public TalonFX rotationMotorLeft;
   public TalonFX rotationMotorRight;
@@ -23,8 +28,7 @@ public class Arm extends SubsystemBase {
   private double rotPosSetpoint = 0.6;
   private GenericEntry rotPosEntry;
   public boolean rotPosMode = false;
-
-
+  public boolean rotFlag = true;
 
   public TalonFX extensionMotor;
   public DigitalInput closedLimit;
@@ -34,15 +38,21 @@ public class Arm extends SubsystemBase {
   private GenericEntry extPosEntry;
   public boolean extPosMode = false;
 
- 
+  private double rotPosSetpoint = 0.35;
+  private GenericEntry rotPosEntry;
+  public boolean rotPosMode = false;
+
 
   public Arm() {
+    // enabled = _driverInterface.m_ArmSubsystemEnabled.getBoolean(true);
+
     rotationMotorLeft = new TalonFX(ArmConstants.ROTATION_LEFT_ID);
     rotationMotorLeft.setNeutralMode(NeutralMode.Brake);
     rotationMotorRight = new TalonFX(ArmConstants.ROTATION_RIGHT_ID);
     rotationMotorRight.setNeutralMode(NeutralMode.Brake);
     rotationMotorRight.setInverted(true);
-    
+    // TODO current limit, max accel.
+
     pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEl);
 
     Shuffleboard.getTab("Subsystems").addNumber("Rotation", () -> getRotation());
@@ -52,13 +62,14 @@ public class Arm extends SubsystemBase {
     rotPosEntry = Shuffleboard.getTab("Subsystems").add("Rotation SP", rotPosSetpoint).getEntry();
 
 
-
     extensionMotor = new TalonFX(ArmConstants.EXTENSION_ID);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
-    extensionMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    extensionMotor.configSelectedFeedbackSensor(
+        TalonFXFeedbackDevice.IntegratedSensor, ArmConstants.kPIDSlot, ArmConstants.kTimeoutMs);
+    extensionMotor.configFeedbackNotContinuous(false, ArmConstants.kTimeoutMs);
 
-    closedLimit = new DigitalInput(ArmConstants.LOWER_LIMIT_CHANNEL);
-    openedLimit = new DigitalInput(ArmConstants.UPPER_LIMIT_CHANNEL);
+    closedLimit = new DigitalInput(ArmConstants.CLOSED_LIMIT_CHANNEL);
+    openedLimit = new DigitalInput(ArmConstants.OPEN_LIMIT_CHANNEL);
 
     Shuffleboard.getTab("Subsystems").addNumber("Extension", () -> getExtension());
     Shuffleboard.getTab("Subsystems").addBoolean("ExtPosMode", () -> extPosMode);
@@ -70,7 +81,7 @@ public class Arm extends SubsystemBase {
 
 
   public void extend(double p) {
-    if (canExtendArm(p)) extensionMotor.set(ControlMode.PercentOutput, p);
+    if (canExtendArm(p) && ExtendEnabled) extensionMotor.set(ControlMode.PercentOutput, p);
     else extensionMotor.set(ControlMode.PercentOutput, 0);
   }
   public void manually_extend(double p) {if (!extPosMode) extend(p);}
@@ -82,7 +93,7 @@ public class Arm extends SubsystemBase {
 
 
   public void rotate(double p) {
-    if (canRotateArm(p)) {
+    if (canRotateArm(p) && RotationEnabled) {
       rotationMotorLeft.set(ControlMode.PercentOutput, p);
       rotationMotorRight.set(ControlMode.PercentOutput, p);
     } else {
@@ -98,6 +109,8 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
+    ExtendEnabled = _driverInterface.m_ArmExtSubsystemEnabled.getBoolean(true);
+    RotationEnabled = _driverInterface.m_ArmRotSubsystemEnabled.getBoolean(true);
 
     extPosSetpoint = extPosEntry.getDouble(extPosSetpoint);
     rotPosSetpoint = rotPosEntry.getDouble(rotPosSetpoint);
@@ -120,6 +133,7 @@ public class Arm extends SubsystemBase {
         rotate(Math.copySign(MathUtils.clamp(2 * Math.abs(error), 0.1, 0.15), error));
       }
     }
+    resetExtensionEncoder();
   }
 
   public boolean canRotateArm(double p) {
@@ -129,5 +143,12 @@ public class Arm extends SubsystemBase {
 
   public boolean canExtendArm(double p) {
     return (!((closedLimit.get() && p < 0) || (openedLimit.get() && p > 0)));
+  }
+
+  public void resetExtensionEncoder() {
+    if (closedLimit.get()) {
+      extensionMotor.setSelectedSensorPosition(
+          0); // anytime  arm hits limit switch, encoder position = 0
+    }
   }
 }

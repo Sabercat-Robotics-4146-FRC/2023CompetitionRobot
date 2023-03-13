@@ -1,18 +1,24 @@
 package frc4146.robot;
 
+import static frc4146.robot.Constants.Setpoints.*;
+
 import common.drivers.Gyroscope;
+import common.robot.DriverReadout;
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc4146.robot.commands.drivetrain.AlignWithFiducial;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc4146.robot.commands.drivetrain.DriveCommand;
+import frc4146.robot.commands.subsystems.AlignWithFiducial;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
+
+  public static DriverReadout driverInterface = new DriverReadout();
 
   private PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
@@ -54,10 +60,9 @@ public class RobotContainer {
                 secondaryController.getLeftTriggerAxis(),
                 secondaryController.getRightTriggerAxis(),
                 secondaryController.getRightYAxis()));
+
     CommandScheduler.getInstance()
         .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
-
-    // enables drive using controller
 
     CameraServer.startAutomaticCapture();
 
@@ -66,29 +71,26 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
-    primaryController.getStartButton().onTrue(Commands.runOnce(drivetrainSubsystem::zeroWheels));
+    primaryController
+        .getStartButton()
+        .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
     primaryController
         .getYButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
     primaryController.getXButton().onTrue(Commands.runOnce(drivetrainSubsystem::toggleDriveFlag));
 
-    primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::lockWheels));
+    // primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::lockWheels));
 
     // primaryController.getBButton().toggleOnTrue(new BalanceRobot(drivetrainSubsystem,
     // gyroscope));
 
     primaryController.getBButton().onTrue(new AlignWithFiducial(drivetrainSubsystem, limelight));
-
+    
     secondaryController.getAButton().onTrue(Commands.runOnce(arm::toggleExtensionMode));
     secondaryController.getBButton().onTrue(Commands.runOnce(arm::toggleRotationMode));
 
     // secondaryController.getBButton().toggleOnTrue(new ArmRotate(arm));
 
-    // secondaryController
-    //    .getBButton().onTrue(new InstantCommand(() -> arm.rotateArm()));
-    // .toggleOnTrue(new InstantCommand(() -> arm.extendArm(arm.getPos())));
-
-    // secondaryControlelr.get
   }
 
   public Arm getArmSubsystem() {
