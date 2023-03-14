@@ -87,7 +87,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private final SwerveModule[] modules;
   private final SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
   private final TalonFX[] talons;
-  private final Pigeon pigeon;
+  private final Pigeon gyroscope;
 
   /** swerveOdometry tracks the robot's position over time, using encoder data */
   private final SwerveOdometry swerveOdometry =
@@ -110,7 +110,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public DrivetrainSubsystem(Pigeon gyro) {
 
-    this.pigeon = gyro;
+    this.gyroscope = gyro;
 
     driveSignal = new HolonomicDriveSignal(new Vector2(0, 0), 0.0, true);
 
@@ -226,7 +226,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         .addBoolean("Field Oriented", () -> fieldOriented)
         .withPosition(0, 3);
     _driverInterface.primaryLayout.addBoolean("Drive Enabled", () -> driveFlag).withPosition(0, 2);
-    _driverInterface.primaryLayout.add("Drive Heading", pigeon).withPosition(0, 0);
+    _driverInterface.primaryLayout.add("Drive Heading", gyroscope).withPosition(0, 0);
   }
 
   /** updates driveSignal with desired translational, rotational velocities */
@@ -259,8 +259,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   /** updates odometry data, to be posted and read by drive functions */
   private void updateOdometry(double time, double dt) {
     Vector2[] moduleVelocities = getModuleVelocities();
-    Rotation2 angle = pigeon.getAdjustedAngle();
-    double angularVelocity = pigeon.getRate();
+    Rotation2 angle = gyroscope.getAdjustedAngle();
+    double angularVelocity = gyroscope.getRate();
 
     ChassisVelocity velocity =
         swerveKinematics.toChassisVelocity(
@@ -384,10 +384,10 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   }
 
   public void resetGyroAngle(Rotation2 angle) {
-    pigeon.setAdjustmentAngle(pigeon.getUnadjustedAngle().rotateBy(angle.inverse()));
+    gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle().rotateBy(angle.inverse()));
   }
 
   public WPI_Pigeon2 getGyroscope() {
-    return pigeon;
+    return gyroscope;
   }
 }

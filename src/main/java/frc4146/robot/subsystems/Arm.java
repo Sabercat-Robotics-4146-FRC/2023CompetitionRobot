@@ -4,8 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import common.math.MathUtils;
 import common.robot.DriverReadout;
 import edu.wpi.first.networktables.GenericEntry;
@@ -85,9 +83,8 @@ public class Arm extends SubsystemBase {
     angEntry = Shuffleboard.getTab("Subsystems").add("Arm Angle", currentAngle).getEntry();
     maxLenEntry = Shuffleboard.getTab("Subsystems").add("Max Arm Length", maxLength).getEntry();
     maxAngEntry = Shuffleboard.getTab("Subsystems").add("Max Arm Angle", maxAngle).getEntry();
+  
   }
-
-
 
   public void extend(double p) {
     if (canExtendArm(p) && ExtendEnabled) extensionMotor.set(ControlMode.PercentOutput, p);
