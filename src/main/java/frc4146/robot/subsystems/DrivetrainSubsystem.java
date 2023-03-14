@@ -8,7 +8,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import common.control.*;
-import common.drivers.Gyroscope;
 import common.kinematics.ChassisVelocity;
 import common.kinematics.SwerveKinematics;
 import common.kinematics.SwerveOdometry;
@@ -85,7 +84,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private final SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
   private final TalonFX[] talons;
 
-  private final Gyroscope gyroscope;
+  private final Pigeon gyroscope;
 
   /** swerveOdometry tracks the robot's position over time, using encoder data */
   private final SwerveOdometry swerveOdometry =
@@ -108,11 +107,11 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   private boolean brake_mode = false;
 
-  public DrivetrainSubsystem(Gyroscope gyro) {
+  public DrivetrainSubsystem(Pigeon gyro) {
 
     gyroscope = gyro;
 
-    gyroscope.setInverted(false);
+    // gyroscope.setInverted(false);
     driveSignal = new HolonomicDriveSignal(new Vector2(0, 0), 0.0, true);
 
     timer = new Timer();
@@ -220,6 +219,10 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     tab.addNumber("Average Velocity", this::getAverageAbsoluteValueVelocity);
     tab.addBoolean("Drive Enabled", () -> driveFlag);
     tab.addBoolean("Field Oriented", () -> fieldOriented);
+
+    tab.addNumber("Pigeon Roll", () -> gyroscope.getRoll());
+    tab.addNumber("Pigeon Pitch", () -> gyroscope.getPitch());
+    tab.addNumber("Pigeon Yaw", () -> gyroscope.getYaw());
   }
 
   /** updates driveSignal with desired translational, rotational velocities */
@@ -252,7 +255,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   /** updates odometry data, to be posted and read by drive functions */
   private void updateOdometry(double time, double dt) {
     Vector2[] moduleVelocities = getModuleVelocities();
-    Rotation2 angle = gyroscope.getAngle();
+    Rotation2 angle = Rotation2.fromDegrees(gyroscope.getAngle());
     double angularVelocity = gyroscope.getRate();
 
     ChassisVelocity velocity =
@@ -336,7 +339,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         .map(
             m ->
                 Vector2.fromAngle(Rotation2.fromRadians(m.getSteerAngle()))
-                    .scale(m.getDriveVelocity() * 39.37008))
+                    .scale(m.getDriveVelocity() * 39.37008)) // inches in meter
         .toArray(Vector2[]::new);
   }
 

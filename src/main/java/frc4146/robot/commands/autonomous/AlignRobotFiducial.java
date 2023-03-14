@@ -24,6 +24,8 @@ public class AlignRobotFiducial extends CommandBase {
     this.limelight = limelight;
 
     Shuffleboard.getTab("Drivetrain").addNumber("Stage", () -> stage);
+
+    addRequirements(drivetrain);
   }
 
   public void initialize() {
@@ -35,7 +37,7 @@ public class AlignRobotFiducial extends CommandBase {
     pid_lr = new PIDController(0.17, 0.0, -0.01);
     pid_lr.setTolerance(0.01, 0.01);
 
-    pid_rot = new PIDController(0.6*0.0125, 1.2*0.0125, 3*0.0125);
+    pid_rot = new PIDController(0.6 * 0.0125, 1.2 * 0.0125, 3 * 0.0125);
     pid_rot.setTolerance(0.05, 0.01);
 
     pid_rot.setSetpoint(0);
@@ -50,7 +52,8 @@ public class AlignRobotFiducial extends CommandBase {
       if (pid_rot.atSetpoint()) {
         stage += 1;
       }
-    } else if (stage == 1) {
+    }
+    if (stage == 1) {
       drivetrain.drive(
           new Vector2(0, MathUtils.clamp(pid_lr.calculate(getLeftRightError()), -0.1, 0.1)),
           0,
@@ -58,7 +61,8 @@ public class AlignRobotFiducial extends CommandBase {
       if (pid_lr.atSetpoint() && pid_rot.atSetpoint()) {
         stage += 1;
       }
-    } else if (stage == 2) {
+    }
+    if (stage == 2) {
       drivetrain.drive(
           new Vector2(MathUtils.clamp(pid_fb.calculate(getForwardBackError()), -0.1, 0.1), 0),
           0,
@@ -81,7 +85,7 @@ public class AlignRobotFiducial extends CommandBase {
   }
 
   public double getRotationError() {
-    return limelight.getHorizontalOffset()/27;
+    return limelight.getHorizontalOffset() / 27;
   }
 
   public void end(boolean interrupted) {

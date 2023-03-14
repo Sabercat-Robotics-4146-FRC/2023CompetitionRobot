@@ -5,19 +5,21 @@ import java.util.Map;
 
 public class Constants {
   public static final int PRIMARY_CONTROLLER_PORT = 0;
-  public static final int SECONDARY_CONTROLLER_PORT = 1;
+  public static final int SECONDARY_CONTROLLER_PORT = 2;
 
   public static class DriveConstants {
 
     public static final int DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR = 2;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_MOTOR = 3;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_ENCODER = 12;
-    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(283.184 + 180);
+    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET =
+        -Math.toRadians(283.184 + 180 + 0.7);
 
     public static final int DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR = 4;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_MOTOR = 5;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_ENCODER = 14;
-    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(278.789 + 180);
+    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET =
+        -Math.toRadians(278.789 + 180 + 1.23);
 
     public static final int DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR = 6;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_MOTOR = 7;
