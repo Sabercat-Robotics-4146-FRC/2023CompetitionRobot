@@ -37,13 +37,9 @@ public class Arm extends SubsystemBase {
   public boolean extPosMode = false;
 
   public double currentLength;
-  private GenericEntry lenEntry;
-  public double maxLength;
-  private GenericEntry maxLenEntry;
   public double currentAngle;
-  private GenericEntry angEntry;
-  public double maxAngle;
-  private GenericEntry maxAngEntry;
+  double maxAngle = Math.PI / 3;
+  double maxLength = 55;
 
   public Arm() {
     // enabled = _driverInterface.m_ArmSubsystemEnabled.getBoolean(true);
@@ -63,7 +59,6 @@ public class Arm extends SubsystemBase {
 
     rotPosEntry = Shuffleboard.getTab("Subsystems").add("Rotation SP", rotPosSetpoint).getEntry();
 
-
     extensionMotor = new TalonFX(ArmConstants.EXTENSION_ID);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
     extensionMotor.configSelectedFeedbackSensor(
@@ -79,24 +74,36 @@ public class Arm extends SubsystemBase {
 
     extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP", extPosSetpoint).getEntry();
 
-    lenEntry = Shuffleboard.getTab("Subsystems").add("Arm Length", currentLength).getEntry();
-    angEntry = Shuffleboard.getTab("Subsystems").add("Arm Angle", currentAngle).getEntry();
-    maxLenEntry = Shuffleboard.getTab("Subsystems").add("Max Arm Length", maxLength).getEntry();
-    maxAngEntry = Shuffleboard.getTab("Subsystems").add("Max Arm Angle", maxAngle).getEntry();
-  
+    Shuffleboard.getTab("TEST").addNumber("Arm Length", () -> currentLength);
+    Shuffleboard.getTab("TEST").addNumber("Arm Angle", () -> currentAngle);
+    Shuffleboard.getTab("TEST").addNumber("Max Arm Length", () -> maxLength);
+    Shuffleboard.getTab("TEST").addNumber("Max Arm Angle", () -> maxAngle);
   }
 
   public void extend(double p) {
     if (canExtendArm(p) && ExtendEnabled) extensionMotor.set(ControlMode.PercentOutput, p);
     else extensionMotor.set(ControlMode.PercentOutput, 0);
   }
-  public void manually_extend(double p) {if (!extPosMode) extend(p);}
-  public double getExtension() {return extensionMotor.getSelectedSensorPosition() / 2048;}
-  public void setExtensionPos(double encSetpoint) {extPosSetpoint = encSetpoint;}
-  public double getExtensionError() {return (extPosSetpoint - getExtension());}
-  public void toggleExtensionMode() {extPosMode = !extPosMode;}
 
+  public void manually_extend(double p) {
+    if (!extPosMode) extend(p);
+  }
 
+  public double getExtension() {
+    return extensionMotor.getSelectedSensorPosition() / 2048;
+  }
+
+  public void setExtensionPos(double encSetpoint) {
+    extPosSetpoint = encSetpoint;
+  }
+
+  public double getExtensionError() {
+    return (extPosSetpoint - getExtension());
+  }
+
+  public void toggleExtensionMode() {
+    extPosMode = !extPosMode;
+  }
 
   public void rotate(double p) {
     if (canRotateArm(p) && RotationEnabled) {
@@ -107,11 +114,26 @@ public class Arm extends SubsystemBase {
       rotationMotorRight.set(ControlMode.PercentOutput, 0);
     }
   }
-  public void manually_rotate(double p) {if (!rotPosMode) rotate(p);}
-  public double getRotation() {return pot.get();}
-  public void setRotationPos(double potSetpoint) {rotPosSetpoint = potSetpoint;}
-  public double getRotationError() {return rotPosSetpoint - getRotation();}
-  public void toggleRotationMode() {rotPosMode = !rotPosMode;}
+
+  public void manually_rotate(double p) {
+    if (!rotPosMode) rotate(p);
+  }
+
+  public double getRotation() {
+    return pot.get();
+  }
+
+  public void setRotationPos(double potSetpoint) {
+    rotPosSetpoint = potSetpoint;
+  }
+
+  public double getRotationError() {
+    return rotPosSetpoint - getRotation();
+  }
+
+  public void toggleRotationMode() {
+    rotPosMode = !rotPosMode;
+  }
 
   @Override
   public void periodic() {
@@ -142,7 +164,6 @@ public class Arm extends SubsystemBase {
     resetExtensionEncoder();
   }
 
-
   public boolean canRotateArm(double p) {
     return (!((getRotation() < ArmConstants.POT_MAX_ROTATION && p < 0)
         || (getRotation() > ArmConstants.POT_MIN_ROTATION && p > 0)));
@@ -155,7 +176,7 @@ public class Arm extends SubsystemBase {
   public void resetExtensionEncoder() {
     if (closedLimit.get()) {
       extensionMotor.setSelectedSensorPosition(
-          0); // anytime  arm hits limit switch, encoder position = 0
+          0); // anytime arm hits limit switch, encoder position = 0
     }
   }
 
@@ -165,20 +186,16 @@ public class Arm extends SubsystemBase {
 
     currentAngle = -(getRotation() * 2 * Math.PI) + 4.210;
     currentLength =
-        (getExtension() * 2 * Math.PI * .75) / 12.5
+        (getExtension() * 2 * Math.PI * .75) / (25 / 2)
             + ArmConstants.MIN_LENGTH; // C=2pi*r, gear_ratio=12.5
 
-    double maxAngle = Math.PI / 3;
-    double maxLength = 55;
-
     if (currentAngle >= maxAngle) {
-      // arm not too high
       drive = false;
+      maxLength = 55;
     } else {
-      // claw not dragging on ground
       maxLength =
           (ArmConstants.SUPERSTRUCTURE_HEIGHT / Math.cos(currentAngle))
-              - 2; // margin of error of 2 inches
+              - 4; // margin of error of 4 inches above ground
     }
     if (currentLength >= maxLength) {
       drive = false;

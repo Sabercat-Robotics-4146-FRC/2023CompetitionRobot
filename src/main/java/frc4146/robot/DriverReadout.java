@@ -37,7 +37,8 @@ public class DriverReadout {
     primaryLayout
         .addCamera("Camera", "USB Camera 0", "")
         .withWidget(BuiltInWidgets.kCameraStream)
-        .withPosition(1, 0);
+        .withPosition(1, 0)
+        .withSize(3, 3);
 
     m_ClawSubsystemEnabled = createSubsystemToggle("Claw Subsystem");
     m_ArmExtSubsystemEnabled = createSubsystemToggle("Extension Enabled");

@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc4146.robot.commands.drivetrain.DriveCommand;
-import frc4146.robot.commands.subsystems.AlignWithFiducial;
 import frc4146.robot.commands.subsystems.*;
+import frc4146.robot.commands.subsystems.AlignWithFiducial;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -97,11 +97,18 @@ public class RobotContainer {
 
     // secondaryController.getBButton().toggleOnTrue(new ArmRotate(arm));
 
-    armState.onTrue(new InstantCommand(() -> primaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
-    armState.onTrue(new InstantCommand(() -> secondaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
-    armState.onFalse(new InstantCommand(() -> primaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
-    armState.onFalse(new InstantCommand(() -> secondaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
-
+    armState.onFalse(
+        new InstantCommand(
+            () -> primaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
+    armState.onFalse(
+        new InstantCommand(
+            () -> secondaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
+    armState.onTrue(
+        new InstantCommand(
+            () -> primaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
+    armState.onTrue(
+        new InstantCommand(
+            () -> secondaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
   }
 
   public DrivetrainSubsystem getDrivetrainSubsystem() {
