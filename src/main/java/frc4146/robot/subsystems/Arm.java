@@ -4,6 +4,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import common.math.MathUtils;
 import common.robot.DriverReadout;
 import edu.wpi.first.networktables.GenericEntry;
@@ -21,16 +23,18 @@ public class Arm extends SubsystemBase {
 
   public TalonFX rotationMotorLeft;
   public TalonFX rotationMotorRight;
+  public AnalogPotentiometer pot;
 
+  private double rotPosSetpoint = 0.6;
+  private GenericEntry rotPosEntry;
+  public boolean rotPosMode = false;
   public boolean rotFlag = true;
 
   public TalonFX extensionMotor;
   public DigitalInput closedLimit;
   public DigitalInput openedLimit;
 
-  public AnalogPotentiometer pot;
-
-  private double extPosSetpoint = 45;
+  private double extPosSetpoint = 0;
   private GenericEntry extPosEntry;
   public boolean extPosMode = false;
 
@@ -57,6 +61,7 @@ public class Arm extends SubsystemBase {
 
     rotPosEntry = Shuffleboard.getTab("Subsystems").add("Rotation SP", rotPosSetpoint).getEntry();
 
+
     extensionMotor = new TalonFX(ArmConstants.EXTENSION_ID);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
     extensionMotor.configSelectedFeedbackSensor(
@@ -73,30 +78,19 @@ public class Arm extends SubsystemBase {
     extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP", extPosSetpoint).getEntry();
   }
 
-  public void manually_extend(double p) {
-    if (!extPosMode) extend(p);
-  }
+
 
   public void extend(double p) {
     if (canExtendArm(p) && ExtendEnabled) extensionMotor.set(ControlMode.PercentOutput, p);
     else extensionMotor.set(ControlMode.PercentOutput, 0);
   }
+  public void manually_extend(double p) {if (!extPosMode) extend(p);}
+  public double getExtension() {return extensionMotor.getSelectedSensorPosition() / 2048;}
+  public void setExtensionPos(double encSetpoint) {extPosSetpoint = encSetpoint;}
+  public double getExtensionError() {return (extPosSetpoint - getExtension());}
+  public void toggleExtensionMode() {extPosMode = !extPosMode;}
 
-  public void setExtensionPos(double encSetpoint) {
-    extPosSetpoint = encSetpoint;
-  }
 
-  public double getExtensionError() {
-    return (extPosSetpoint - getExtension());
-  }
-
-  public void toggleExtensionMode() {
-    extPosMode = !extPosMode;
-  }
-
-  public void manually_rotate(double p) {
-    if (!rotPosMode) rotate(p);
-  }
 
   public void rotate(double p) {
     if (canRotateArm(p) && RotationEnabled) {
@@ -107,18 +101,11 @@ public class Arm extends SubsystemBase {
       rotationMotorRight.set(ControlMode.PercentOutput, 0);
     }
   }
-
-  public void setRotationPos(double potSetpoint) {
-    rotPosSetpoint = potSetpoint;
-  }
-
-  public double getRotationError() {
-    return (rotPosSetpoint - getRotation());
-  }
-
-  public void toggleRotationMode() {
-    rotPosMode = !rotPosMode;
-  }
+  public void manually_rotate(double p) {if (!rotPosMode) rotate(p);}
+  public double getRotation() {return pot.get();}
+  public void setRotationPos(double potSetpoint) {rotPosSetpoint = potSetpoint;}
+  public double getRotationError() {return rotPosSetpoint - getRotation();}
+  public void toggleRotationMode() {rotPosMode = !rotPosMode;}
 
   @Override
   public void periodic() {
@@ -147,14 +134,6 @@ public class Arm extends SubsystemBase {
       }
     }
     resetExtensionEncoder();
-  }
-
-  public double getExtension() {
-    return extensionMotor.getSelectedSensorPosition() / 2048;
-  }
-
-  public double getRotation() {
-    return pot.get();
   }
 
   public boolean canRotateArm(double p) {
