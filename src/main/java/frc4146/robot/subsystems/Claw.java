@@ -19,7 +19,9 @@ public class Claw implements Subsystem {
     enabled = _driverInterface.m_ClawSubsystemEnabled.getBoolean(true);
 
     clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
-    Shuffleboard.getTab("Subsystems").addNumber("Claw", () -> getPos());
+    Shuffleboard.getTab("Subsystems").addNumber("Claw Position", () -> getPos());
+    Shuffleboard.getTab("Subsystems").addNumber("Claw Current", () -> clawMotor.getStatorCurrent());
+
   }
 
   @Override
@@ -38,6 +40,6 @@ public class Claw implements Subsystem {
   }
 
   public boolean hasObject() {
-    return clawMotor.getStatorCurrent() > 12; // TODO test
+    return (clawMotor.getStatorCurrent() > 12 && getPos() > .4); // TODO test
   }
 }

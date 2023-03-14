@@ -10,7 +10,6 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc4146.robot.Constants.ArmConstants;
 
@@ -38,6 +37,15 @@ public class Arm extends SubsystemBase {
   private double rotPosSetpoint = 0.35;
   private GenericEntry rotPosEntry;
   public boolean rotPosMode = false;
+
+  public double currentLength;
+  private GenericEntry lenEntry;
+  public double maxLength;
+  private GenericEntry maxLenEntry;
+  public double currentAngle;
+  private GenericEntry angEntry;
+  public double maxAngle;
+  private GenericEntry maxAngEntry;
 
   public Arm() {
     // enabled = _driverInterface.m_ArmSubsystemEnabled.getBoolean(true);
@@ -71,6 +79,11 @@ public class Arm extends SubsystemBase {
     Shuffleboard.getTab("Subsystems").addNumber("ExtError", () -> getExtensionError());
 
     extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP", extPosSetpoint).getEntry();
+
+    lenEntry = Shuffleboard.getTab("Subsystems").add("Arm Length", currentLength).getEntry();
+    angEntry = Shuffleboard.getTab("Subsystems").add("Arm Angle", currentAngle).getEntry();
+    maxLenEntry = Shuffleboard.getTab("Subsystems").add("Max Arm Length", maxLength).getEntry();
+    maxAngEntry = Shuffleboard.getTab("Subsystems").add("Max Arm Angle", maxAngle).getEntry();
   }
 
   public void manually_extend(double p) {
@@ -147,7 +160,6 @@ public class Arm extends SubsystemBase {
       }
     }
     resetExtensionEncoder();
-    checkArmForDrive();
   }
 
   public double getExtension() {
@@ -174,24 +186,31 @@ public class Arm extends SubsystemBase {
     }
   }
 
-  /* if necessary, move arm to a safe position to drive */
-  public void checkArmForDrive() {
-    double current_angle = getRotation() * 2 * Math.PI; // + offset
-    double current_length = (getExtension() * 2 * Math.PI * .75) / 25 + ArmConstants.MIN_LENGTH;
+  /* if necessary, move arm to a safe position to drive; true->OK to drive, false->vibrate controller*/
+  public boolean safeToDrive() {
+    boolean drive = true;
 
-    double max_angle = Math.PI / 3;
-    double max_length = ArmConstants.SUPERSTRUCTURE_HEIGHT / Math.cos(current_angle);
+    currentAngle = -(getRotation() * 2 * Math.PI) + 4.210;
+    currentLength =
+        (getExtension() * 2 * Math.PI * .75) / 12.5
+            + ArmConstants.MIN_LENGTH; // C=2pi*r, gear_ratio=12.5
 
-    // arm not too high
-    /*if (current_angle >= max_angle) {
-      setRotationPos(Setpoints.drive_pos[0]);
+    double maxAngle = Math.PI / 3;
+    double maxLength = 55;
+
+    if (currentAngle >= maxAngle) {
+      // arm not too high
+      drive = false;
+    } else {
+      // claw not dragging on ground
+      maxLength =
+          (ArmConstants.SUPERSTRUCTURE_HEIGHT / Math.cos(currentAngle))
+              - 2; // margin of error of 2 inches
     }
-    // claw not dragging on ground
-    if (current_length >= max_length) {
-      setExtensionPos(Setpoints.drive_pos[1]);
-    }*/
+    if (currentLength >= maxLength) {
+      drive = false;
+    }
 
-    SmartDashboard.putNumber("arm length", current_length);
-    SmartDashboard.putNumber("arm angle", current_angle);
+    return drive;
   }
 }

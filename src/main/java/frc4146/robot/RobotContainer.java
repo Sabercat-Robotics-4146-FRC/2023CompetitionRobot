@@ -1,16 +1,18 @@
 package frc4146.robot;
 
 import common.robot.DriverReadout;
-import common.robot.input.XboxController;
+import common.robot.input.MainXboxController;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.subsystems.AlignWithFiducial;
-import frc4146.robot.commands.subsystems.ArmCommand;
-import frc4146.robot.commands.subsystems.ClawCommand;
+import frc4146.robot.commands.subsystems.*;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -19,11 +21,15 @@ public class RobotContainer {
 
   private PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
-  private final XboxController primaryController =
-      new XboxController(Constants.PRIMARY_CONTROLLER_PORT);
+  private final MainXboxController primaryController =
+      new MainXboxController(Constants.PRIMARY_CONTROLLER_PORT);
+  private final MainXboxController secondaryController =
+      new MainXboxController(Constants.SECONDARY_CONTROLLER_PORT);
 
-  private final XboxController secondaryController =
-      new XboxController(Constants.SECONDARY_CONTROLLER_PORT);
+  private final XboxController primaryRumbleController =
+      new XboxController(Constants.PRIMARY_CONTROLLER_PORT); // TODO fix
+  private final XboxController secondaryRumbleController =
+      new XboxController(Constants.SECONDARY_CONTROLLER_PORT); // TODO fix
 
   private final Pigeon pigeon = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(pigeon);
@@ -31,6 +37,8 @@ public class RobotContainer {
   private final Limelight limelight = new Limelight();
   private final Arm arm = new Arm();
   private final Claw claw = new Claw();
+
+  private final Trigger armState;
 
   public RobotContainer() {
     pdh.setSwitchableChannel(true);
@@ -60,6 +68,8 @@ public class RobotContainer {
     CommandScheduler.getInstance()
         .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
 
+    armState = new Trigger(() -> arm.safeToDrive());
+
     CameraServer.startAutomaticCapture();
 
     configureButtonBindings();
@@ -86,6 +96,11 @@ public class RobotContainer {
     secondaryController.getBButton().onTrue(Commands.runOnce(arm::toggleRotationMode));
 
     // secondaryController.getBButton().toggleOnTrue(new ArmRotate(arm));
+
+    armState.onTrue(new InstantCommand(() -> primaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
+    armState.onTrue(new InstantCommand(() -> secondaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
+    armState.onFalse(new InstantCommand(() -> primaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
+    armState.onFalse(new InstantCommand(() -> secondaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
 
   }
 
