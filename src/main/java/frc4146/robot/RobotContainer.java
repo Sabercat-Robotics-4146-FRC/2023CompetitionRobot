@@ -1,11 +1,10 @@
 package frc4146.robot;
 
 import common.robot.DriverReadout;
-import common.robot.input.MainXboxController;
+import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -21,15 +20,13 @@ public class RobotContainer {
 
   private PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
-  private final MainXboxController primaryController =
-      new MainXboxController(Constants.PRIMARY_CONTROLLER_PORT);
-  private final MainXboxController secondaryController =
-      new MainXboxController(Constants.SECONDARY_CONTROLLER_PORT);
+  private final XboxController primaryController =
+      new XboxController(Constants.PRIMARY_CONTROLLER_PORT);
+  private final XboxController secondaryController =
+      new XboxController(Constants.SECONDARY_CONTROLLER_PORT);
 
-  private final XboxController primaryRumbleController =
-      new XboxController(Constants.PRIMARY_CONTROLLER_PORT); // TODO fix
-  private final XboxController secondaryRumbleController =
-      new XboxController(Constants.SECONDARY_CONTROLLER_PORT); // TODO fix
+  private final GenericHID secondaryRumble =
+      new GenericHID(Constants.SECONDARY_CONTROLLER_PORT);
 
   private final Pigeon pigeon = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(pigeon);
@@ -99,16 +96,11 @@ public class RobotContainer {
 
     armState.onFalse(
         new InstantCommand(
-            () -> primaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
-    armState.onFalse(
-        new InstantCommand(
-            () -> secondaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
+            () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
+
     armState.onTrue(
         new InstantCommand(
-            () -> primaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
-    armState.onTrue(
-        new InstantCommand(
-            () -> secondaryRumbleController.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
+            () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
   }
 
   public DrivetrainSubsystem getDrivetrainSubsystem() {
