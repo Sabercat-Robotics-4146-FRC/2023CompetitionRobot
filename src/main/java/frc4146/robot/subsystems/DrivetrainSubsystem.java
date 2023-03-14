@@ -5,10 +5,10 @@ import static frc4146.robot.Constants.DriveConstants;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import common.control.*;
-import common.drivers.Gyroscope;
 import common.kinematics.ChassisVelocity;
 import common.kinematics.SwerveKinematics;
 import common.kinematics.SwerveOdometry;
@@ -87,8 +87,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private final SwerveModule[] modules;
   private final SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
   private final TalonFX[] talons;
-
-  private final Gyroscope gyroscope;
+  private final Pigeon pigeon;
 
   /** swerveOdometry tracks the robot's position over time, using encoder data */
   private final SwerveOdometry swerveOdometry =
@@ -109,10 +108,9 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private final GenericEntry odometryYEntry; // robot's y position
   private final GenericEntry odometryAngleEntry; // robot's heading/angle
 
-  public DrivetrainSubsystem(Gyroscope gyro) {
+  public DrivetrainSubsystem(Pigeon gyro) {
 
-    gyroscope = gyro;
-    gyroscope.setInverted(false);
+    this.pigeon = gyro;
 
     driveSignal = new HolonomicDriveSignal(new Vector2(0, 0), 0.0, true);
 
@@ -228,7 +226,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         .addBoolean("Field Oriented", () -> fieldOriented)
         .withPosition(0, 3);
     _driverInterface.primaryLayout.addBoolean("Drive Enabled", () -> driveFlag).withPosition(0, 2);
-    _driverInterface.primaryLayout.add("Drive Heading", gyroscope).withPosition(0, 0);
+    _driverInterface.primaryLayout.add("Drive Heading", pigeon).withPosition(0, 0);
   }
 
   /** updates driveSignal with desired translational, rotational velocities */
@@ -261,8 +259,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   /** updates odometry data, to be posted and read by drive functions */
   private void updateOdometry(double time, double dt) {
     Vector2[] moduleVelocities = getModuleVelocities();
-    Rotation2 angle = gyroscope.getAngle();
-    double angularVelocity = gyroscope.getRate();
+    Rotation2 angle = pigeon.getAdjustedAngle();
+    double angularVelocity = pigeon.getRate();
 
     ChassisVelocity velocity =
         swerveKinematics.toChassisVelocity(
@@ -386,10 +384,10 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   }
 
   public void resetGyroAngle(Rotation2 angle) {
-    gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle().rotateBy(angle.inverse()));
+    pigeon.setAdjustmentAngle(pigeon.getUnadjustedAngle().rotateBy(angle.inverse()));
   }
 
-  public Gyroscope getGyroscope() {
-    return gyroscope;
+  public WPI_Pigeon2 getGyroscope() {
+    return pigeon;
   }
 }

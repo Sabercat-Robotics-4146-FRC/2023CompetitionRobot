@@ -1,8 +1,5 @@
 package frc4146.robot;
 
-import static frc4146.robot.Constants.Setpoints.*;
-
-import common.drivers.Gyroscope;
 import common.robot.DriverReadout;
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -28,11 +25,10 @@ public class RobotContainer {
   private final XboxController secondaryController =
       new XboxController(Constants.SECONDARY_CONTROLLER_PORT);
 
-  private final Pigeon gyroscope = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
-  private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(gyroscope);
+  private final Pigeon pigeon = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
+  private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(pigeon);
 
   private final Limelight limelight = new Limelight();
-
   private final Arm arm = new Arm();
   private final Claw claw = new Claw();
 
@@ -70,7 +66,7 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
+    primaryController.getStartButton().onTrue(Commands.runOnce(pigeon::calibrate));
     primaryController
         .getStartButton()
         .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
@@ -85,7 +81,7 @@ public class RobotContainer {
     // gyroscope));
 
     primaryController.getBButton().onTrue(new AlignWithFiducial(drivetrainSubsystem, limelight));
-    
+
     secondaryController.getAButton().onTrue(Commands.runOnce(arm::toggleExtensionMode));
     secondaryController.getBButton().onTrue(Commands.runOnce(arm::toggleRotationMode));
 
@@ -93,15 +89,7 @@ public class RobotContainer {
 
   }
 
-  public Arm getArmSubsystem() {
-    return arm;
-  }
-
   public DrivetrainSubsystem getDrivetrainSubsystem() {
     return drivetrainSubsystem;
-  }
-
-  public Gyroscope getGyroscope() {
-    return gyroscope;
   }
 }
