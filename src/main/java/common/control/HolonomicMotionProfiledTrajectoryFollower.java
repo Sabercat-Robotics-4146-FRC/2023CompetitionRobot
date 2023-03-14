@@ -1,5 +1,6 @@
 package common.control;
 
+import common.math.MathUtils;
 import common.math.RigidTransform2;
 import common.math.Vector2;
 import common.util.HolonomicDriveSignal;
@@ -18,12 +19,14 @@ public class HolonomicMotionProfiledTrajectoryFollower
 
   private boolean finished = false;
 
-  private double duration = 0;
   private double lastTime = 0;
 
   private double scale;
   private double maxSpeed = .5;
   private double reduction = 0;
+
+  private double lastTranslationx = 0;
+  private double lastTranslationy = 0;
 
   public HolonomicMotionProfiledTrajectoryFollower(
       PidConstants translationConstants,
@@ -47,12 +50,6 @@ public class HolonomicMotionProfiledTrajectoryFollower
       double time,
       double dt) {
 
-    duration = Math.max(trajectory.getDuration(), duration);
-
-    if(trajectory.getDuration() - time < 0.1) {
-      maxSpeed /= 1.5;
-    }
-
     if(lastTime == 0) lastTime = time;
 
     time -= reduction;
@@ -67,38 +64,47 @@ public class HolonomicMotionProfiledTrajectoryFollower
       previousState = trajectory.calculate(0.0);
     }
 
-    double translationx = (lastState.getPathState().getPosition().x - previousState.getPathState().getPosition().x) * 50;
-    double translationy = (lastState.getPathState().getPosition().y - previousState.getPathState().getPosition().y) * 50;
+    double translationx = (lastState.getPathState().getPosition().x - previousState.getPathState().getPosition().x) * 100;
+    double translationy = (lastState.getPathState().getPosition().y - previousState.getPathState().getPosition().y) * 100;
+
 
     if(translationx > maxSpeed || translationx < -maxSpeed) {
       scale = Math.abs(translationx / maxSpeed);
-      translationx = Math.copySign(maxSpeed, translationx);
+      translationx = maxSpeed * (translationx/Math.abs(translationx));
       translationy /= scale;
-      duration += (time - lastTime) - ((time - lastTime) / scale);
-      reduction += (time - lastTime) - ((time - lastTime) / scale);
+      reduction += (time - lastTime) - (time - lastTime) / scale;
     }
 
     if(translationy > maxSpeed || translationy < -maxSpeed) {
       scale = Math.abs(translationy / maxSpeed);
-      translationy = Math.copySign(maxSpeed, translationy);
+      translationy = maxSpeed * (translationy/Math.abs(translationy));
       translationx /= scale;
-      duration += (time - lastTime) - ((time - lastTime) / scale);
-      reduction += (time - lastTime) - ((time - lastTime) / scale);
+      reduction += (time - lastTime) - (time - lastTime) / scale;
     }
 
-    SmartDashboard.putNumber("x", trajectory.calculate(time).getPathState().getPosition().y);
+    if(Math.abs(translationx - lastTranslationx) > maxSpeed/1.25) {
+      translationx = lastTranslationx;
+    }
 
+    if(Math.abs(translationy - lastTranslationy) > maxSpeed/1.25) {
+      translationy = lastTranslationy;
+    }
+
+
+
+    SmartDashboard.putNumber("X", translationx);
+    SmartDashboard.putString("TESTTTTT", time + reduction + " " + trajectory.getDuration());
     
-    double rotation = 0;
     lastTime = time;
-
     previousState = lastState;
+    lastTranslationx = translationx;
+    lastTranslationy = translationy;
 
     return new HolonomicDriveSignal(
         new Vector2(
-            -translationx, -translationy),
-        -rotation,
-        true);
+           0, 0),
+        0,
+        false);
   }
 
   public Trajectory.State getLastState() {

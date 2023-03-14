@@ -1,9 +1,12 @@
 package common.control;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import common.math.MathUtils;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc4146.robot.autonomous.AutonomousFactory;
 
 public class Trajectory {
   private final Path path;
@@ -12,16 +15,19 @@ public class Trajectory {
 
   private List<ConstrainedPathState> constrainedPathStates = new ArrayList<>();
   private double[] pathStateStartTimes;
+  private List<AutonomousFactory.State> waypoints;
+  private List<Double> waypointTimes = new ArrayList<>();
 
   public Trajectory(
-      Path path, TrajectoryConstraint[] trajectoryConstraints, double sampleDistance) {
-    this(path, trajectoryConstraints, sampleDistance, 0.0, 0.0);
+    Path path, TrajectoryConstraint[] trajectoryConstraints, double sampleDistance, List<AutonomousFactory.State> waypoints) {
+      this(path, trajectoryConstraints, sampleDistance, waypoints, 0.0, 0.0);
   }
 
   public Trajectory(
       Path path,
       TrajectoryConstraint[] trajectoryConstraints,
       double sampleDistance,
+      List<AutonomousFactory.State> waypoints,
       double trajectoryStartingVelocity,
       double trajectoryEndingVelocity) {
     this.path = path;
@@ -157,9 +163,23 @@ public class Trajectory {
     pathStateStartTimes = new double[constrainedPathStates.size()];
 
     double duration = 0.0;
+    int j = 0;
     for (int i = 0; i < constrainedPathStates.size(); i++) {
       pathStateStartTimes[i] = duration;
       duration += constrainedPathStates.get(i).getDuration();
+      if(
+        MathUtils.epsilonEquals(
+          constrainedPathStates.get(i).pathState.getPosition().x, 
+          waypoints.get(j).x
+        ) && 
+        MathUtils.epsilonEquals(
+          constrainedPathStates.get(i).pathState.getPosition().y, 
+          waypoints.get(j).y
+        )) {
+          //waypointTimes.add(duration);
+      }
+
+      if(i!=0) SmartDashboard.putNumber("TESTT", constrainedPathStates.get(i).pathState.getPosition().x - constrainedPathStates.get(i-1).pathState.getPosition().x);
     }
     this.duration = duration;
   }
@@ -195,6 +215,10 @@ public class Trajectory {
 
   public Path getPath() {
     return path;
+  }
+
+  public List<Double> getWaypointTimes() {
+    return waypointTimes;
   }
 
   class ConstrainedPathState {
