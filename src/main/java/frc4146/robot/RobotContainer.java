@@ -7,20 +7,17 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-<<<<<<< HEAD
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.subsystems.*;
 import frc4146.robot.commands.subsystems.AlignWithFiducial;
-=======
 import frc4146.robot.commands.autonomous.AlignRobotFiducial;
 import frc4146.robot.commands.autonomous.BalanceRobot;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.commands.subsystems.PositionPiece;
->>>>>>> Competition
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -82,15 +79,13 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-<<<<<<< HEAD
+  
     primaryController.getStartButton().onTrue(Commands.runOnce(pigeon::calibrate));
     primaryController
         .getStartButton()
         .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
-=======
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
 
->>>>>>> Competition
     primaryController
         .getLeftBumperButton()
         .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(false)));
@@ -123,7 +118,6 @@ public class RobotContainer {
         .and(secondaryController.getYButton())
         .toggleOnTrue(new PositionPiece(arm, "cone", "high"));
 
-<<<<<<< HEAD
     // primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::lockWheels));
 
     // primaryController.getBButton().toggleOnTrue(new BalanceRobot(drivetrainSubsystem,
@@ -143,7 +137,7 @@ public class RobotContainer {
     armState.onTrue(
         new InstantCommand(
             () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
-=======
+
     secondaryController
         .getRightBumperButton()
         .and(secondaryController.getXButton())
@@ -164,7 +158,6 @@ public class RobotContainer {
 
   public Arm getArmSubsystem() {
     return arm;
->>>>>>> Competition
   }
 
   public DrivetrainSubsystem getDrivetrainSubsystem() {
