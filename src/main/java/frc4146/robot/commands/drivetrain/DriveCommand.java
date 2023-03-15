@@ -31,7 +31,7 @@ public class DriveCommand extends CommandBase {
 
   @Override
   public void execute() {
-<<<<<<< HEAD
+
     double th = 0.01;
 
     double f = forward.get();
@@ -42,7 +42,6 @@ public class DriveCommand extends CommandBase {
     if (Math.abs(r) < th) r = 0;
 
     drivetrainSubsystem.drive(new Vector2(-f / 2.0, s / 2.0), r / 6.0);
-=======
 
     double f = forward.get();
     double s = strafe.get();
@@ -55,8 +54,8 @@ public class DriveCommand extends CommandBase {
             sf.calculate(
                 Math.copySign(Math.tan(Math.abs(s)) * (Math.sin(Math.abs(s)) + 0.5) / 3.25, s))),
         rf.calculate(Math.copySign(Math.tan(Math.abs(r)) * (Math.sin(Math.abs(r)) + 1) / 60.0, r)), false);
->>>>>>> Competition
-  }
+
+}
 
   @Override
   public void end(boolean interrupted) {
