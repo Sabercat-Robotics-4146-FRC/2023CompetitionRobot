@@ -138,6 +138,7 @@ $RECYCLE.BIN/
 ### Gradle ###
 .gradle
 /build/
+/settings/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -160,3 +161,6 @@ bin/
 
 # Simulation GUI and other tools window save file
 *-window.json
+
+# WPILIB License
+WPILib-License.md
