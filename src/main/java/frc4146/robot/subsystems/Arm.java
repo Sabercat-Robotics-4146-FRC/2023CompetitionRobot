@@ -25,10 +25,7 @@ public class Arm extends SubsystemBase {
 
   private double rotPosSetpoint = 0.6;
   public boolean rotPosMode = false;
-<<<<<<< HEAD
   public boolean rotFlag = true;
-=======
->>>>>>> Competition
 
   public TalonFX extensionMotor;
   public DigitalInput closedLimit;
@@ -37,14 +34,11 @@ public class Arm extends SubsystemBase {
   private double extPosSetpoint = 0;
   public boolean extPosMode = false;
 
-<<<<<<< HEAD
   public double currentLength;
   public double currentAngle;
   double maxAngle = Math.PI / 3;
   double maxLength = 55;
 
-=======
->>>>>>> Competition
   public Arm() {
     // enabled = _driverInterface.m_ArmSubsystemEnabled.getBoolean(true);
 
@@ -53,28 +47,18 @@ public class Arm extends SubsystemBase {
     rotationMotorRight = new TalonFX(ArmConstants.ROTATION_RIGHT_ID);
     rotationMotorRight.setNeutralMode(NeutralMode.Brake);
     rotationMotorRight.setInverted(true);
-<<<<<<< HEAD
     // TODO current limit, max accel.
 
     pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEL);
-=======
 
     rotationMotorLeft.setNeutralMode(NeutralMode.Brake);
     rotationMotorRight.setNeutralMode(NeutralMode.Brake);
-
-    pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEl);
->>>>>>> Competition
 
     Shuffleboard.getTab("Subsystems").addNumber("Rotation", () -> getRotation());
     Shuffleboard.getTab("Subsystems").addBoolean("RotPosMode", () -> rotPosMode);
     Shuffleboard.getTab("Subsystems").addNumber("RotError", () -> getRotationError());
 
-<<<<<<< HEAD
     rotPosEntry = Shuffleboard.getTab("Subsystems").add("Rotation SP", rotPosSetpoint).getEntry();
-=======
-    // rotPosEntry = Shuffleboard.getTab("Subsystems").add("Rotation SP",
-    // rotPosSetpoint).getEntry();
->>>>>>> Competition
 
     extensionMotor = new TalonFX(ArmConstants.EXTENSION_ID);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
@@ -89,17 +73,13 @@ public class Arm extends SubsystemBase {
     Shuffleboard.getTab("Subsystems").addBoolean("ExtPosMode", () -> extPosMode);
     Shuffleboard.getTab("Subsystems").addNumber("ExtError", () -> getExtensionError());
 
-<<<<<<< HEAD
     extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP", extPosSetpoint).getEntry();
 
     Shuffleboard.getTab("TEST").addNumber("Arm Length", () -> currentLength);
     Shuffleboard.getTab("TEST").addNumber("Arm Angle", () -> currentAngle);
     Shuffleboard.getTab("TEST").addNumber("Max Arm Length", () -> maxLength);
     Shuffleboard.getTab("TEST").addNumber("Max Arm Angle", () -> maxAngle);
-=======
-    // extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP",
-    // extPosSetpoint).getEntry();
->>>>>>> Competition
+
   }
 
   public void extend(double p) {
@@ -108,10 +88,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void manually_extend(double p) {
-<<<<<<< HEAD
-=======
-    if (p > 0) extPosMode = false;
->>>>>>> Competition
+
     if (!extPosMode) extend(p);
   }
 
@@ -130,13 +107,6 @@ public class Arm extends SubsystemBase {
   public void toggleExtensionMode() {
     extPosMode = !extPosMode;
   }
-<<<<<<< HEAD
-=======
-
-  public void toggleExtensionMode(boolean e) {
-    extPosMode = e;
-  }
->>>>>>> Competition
 
   public void rotate(double p) {
     if (canRotateArm(p) && RotationEnabled) {
@@ -149,10 +119,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void manually_rotate(double p) {
-<<<<<<< HEAD
-=======
-    if (p > 0) rotPosMode = false;
->>>>>>> Competition
+
     if (!rotPosMode) rotate(p);
   }
 
@@ -171,13 +138,6 @@ public class Arm extends SubsystemBase {
   public void toggleRotationMode() {
     rotPosMode = !rotPosMode;
   }
-<<<<<<< HEAD
-=======
-
-  public void toggleRotationMode(boolean r) {
-    rotPosMode = r;
-  }
->>>>>>> Competition
 
   @Override
   public void periodic() {
@@ -214,11 +174,11 @@ public class Arm extends SubsystemBase {
     return (!((closedLimit.get() && p < 0) || (openedLimit.get() && p > 0)));
   }
 
+  /* when arm hits closed limit switch, set encoder value to 0 */
   public void resetExtensionEncoder() {
     if (closedLimit.get()) {
       extensionMotor.setSelectedSensorPosition(
-<<<<<<< HEAD
-          0); // anytime arm hits limit switch, encoder position = 0
+          0);
     }
   }
 
@@ -245,9 +205,5 @@ public class Arm extends SubsystemBase {
 
     return drive;
   }
-=======
-          0); // make sure arm isn't traveling too far past limit switch
-    }
-  }
->>>>>>> Competition
+
 }
