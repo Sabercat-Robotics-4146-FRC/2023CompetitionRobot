@@ -5,15 +5,14 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import common.robot.DriverReadout;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc4146.robot.Constants.ClawConstants;
 
-public class Claw implements Subsystem {
-  public boolean enabled;
-
+public class Claw extends SubsystemBase {
   public TalonSRX clawMotor;
   public AnalogPotentiometer pot;
   public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
+  public boolean enabled;
 
   public Claw() {
     enabled = _driverInterface.m_ClawSubsystemEnabled.getBoolean(true);
@@ -23,11 +22,17 @@ public class Claw implements Subsystem {
     Shuffleboard.getTab("Subsystems").addNumber("Claw Current", () -> clawMotor.getStatorCurrent());
   
     Shuffleboard.getTab("DriverReadout").addBoolean("Holding Object?", () -> hasObject());
+    
+    clawMotor.config_kP(3,0.3, 30);
+    clawMotor.config_kI(3,0, 30);
+    clawMotor.config_kD(3,0, 30);
+  
   }
 
   @Override
   public void periodic() {
     enabled = _driverInterface.m_ClawSubsystemEnabled.getBoolean(true);
+
   }
 
   public void manuallySetClaw(double p) {

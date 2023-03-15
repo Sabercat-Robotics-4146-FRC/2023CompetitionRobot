@@ -10,8 +10,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc4146.robot.commands.drivetrain.DriveCommand;
-import frc4146.robot.commands.subsystems.*;
 import frc4146.robot.commands.subsystems.AlignWithFiducial;
+import frc4146.robot.commands.autonomous.AlignRobotFiducial;
+import frc4146.robot.commands.autonomous.BalanceRobot;
+import frc4146.robot.commands.subsystems.ArmCommand;
+import frc4146.robot.commands.subsystems.ClawCommand;
+import frc4146.robot.commands.subsystems.PositionPiece;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -28,8 +32,8 @@ public class RobotContainer {
   private final GenericHID secondaryRumble =
       new GenericHID(Constants.SECONDARY_CONTROLLER_PORT);
 
-  private final Pigeon pigeon = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
-  private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(pigeon);
+  private final Pigeon gyroscope = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
+  private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(gyroscope);
 
   private final Limelight limelight = new Limelight();
   private final Arm arm = new Arm();
@@ -73,14 +77,43 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    primaryController.getStartButton().onTrue(Commands.runOnce(pigeon::calibrate));
+  
+    primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
     primaryController
         .getStartButton()
         .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
+
     primaryController
-        .getYButton()
+        .getLeftBumperButton()
+        .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(false)));
+    primaryController
+        .getRightBumperButton()
+        .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(true)));
+
+    primaryController.getAButton().onTrue(new BalanceRobot(drivetrainSubsystem, gyroscope));
+    primaryController
+        .getBButton()
+        .toggleOnTrue(new AlignRobotFiducial(drivetrainSubsystem, limelight));
+    primaryController
+        .getXButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
-    primaryController.getXButton().onTrue(Commands.runOnce(drivetrainSubsystem::toggleDriveFlag));
+        
+    secondaryController
+        .getLeftBumperButton()
+        .and(secondaryController.getXButton())
+        .toggleOnTrue(new PositionPiece(arm, "cone", "intake"));
+    secondaryController
+        .getLeftBumperButton()
+        .and(secondaryController.getAButton())
+        .toggleOnTrue(new PositionPiece(arm, "cone", "low"));
+    secondaryController
+        .getLeftBumperButton()
+        .and(secondaryController.getBButton())
+        .toggleOnTrue(new PositionPiece(arm, "cone", "mid"));
+    secondaryController
+        .getLeftBumperButton()
+        .and(secondaryController.getYButton())
+        .toggleOnTrue(new PositionPiece(arm, "cone", "high"));
 
     // primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::lockWheels));
 
@@ -101,6 +134,27 @@ public class RobotContainer {
     armState.onTrue(
         new InstantCommand(
             () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
+
+    secondaryController
+        .getRightBumperButton()
+        .and(secondaryController.getXButton())
+        .toggleOnTrue(new PositionPiece(arm, "cube", "intake"));
+    secondaryController
+        .getRightBumperButton()
+        .and(secondaryController.getAButton())
+        .toggleOnTrue(new PositionPiece(arm, "cube", "low"));
+    secondaryController
+        .getRightBumperButton()
+        .and(secondaryController.getBButton())
+        .toggleOnTrue(new PositionPiece(arm, "cube", "mid"));
+    secondaryController
+        .getRightBumperButton()
+        .and(secondaryController.getYButton())
+        .toggleOnTrue(new PositionPiece(arm, "cube", "high"));
+  }
+
+  public Arm getArmSubsystem() {
+    return arm;
   }
 
   public DrivetrainSubsystem getDrivetrainSubsystem() {

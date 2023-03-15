@@ -108,6 +108,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private final GenericEntry odometryYEntry; // robot's y position
   private final GenericEntry odometryAngleEntry; // robot's heading/angle
 
+  private boolean brake_mode = false;
+
   public DrivetrainSubsystem(Pigeon gyro) {
 
     this.gyroscope = gyro;
@@ -174,8 +176,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         };
 
     for (var talon : talons) {
-      talon.configSupplyCurrentLimit(
-          new SupplyCurrentLimitConfiguration(true, 30, 35, 1)); // max current (amps), 30
+      talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 30, 0.5));
       talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
     }
 
@@ -242,7 +243,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
       ty = 0;
     }
     double mag = Math.hypot(tx, ty);
-    double rotDeadband = 0.002;
+    double rotDeadband = 0.0025;
     if (mag <= 0.005) rotDeadband = 0.005;
     if (Math.abs(rotationalVelocity) < rotDeadband) {
       rotationalVelocity = 0;
@@ -330,6 +331,18 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     for (var talon : talons) {
       talon.setNeutralMode(NeutralMode.Brake);
     }
+  }
+
+  public void setMode(boolean brake) {
+    brake_mode = brake;
+    for (TalonFX talon : talons) {
+      if (brake) talon.setNeutralMode(NeutralMode.Brake);
+      else talon.setNeutralMode(NeutralMode.Coast);
+    }
+  }
+
+  public void toggleMode() {
+    setMode(!brake_mode);
   }
 
   public double getAverageAbsoluteValueVelocity() {

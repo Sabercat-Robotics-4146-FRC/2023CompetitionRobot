@@ -6,7 +6,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import common.math.MathUtils;
 import common.robot.DriverReadout;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -24,7 +23,6 @@ public class Arm extends SubsystemBase {
   public AnalogPotentiometer pot;
 
   private double rotPosSetpoint = 0.6;
-  private GenericEntry rotPosEntry;
   public boolean rotPosMode = false;
   public boolean rotFlag = true;
 
@@ -33,7 +31,6 @@ public class Arm extends SubsystemBase {
   public DigitalInput openedLimit;
 
   private double extPosSetpoint = 0;
-  private GenericEntry extPosEntry;
   public boolean extPosMode = false;
 
   public double currentLength;
@@ -53,11 +50,12 @@ public class Arm extends SubsystemBase {
 
     pot = new AnalogPotentiometer(ArmConstants.ROTATION_POT_CHANNEL);
 
+    rotationMotorLeft.setNeutralMode(NeutralMode.Brake);
+    rotationMotorRight.setNeutralMode(NeutralMode.Brake);
+
     Shuffleboard.getTab("Subsystems").addNumber("Rotation", () -> getRotation());
     Shuffleboard.getTab("Subsystems").addBoolean("RotPosMode", () -> rotPosMode);
     Shuffleboard.getTab("Subsystems").addNumber("RotError", () -> getRotationError());
-
-    rotPosEntry = Shuffleboard.getTab("Subsystems").add("Rotation SP", rotPosSetpoint).getEntry();
 
     extensionMotor = new TalonFX(ArmConstants.EXTENSION_ID);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
@@ -72,12 +70,11 @@ public class Arm extends SubsystemBase {
     Shuffleboard.getTab("Subsystems").addBoolean("ExtPosMode", () -> extPosMode);
     Shuffleboard.getTab("Subsystems").addNumber("ExtError", () -> getExtensionError());
 
-    extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP", extPosSetpoint).getEntry();
-
     Shuffleboard.getTab("TEST").addNumber("Arm Length", () -> currentLength);
     Shuffleboard.getTab("TEST").addNumber("Arm Angle", () -> currentAngle);
     Shuffleboard.getTab("TEST").addNumber("Max Arm Length", () -> maxLength);
     Shuffleboard.getTab("TEST").addNumber("Max Arm Angle", () -> maxAngle);
+
   }
 
   public void extend(double p) {
@@ -86,6 +83,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void manually_extend(double p) {
+
     if (!extPosMode) extend(p);
   }
 
@@ -105,6 +103,10 @@ public class Arm extends SubsystemBase {
     extPosMode = !extPosMode;
   }
 
+  public void toggleExtensionMode(boolean e) {
+    extPosMode = e;
+  }
+
   public void rotate(double p) {
     if (canRotateArm(p) && RotationEnabled) {
       rotationMotorLeft.set(ControlMode.PercentOutput, p);
@@ -116,6 +118,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void manually_rotate(double p) {
+
     if (!rotPosMode) rotate(p);
   }
 
@@ -135,13 +138,14 @@ public class Arm extends SubsystemBase {
     rotPosMode = !rotPosMode;
   }
 
+  public void toggleRotationMode(boolean r) {
+    rotPosMode = r;
+  }
+
   @Override
   public void periodic() {
     ExtendEnabled = _driverInterface.m_ArmExtSubsystemEnabled.getBoolean(true);
     RotationEnabled = _driverInterface.m_ArmRotSubsystemEnabled.getBoolean(true);
-
-    extPosSetpoint = extPosEntry.getDouble(extPosSetpoint);
-    rotPosSetpoint = rotPosEntry.getDouble(rotPosSetpoint);
 
     if (extPosMode) {
       double error = getExtensionError();
@@ -173,10 +177,11 @@ public class Arm extends SubsystemBase {
     return (!((closedLimit.get() && p < 0) || (openedLimit.get() && p > 0)));
   }
 
+  /* when arm hits closed limit switch, set encoder value to 0 */
   public void resetExtensionEncoder() {
     if (closedLimit.get()) {
       extensionMotor.setSelectedSensorPosition(
-          0); // anytime arm hits limit switch, encoder position = 0
+          0);
     }
   }
 
@@ -203,4 +208,5 @@ public class Arm extends SubsystemBase {
 
     return drive;
   }
+
 }
