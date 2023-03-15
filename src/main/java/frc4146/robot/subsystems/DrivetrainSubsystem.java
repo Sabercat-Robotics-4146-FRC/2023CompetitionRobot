@@ -5,10 +5,7 @@ import static frc4146.robot.Constants.DriveConstants;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-<<<<<<< HEAD
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
-=======
->>>>>>> Competition
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import common.control.*;
@@ -90,12 +87,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private final SwerveModule[] modules;
   private final SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
   private final TalonFX[] talons;
-<<<<<<< HEAD
   private final Pigeon gyroscope;
-=======
-
-  private final Gyroscope gyroscope;
->>>>>>> Competition
 
   /** swerveOdometry tracks the robot's position over time, using encoder data */
   private final SwerveOdometry swerveOdometry =
@@ -116,13 +108,9 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private final GenericEntry odometryYEntry; // robot's y position
   private final GenericEntry odometryAngleEntry; // robot's heading/angle
 
-<<<<<<< HEAD
   public DrivetrainSubsystem(Pigeon gyro) {
-=======
-  private boolean brake_mode = false;
 
-  public DrivetrainSubsystem(Gyroscope gyro) {
->>>>>>> Competition
+  private boolean brake_mode = false;
 
     this.gyroscope = gyro;
 
@@ -188,12 +176,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         };
 
     for (var talon : talons) {
-<<<<<<< HEAD
-      talon.configSupplyCurrentLimit(
-          new SupplyCurrentLimitConfiguration(true, 30, 35, 1)); // max current (amps), 30
-=======
       talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 30, 0.5));
->>>>>>> Competition
       talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
     }
 
@@ -334,25 +317,19 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     odometryAngleEntry.setDouble(pose.rotation.toDegrees());
   }
 
-<<<<<<< HEAD
   /* lock wheels to a particular angle, in degrees */
-=======
->>>>>>> Competition
   public void lockWheelsAngle(double angle) {
     if (getAverageAbsoluteValueVelocity() < 5.0) {
       frontLeftModule.set(0, angle * 2 * Math.PI / 180);
       frontRightModule.set(0, angle * 2 * Math.PI / 180);
       backLeftModule.set(0, angle * 2 * Math.PI / 180);
       backRightModule.set(0, angle * 2 * Math.PI / 180);
-<<<<<<< HEAD
     }
   }
 
   public void enableBrakeMode() {
     for (var talon : talons) {
       talon.setNeutralMode(NeutralMode.Brake);
-=======
->>>>>>> Competition
     }
   }
 
