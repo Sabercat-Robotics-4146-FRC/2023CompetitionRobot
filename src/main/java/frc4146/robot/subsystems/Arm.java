@@ -5,7 +5,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import common.math.MathUtils;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -60,6 +59,9 @@ public class Arm extends SubsystemBase {
 
     // extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP",
     // extPosSetpoint).getEntry();
+
+    Shuffleboard.getTab("Test Mode").addNumber("Rotation Pot", () -> getRotation());
+    Shuffleboard.getTab("Test Mode").addNumber("Extension Encoder", () -> getExtension());
   }
 
   /* percent output control mode */
@@ -169,8 +171,7 @@ public class Arm extends SubsystemBase {
   /* when arm is fully retracted, reset encoder value to 0 */
   public void resetExtensionEncoder() {
     if (closedLimit.get()) {
-      extensionMotor.setSelectedSensorPosition(
-          0);
+      extensionMotor.setSelectedSensorPosition(0);
     }
   }
 }

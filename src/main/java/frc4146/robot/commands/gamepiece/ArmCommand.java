@@ -10,19 +10,24 @@ public class ArmCommand extends CommandBase {
   private final Axis retract;
   private final Axis rotate;
 
-  public ArmCommand(Arm arm, Axis retract, Axis extend, Axis rotate) {
+  private double damping = 1;
+
+  public ArmCommand(Arm arm, Axis retract, Axis extend, Axis rotate, boolean testMode) {
     this.arm = arm;
     this.extend = extend;
     this.retract = retract;
     this.rotate = rotate;
+    if (testMode) {
+      damping = 0.2;
+    }
 
     addRequirements(arm);
   }
 
   @Override
   public void execute() {
-    arm.manually_rotate(-rotate.get(true));
-    arm.manually_extend(extend.get(true) / 2 - retract.get(true) / 2);
+    arm.manually_rotate(-rotate.get(true) * damping);
+    arm.manually_extend(extend.get(true) * damping / 2 - retract.get(true) * damping / 2);
   }
 
   @Override

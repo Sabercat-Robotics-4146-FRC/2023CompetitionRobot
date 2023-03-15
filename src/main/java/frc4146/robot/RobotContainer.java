@@ -4,11 +4,14 @@ import common.drivers.Gyroscope;
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc4146.robot.commands.autonomous.AlignRobotFiducial;
 import frc4146.robot.commands.autonomous.BalanceRobot;
 import frc4146.robot.commands.drivetrain.DriveCommand;
+import frc4146.robot.commands.drivetrain.TestDriveCommand;
 import frc4146.robot.commands.gamepiece.ArmCommand;
 import frc4146.robot.commands.gamepiece.ClawCommand;
 import frc4146.robot.commands.gamepiece.PositionPiece;
@@ -32,21 +35,44 @@ public class RobotContainer {
   private final Arm arm = new Arm();
   private final Claw claw = new Claw();
 
+  public boolean testMode;
+
   public RobotContainer() {
+
     pdh.setSwitchableChannel(true);
 
     CommandScheduler.getInstance().registerSubsystem(drivetrainSubsystem);
-    CommandScheduler.getInstance().registerSubsystem(arm);
-    CommandScheduler.getInstance().registerSubsystem(claw);
+    // CommandScheduler.getInstance().registerSubsystem(arm);
+    // CommandScheduler.getInstance().registerSubsystem(claw);
 
-    CommandScheduler.getInstance()
-        .setDefaultCommand(
-            drivetrainSubsystem,
-            new DriveCommand(
-                drivetrainSubsystem,
-                primaryController.getLeftYAxis(),
-                primaryController.getLeftXAxis(),
-                primaryController.getRightXAxis()));
+    // note: test mode must be configured in this tab before enabling, can also change default value in code
+    testMode =
+        Shuffleboard.getTab("Test Mode")
+            .add("Test Mode", false)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .withSize(1, 1)
+            .getEntry()
+            .getBoolean(false);
+
+    if (testMode) {
+      CommandScheduler.getInstance()
+          .setDefaultCommand(
+              drivetrainSubsystem,
+              new TestDriveCommand(
+                  drivetrainSubsystem,
+                  primaryController.getLeftYAxis(),
+                  primaryController.getLeftXAxis(),
+                  primaryController.getRightXAxis()));
+    } else {
+      CommandScheduler.getInstance()
+          .setDefaultCommand(
+              drivetrainSubsystem,
+              new DriveCommand(
+                  drivetrainSubsystem,
+                  primaryController.getLeftYAxis(),
+                  primaryController.getLeftXAxis(),
+                  primaryController.getRightXAxis()));
+    }
 
     CommandScheduler.getInstance()
         .setDefaultCommand(
@@ -55,10 +81,12 @@ public class RobotContainer {
                 arm,
                 secondaryController.getLeftTriggerAxis(),
                 secondaryController.getRightTriggerAxis(),
-                secondaryController.getRightYAxis()));
-                
+                secondaryController.getRightYAxis(),
+                testMode));
+
     CommandScheduler.getInstance()
-        .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
+        .setDefaultCommand(
+            claw, new ClawCommand(claw, secondaryController.getLeftXAxis(), testMode));
 
     CameraServer.startAutomaticCapture();
 
@@ -84,7 +112,7 @@ public class RobotContainer {
     primaryController
         .getXButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
-        
+
     // while holding LEFT bumper, press other button to go to setpoint for CONE
     secondaryController
         .getLeftBumperButton()
@@ -130,7 +158,12 @@ public class RobotContainer {
     return drivetrainSubsystem;
   }
 
+  public Claw getClawSubsystem() {
+    return claw;
+  }
+
   public Gyroscope getGyroscope() {
     return gyroscope;
   }
+
 }
