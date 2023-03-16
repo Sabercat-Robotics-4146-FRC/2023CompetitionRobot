@@ -159,9 +159,9 @@ public class RobotContainer {
         .toggleOnTrue(new PositionPiece(arm, "cube", "high"));
 
 
-    armState.onFalse(
-        new InstantCommand(
-            () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
+    armState
+        .and(() -> drivetrainSubsystem.getAverageAbsoluteValueVelocity() > 0.5)
+        .onFalse(new InstantCommand(() -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
 
     armState.onTrue(
         new InstantCommand(

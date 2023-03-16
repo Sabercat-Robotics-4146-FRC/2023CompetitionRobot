@@ -152,7 +152,7 @@ public class Arm extends SubsystemBase {
     } else {
       maxLength =
           (ArmConstants.SUPERSTRUCTURE_HEIGHT / Math.cos(currentAngle))
-              - 4; // margin of error of 4 inches above ground
+              - 1; // margin of error of 1 inch above ground
     }
     if (currentLength >= maxLength) {
       drive = false;
