@@ -28,6 +28,14 @@ public class Trajectories {
         commands.put("RedScoreThree", ScoreOne());
         commands.put("RedEngageThree", EngageOne());
         commands.put("RedLeaveThree", LeaveOne());
+        commands.put("BlueScoreEngageThree", ScoreEngageThree());
+        commands.put("BlueScoreThree", ScoreOne());
+        commands.put("BlueEngageThree", EngageThree());
+        commands.put("BlueLeaveThree", LeaveOne());
+        commands.put("RedEngageOne", ScoreEngageThree());
+        commands.put("RedScoreOne", ScoreOne());
+        commands.put("RedEngageOne", EngageThree());
+        commands.put("RedLeaveOne", LeaveOne());
 
     }
 
