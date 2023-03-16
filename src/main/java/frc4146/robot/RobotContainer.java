@@ -21,6 +21,8 @@ import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.commands.subsystems.PositionPiece;
 import frc4146.robot.commands.subsystems.ScorePiece;
 import frc4146.robot.subsystems.*;
+import frc4146.robot.util.AutonomousSelector;
+import frc4146.robot.util.AutonomousTab;
 
 public class RobotContainer {
 
@@ -48,6 +50,9 @@ public class RobotContainer {
   private final Claw claw = new Claw();
 
   private final Trigger armState;
+
+  private final AutonomousSelector autonomousSelector;
+  private final AutonomousTab autonomousTab;
 
   public RobotContainer() {
     pdh.setSwitchableChannel(true);
@@ -79,6 +84,9 @@ public class RobotContainer {
     armState = new Trigger(() -> arm.safeToDrive());
 
     CameraServer.startAutomaticCapture();
+
+    autonomousSelector = new AutonomousSelector(this);
+    autonomousTab = new AutonomousTab(this);
 
     configureButtonBindings();
   }
@@ -182,6 +190,10 @@ public class RobotContainer {
 
   public Pigeon getGyroscope() {
     return gyroscope;
+  }
+
+  public AutonomousSelector getAutonomousSelector() {
+    return autonomousSelector;
   }
 
   public Command getAutonomousCommand() {

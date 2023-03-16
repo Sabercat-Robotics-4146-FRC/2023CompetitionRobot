@@ -23,7 +23,7 @@ public class AutonomousSelector {
     for(int i = 0; i < 5; i++) pathChooser[i] = new SendableChooser<>();
 
     pathChooser[0].setDefaultOption("Red", "Red");
-    pathChooser[4].setDefaultOption("One", "One");
+    pathChooser[4].setDefaultOption("None", "None");
 
     for(int i = 1; i < 4; i++) {
       pathChooser[i].setDefaultOption("No", "");
@@ -34,6 +34,7 @@ public class AutonomousSelector {
     pathChooser[2].addOption("Yes", "Engage");
     pathChooser[3].addOption("Yes", "OnlyLeave");
 
+    pathChooser[4].addOption("One", "One");
     pathChooser[4].addOption("Two", "Two");
     pathChooser[4].addOption("Three", "Three");
 
