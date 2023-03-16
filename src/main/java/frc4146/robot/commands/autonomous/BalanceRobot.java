@@ -3,7 +3,6 @@ package frc4146.robot.commands.autonomous;
 import common.math.RigidTransform2;
 import common.math.Vector2;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc4146.robot.subsystems.DrivetrainSubsystem;
 import frc4146.robot.subsystems.Pigeon;
@@ -30,7 +29,7 @@ public class BalanceRobot extends CommandBase {
   public BalanceRobot(DrivetrainSubsystem drivetrain, Pigeon pigeon) {
     this.drivetrain = drivetrain;
     this.pigeon = pigeon;
-    Shuffleboard.getTab("Drivetrain").addNumber("StageB", () -> stage);
+    // Shuffleboard.getTab("Drivetrain").addNumber("StageB", () -> stage);
 
     addRequirements(drivetrain);
   }

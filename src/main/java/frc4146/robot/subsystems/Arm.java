@@ -19,7 +19,6 @@ public class Arm extends SubsystemBase {
   public boolean extensionEnabled = true;
   public boolean rotationEnabled = true;
 
-
   public TalonFX rotationMotorLeft;
   public TalonFX rotationMotorRight;
   public AnalogPotentiometer pot;
@@ -60,7 +59,8 @@ public class Arm extends SubsystemBase {
 
     extensionMotor = new TalonFX(ArmConstants.EXTENSION_ID);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
-    extensionMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, ArmConstants.kPIDSlot, ArmConstants.kTimeoutMs);
+    extensionMotor.configSelectedFeedbackSensor(
+        TalonFXFeedbackDevice.IntegratedSensor, ArmConstants.kPIDSlot, ArmConstants.kTimeoutMs);
 
     closedLimit = new DigitalInput(ArmConstants.LOWER_LIMIT_CHANNEL);
     openedLimit = new DigitalInput(ArmConstants.UPPER_LIMIT_CHANNEL);
@@ -160,7 +160,6 @@ public class Arm extends SubsystemBase {
 
     return drive;
   }
-
 
   @Override
   public void periodic() {

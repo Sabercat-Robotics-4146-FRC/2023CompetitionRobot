@@ -10,9 +10,10 @@ import frc4146.robot.subsystems.DrivetrainSubsystem;
 import frc4146.robot.subsystems.Pigeon;
 
 public class SimpleTrajectory extends SequentialCommandGroup {
-  public SimpleTrajectory(DrivetrainSubsystem drivetrainSubsystem, Pigeon pigeon, Arm arm, Claw claw) {
+  public SimpleTrajectory(
+      DrivetrainSubsystem drivetrainSubsystem, Pigeon pigeon, Arm arm, Claw claw) {
     addCommands(
-        new ScorePiece(arm, claw, "cone", "top"),
+        new ScorePiece(arm, claw, "cone", "high"),
         new StraightLine(drivetrainSubsystem, pigeon, -150),
         new TurnRobot(drivetrainSubsystem, pigeon, -90),
         new StraightLine(drivetrainSubsystem, pigeon, 55),

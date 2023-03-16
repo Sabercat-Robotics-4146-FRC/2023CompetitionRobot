@@ -1,9 +1,8 @@
 package frc4146.robot.subsystems;
 
-import common.robot.DriverReadout;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import common.robot.DriverReadout;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,13 +18,13 @@ public class Claw extends SubsystemBase {
   public Claw() {
     clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
 
-     Shuffleboard.getTab("Subsystems").addNumber("Claw Position", () -> getPos());
-     Shuffleboard.getTab("Subsystems").addNumber("Claw Current", () -> clawMotor.getStatorCurrent());
-     Shuffleboard.getTab("DriverReadout").addBoolean("Holding Object?", () -> hasObject());
+    Shuffleboard.getTab("Subsystems").addNumber("Claw Position", () -> getPos());
+    Shuffleboard.getTab("Subsystems").addNumber("Claw Current", () -> clawMotor.getStatorCurrent());
+    Shuffleboard.getTab("DriverReadout").addBoolean("Holding Object?", () -> hasObject());
   }
 
   public void setClaw(double p) {
-    if(enabled) clawMotor.set(ControlMode.PercentOutput, p);
+    if (enabled) clawMotor.set(ControlMode.PercentOutput, p);
   }
 
   public void manuallySetClaw(double p) {
