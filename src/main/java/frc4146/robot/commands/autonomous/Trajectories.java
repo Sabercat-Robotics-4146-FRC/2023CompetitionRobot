@@ -1,5 +1,8 @@
 package frc4146.robot.commands.autonomous;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -11,49 +14,21 @@ import frc4146.robot.commands.subsystems.ScorePiece;
 public class Trajectories {
     SendableChooser<Command> sendableChooser;
     RobotContainer container;
+    Map<String, Command> commands;
 
     public Trajectories(RobotContainer container) {
         this.container = container;
-        
-        sendableChooser.addOption(
-            "BlueOneScoreEngage", 
-            ScoreEngageOne()
-        );
+        commands = new HashMap<>();
 
-        sendableChooser.addOption(
-            "BlueOneScore", 
-            ScoreEngageOne()
-        );
+        commands.put("BlueScoreEngageOne", ScoreEngageOne());
+        commands.put("BlueScoreOne", ScoreOne());
+        commands.put("BlueEngageOne", EngageOne());
+        commands.put("BlueLeaveOne", LeaveOne());
+        commands.put("RedEngageThree", ScoreEngageOne());
+        commands.put("RedScoreThree", ScoreOne());
+        commands.put("RedEngageThree", EngageOne());
+        commands.put("RedLeaveThree", LeaveOne());
 
-        sendableChooser.addOption(
-            "BlueOneEngage", 
-            ScoreEngageOne()
-        );
-
-        sendableChooser.addOption(
-            "BlueOneLeave", 
-            ScoreEngageOne()
-        );
-
-        sendableChooser.addOption(
-            "RedThreeScoreEngage", 
-            ScoreEngageOne()
-        );
-
-        sendableChooser.addOption(
-            "RedThreeScore", 
-            ScoreEngageOne()
-        );
-
-        sendableChooser.addOption(
-            "RedThreeEngage", 
-            ScoreEngageOne()
-        );
-
-        sendableChooser.addOption(
-            "RedThreeLeave", 
-            ScoreEngageOne()
-        );
     }
 
     public SendableChooser<Command> getSendableChooser() {
@@ -79,7 +54,7 @@ public class Trajectories {
 
         command.addCommands(
             new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
-            new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -100)
+            new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150)
         );
 
         return command;
@@ -102,7 +77,7 @@ public class Trajectories {
         SequentialCommandGroup command = new SequentialCommandGroup();
 
         command.addCommands(
-            new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -100)
+            new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150)
         );
 
         return command;
@@ -115,7 +90,7 @@ public class Trajectories {
             new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150),
             new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
-            new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55),
+            new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
             new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())
         );
 
@@ -129,18 +104,8 @@ public class Trajectories {
         command.addCommands(
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150),
             new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
-            new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55),
+            new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
             new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())
-        );
-
-        return command;
-    }
-
-    public Command LeaveThree() {
-        SequentialCommandGroup command = new SequentialCommandGroup();
-
-        command.addCommands(
-            new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -100)
         );
 
         return command;
