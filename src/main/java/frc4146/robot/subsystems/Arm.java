@@ -70,13 +70,15 @@ public class Arm extends SubsystemBase {
     Shuffleboard.getTab("Subsystems").addBoolean("ExtPosMode", () -> extPosMode);
     Shuffleboard.getTab("Subsystems").addNumber("ExtError", () -> getExtensionError());
 
-    Shuffleboard.getTab("TEST").addNumber("Arm Length", () -> currentLength);
-    Shuffleboard.getTab("TEST").addNumber("Arm Angle", () -> currentAngle);
-    Shuffleboard.getTab("TEST").addNumber("Max Arm Length", () -> maxLength);
-    Shuffleboard.getTab("TEST").addNumber("Max Arm Angle", () -> maxAngle);
+    // extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP",
+    // extPosSetpoint).getEntry();
+
+    Shuffleboard.getTab("Test Mode").addNumber("Rotation Pot", () -> getRotation());
+    Shuffleboard.getTab("Test Mode").addNumber("Extension Encoder", () -> getExtension());
 
   }
 
+  /* percent output control mode */
   public void extend(double p) {
     if (canExtendArm(p) && ExtendEnabled) extensionMotor.set(ControlMode.PercentOutput, p);
     else extensionMotor.set(ControlMode.PercentOutput, 0);
@@ -87,6 +89,7 @@ public class Arm extends SubsystemBase {
     if (!extPosMode) extend(p);
   }
 
+  /* in full encoder revolutions */
   public double getExtension() {
     return extensionMotor.getSelectedSensorPosition() / 2048;
   }
@@ -107,6 +110,7 @@ public class Arm extends SubsystemBase {
     extPosMode = e;
   }
 
+  /* percent output control mode */
   public void rotate(double p) {
     if (canRotateArm(p) && RotationEnabled) {
       rotationMotorLeft.set(ControlMode.PercentOutput, p);
@@ -122,6 +126,7 @@ public class Arm extends SubsystemBase {
     if (!rotPosMode) rotate(p);
   }
 
+  /* in full potentiometer revolutions */
   public double getRotation() {
     return pot.get();
   }
@@ -168,11 +173,13 @@ public class Arm extends SubsystemBase {
     resetExtensionEncoder();
   }
 
+  /* software limit for arm rotation */
   public boolean canRotateArm(double p) {
     return (!((getRotation() < ArmConstants.POT_MAX_ROTATION && p < 0)
         || (getRotation() > ArmConstants.POT_MIN_ROTATION && p > 0)));
   }
 
+  /* logic for limit switch limit for arm extension */
   public boolean canExtendArm(double p) {
     return (!((closedLimit.get() && p < 0) || (openedLimit.get() && p > 0)));
   }
@@ -182,6 +189,7 @@ public class Arm extends SubsystemBase {
     if (closedLimit.get()) {
       extensionMotor.setSelectedSensorPosition(
           0);
+
     }
   }
 

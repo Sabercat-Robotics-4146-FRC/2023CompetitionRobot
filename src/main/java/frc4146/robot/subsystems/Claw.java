@@ -20,6 +20,8 @@ public class Claw extends SubsystemBase {
     clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
     Shuffleboard.getTab("Subsystems").addNumber("Claw Position", () -> getPos());
     Shuffleboard.getTab("Subsystems").addNumber("Claw Current", () -> clawMotor.getStatorCurrent());
+    
+    Shuffleboard.getTab("Test Mode").addNumber("Claw Pot", () -> getPos());
   
     Shuffleboard.getTab("DriverReadout").addBoolean("Holding Object?", () -> hasObject());
     
@@ -32,15 +34,16 @@ public class Claw extends SubsystemBase {
   @Override
   public void periodic() {
     enabled = _driverInterface.m_ClawSubsystemEnabled.getBoolean(true);
-
   }
 
+  /* percent output control mode */
   public void manuallySetClaw(double p) {
     if (enabled) {
       clawMotor.set(ControlMode.PercentOutput, p);
     }
   }
 
+  /* in full potentiometer revolutions */
   public double getPos() {
     return clawMotor.getSelectedSensorPosition() / 1024;
   }

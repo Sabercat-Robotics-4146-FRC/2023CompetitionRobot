@@ -309,7 +309,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     updateDisplay();
   }
 
-  /** updates NetworkTable with data read from robot pose */
+  /* updates NetworkTable with data read from robot pose */
   public void updateDisplay() {
     RigidTransform2 pose = getPose();
     odometryXEntry.setDouble(pose.translation.x);
@@ -317,7 +317,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     odometryAngleEntry.setDouble(pose.rotation.toDegrees());
   }
 
-  /* lock wheels to a particular angle, in degrees */
+
+  /* allows robot to drive in only one direction while self-leveling */
   public void lockWheelsAngle(double angle) {
     if (getAverageAbsoluteValueVelocity() < 5.0) {
       frontLeftModule.set(0, angle * 2 * Math.PI / 180);

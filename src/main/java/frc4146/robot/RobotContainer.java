@@ -5,6 +5,8 @@ import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -16,6 +18,12 @@ import frc4146.robot.commands.autonomous.BalanceRobot;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.commands.subsystems.PositionPiece;
+import frc4146.robot.commands.drivetrain.DriveCommand;
+import frc4146.robot.commands.drivetrain.TestDriveCommand;
+import frc4146.robot.commands.gamepiece.ArmCommand;
+import frc4146.robot.commands.gamepiece.ClawCommand;
+import frc4146.robot.commands.gamepiece.PositionPiece;
+
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -41,21 +49,44 @@ public class RobotContainer {
 
   private final Trigger armState;
 
+  public boolean testMode;
+
   public RobotContainer() {
+
     pdh.setSwitchableChannel(true);
 
     CommandScheduler.getInstance().registerSubsystem(drivetrainSubsystem);
-    CommandScheduler.getInstance().registerSubsystem(arm);
-    CommandScheduler.getInstance().registerSubsystem(claw);
+    // CommandScheduler.getInstance().registerSubsystem(arm);
+    // CommandScheduler.getInstance().registerSubsystem(claw);
 
-    CommandScheduler.getInstance()
-        .setDefaultCommand(
-            drivetrainSubsystem,
-            new DriveCommand(
-                drivetrainSubsystem,
-                primaryController.getLeftYAxis(),
-                primaryController.getLeftXAxis(),
-                primaryController.getRightXAxis()));
+    // note: test mode must be configured in this tab before enabling, can also change default value in code
+    testMode =
+        Shuffleboard.getTab("Test Mode")
+            .add("Test Mode", false)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .withSize(1, 1)
+            .getEntry()
+            .getBoolean(false);
+
+    if (testMode) {
+      CommandScheduler.getInstance()
+          .setDefaultCommand(
+              drivetrainSubsystem,
+              new TestDriveCommand(
+                  drivetrainSubsystem,
+                  primaryController.getLeftYAxis(),
+                  primaryController.getLeftXAxis(),
+                  primaryController.getRightXAxis()));
+    } else {
+      CommandScheduler.getInstance()
+          .setDefaultCommand(
+              drivetrainSubsystem,
+              new DriveCommand(
+                  drivetrainSubsystem,
+                  primaryController.getLeftYAxis(),
+                  primaryController.getLeftXAxis(),
+                  primaryController.getRightXAxis()));
+    }
 
     CommandScheduler.getInstance()
         .setDefaultCommand(
@@ -64,10 +95,12 @@ public class RobotContainer {
                 arm,
                 secondaryController.getLeftTriggerAxis(),
                 secondaryController.getRightTriggerAxis(),
-                secondaryController.getRightYAxis()));
+                secondaryController.getRightYAxis(),
+                testMode));
 
     CommandScheduler.getInstance()
-        .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
+        .setDefaultCommand(
+            claw, new ClawCommand(claw, secondaryController.getLeftXAxis(), testMode));
 
     armState = new Trigger(() -> arm.safeToDrive());
 
@@ -77,8 +110,11 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-  
+
+
+    // re-centers robot orientation so that current heading = default heading
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
+    
     primaryController
         .getStartButton()
         .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
@@ -97,7 +133,8 @@ public class RobotContainer {
     primaryController
         .getXButton()
         .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
-        
+
+    // while holding LEFT bumper, press other button to go to setpoint for CONE
     secondaryController
         .getLeftBumperButton()
         .and(secondaryController.getXButton())
@@ -115,18 +152,6 @@ public class RobotContainer {
         .and(secondaryController.getYButton())
         .toggleOnTrue(new PositionPiece(arm, "cone", "high"));
 
-    // primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::lockWheels));
-
-    // primaryController.getBButton().toggleOnTrue(new BalanceRobot(drivetrainSubsystem,
-    // gyroscope));
-
-    primaryController.getBButton().onTrue(new AlignWithFiducial(drivetrainSubsystem, limelight));
-
-    secondaryController.getAButton().onTrue(Commands.runOnce(arm::toggleExtensionMode));
-    secondaryController.getBButton().onTrue(Commands.runOnce(arm::toggleRotationMode));
-
-    // secondaryController.getBButton().toggleOnTrue(new ArmRotate(arm));
-
     armState.onFalse(
         new InstantCommand(
             () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
@@ -135,6 +160,7 @@ public class RobotContainer {
         new InstantCommand(
             () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
 
+    // while holding RIGHT bumper, press other button to go to setpoint for CUBE
     secondaryController
         .getRightBumperButton()
         .and(secondaryController.getXButton())
@@ -160,4 +186,13 @@ public class RobotContainer {
   public DrivetrainSubsystem getDrivetrainSubsystem() {
     return drivetrainSubsystem;
   }
+
+  public Claw getClawSubsystem() {
+    return claw;
+  }
+
+  public Gyroscope getGyroscope() {
+    return gyroscope;
+  }
+
 }

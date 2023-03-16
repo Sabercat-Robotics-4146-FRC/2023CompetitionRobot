@@ -59,10 +59,13 @@ public class Constants {
 
     public static final int CLAW_ID = 24;
 
+
     public static final int kPIDSlot = 0;
     public static final int kTimeoutMs = 30;
 
-public static final Map<String, HashMap> SETPOINTS =
+    // hashmap for arm setpoints, {"gamepiece":{"position":{rotation,extension}}}, allows for easy access
+    public static final Map<String, HashMap> SETPOINTS =
+
         new HashMap<String, HashMap>() {
           {
             put(
