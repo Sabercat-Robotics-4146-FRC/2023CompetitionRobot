@@ -1,11 +1,17 @@
 package frc4146.robot;
 
+import common.robot.DriverReadout;
+import edu.wpi.first.wpilibj.GenericHID;
+
+
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc4146.robot.commands.autonomous.AlignWithTarget;
 import frc4146.robot.commands.autonomous.BalanceRobot;
 import frc4146.robot.commands.autonomous.SimpleTrajectory;
@@ -18,15 +24,20 @@ import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
 
+    public static DriverReadout driverInterface = new DriverReadout();
+
+
   private PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
   private final XboxController primaryController =
       new XboxController(Constants.PRIMARY_CONTROLLER_PORT);
 
-  // private final DriveJoysticks joysticks = new DriveJoysticks(0, 1);
+  
 
   private final XboxController secondaryController =
       new XboxController(Constants.SECONDARY_CONTROLLER_PORT);
+  private final GenericHID secondaryRumble =
+      new GenericHID(Constants.SECONDARY_CONTROLLER_PORT);
 
   private final Pigeon gyroscope = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(gyroscope);
@@ -35,6 +46,8 @@ public class RobotContainer {
 
   private final Arm arm = new Arm();
   private final Claw claw = new Claw();
+
+  private final Trigger armState;
 
   public RobotContainer() {
     pdh.setSwitchableChannel(true);
@@ -63,6 +76,8 @@ public class RobotContainer {
     CommandScheduler.getInstance()
         .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
 
+    armState = new Trigger(() -> arm.safeToDrive());
+
     CameraServer.startAutomaticCapture();
 
     configureButtonBindings();
@@ -71,6 +86,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::reset));
+    
 
     primaryController
         .getLeftBumperButton()
@@ -79,7 +95,13 @@ public class RobotContainer {
         .getRightBumperButton()
         .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(true)));
 
-    primaryController.getAButton().onTrue(new BalanceRobot(drivetrainSubsystem, gyroscope));
+    primaryController
+        .getBButton()
+        .onTrue(Commands.runOnce(drivetrainSubsystem::toggleLocked));
+
+    primaryController
+        .getAButton()
+        .onTrue(new BalanceRobot(drivetrainSubsystem, gyroscope));
 
     primaryController
         .getXButton()
@@ -88,13 +110,17 @@ public class RobotContainer {
     // primaryController
     //     .getXButton()
     //     .toggleOnTrue(new StraightLine(drivetrainSubsystem, gyroscope, -200));
-    // // primaryController
-    // //     .getXButton()
-    // //     .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
+    // primaryController
+    //     .getXButton()
+    //     .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
 
-    primaryController
-        .getYButton()
-        .toggleOnTrue(new AlignWithTarget(drivetrainSubsystem, limelight));
+    // primaryController
+    //     .getYButton()
+    //     .toggleOnTrue(new AlignWithTarget(drivetrainSubsystem, limelight));
+
+    // primaryController
+    //     .getBButton()
+    //     .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
 
     secondaryController.getStartButton().toggleOnTrue(new ScorePiece(arm, claw, "cone", "high"));
 
@@ -131,6 +157,15 @@ public class RobotContainer {
         .getRightBumperButton()
         .and(secondaryController.getYButton())
         .toggleOnTrue(new PositionPiece(arm, "cube", "high"));
+
+
+    armState.onFalse(
+        new InstantCommand(
+            () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
+
+    armState.onTrue(
+        new InstantCommand(
+            () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
   }
 
   public Arm getArmSubsystem() {

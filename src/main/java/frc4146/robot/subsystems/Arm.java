@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import common.math.MathUtils;
+import common.robot.DriverReadout;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -12,6 +13,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc4146.robot.Constants.ArmConstants;
 
 public class Arm extends SubsystemBase {
+
+  public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
+
+  public boolean extensionEnabled = true;
+  public boolean rotationEnabled = true;
+
 
   public TalonFX rotationMotorLeft;
   public TalonFX rotationMotorRight;
@@ -26,6 +33,11 @@ public class Arm extends SubsystemBase {
 
   private double extPosSetpoint = 0;
   public boolean extPosMode = false;
+
+  public double currentLength;
+  public double currentAngle;
+  double maxAngle = Math.PI / 3;
+  double maxLength = 55;
 
   public Arm() {
     rotationMotorLeft = new TalonFX(ArmConstants.ROTATION_LEFT_ID);
@@ -48,7 +60,7 @@ public class Arm extends SubsystemBase {
 
     extensionMotor = new TalonFX(ArmConstants.EXTENSION_ID);
     extensionMotor.setNeutralMode(NeutralMode.Brake);
-    extensionMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    extensionMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, ArmConstants.kPIDSlot, ArmConstants.kTimeoutMs);
 
     closedLimit = new DigitalInput(ArmConstants.LOWER_LIMIT_CHANNEL);
     openedLimit = new DigitalInput(ArmConstants.UPPER_LIMIT_CHANNEL);
@@ -62,7 +74,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void extend(double p) {
-    if (canExtendArm(p)) extensionMotor.set(ControlMode.PercentOutput, p);
+    if (canExtendArm(p) && extensionEnabled) extensionMotor.set(ControlMode.PercentOutput, p);
     else extensionMotor.set(ControlMode.PercentOutput, 0);
   }
 
@@ -92,7 +104,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void rotate(double p) {
-    if (canRotateArm(p)) {
+    if (canRotateArm(p) && rotationEnabled) {
       rotationMotorLeft.set(ControlMode.PercentOutput, p);
       rotationMotorRight.set(ControlMode.PercentOutput, p);
     } else {
@@ -126,8 +138,35 @@ public class Arm extends SubsystemBase {
     rotPosMode = r;
   }
 
+  public boolean safeToDrive() {
+    boolean drive = true;
+
+    currentAngle = -(getRotation() * 2 * Math.PI) + 4.210;
+    currentLength =
+        (getExtension() * 2 * Math.PI * .75) / (25 / 2)
+            + ArmConstants.MIN_LENGTH; // C=2pi*r, gear_ratio=12.5
+
+    if (currentAngle >= maxAngle) {
+      drive = false;
+      maxLength = 55;
+    } else {
+      maxLength =
+          (ArmConstants.SUPERSTRUCTURE_HEIGHT / Math.cos(currentAngle))
+              - 4; // margin of error of 4 inches above ground
+    }
+    if (currentLength >= maxLength) {
+      drive = false;
+    }
+
+    return drive;
+  }
+
+
   @Override
   public void periodic() {
+
+    extensionEnabled = _driverInterface.m_ArmExtSubsystemEnabled.getBoolean(true);
+    rotationEnabled = _driverInterface.m_ArmRotSubsystemEnabled.getBoolean(true);
 
     if (extPosMode) {
       double error = getExtensionError();

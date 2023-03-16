@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Constants {
   public static final int PRIMARY_CONTROLLER_PORT = 0;
-  public static final int SECONDARY_CONTROLLER_PORT = 2;
+  public static final int SECONDARY_CONTROLLER_PORT = 1;
 
   public static class DriveConstants {
 
@@ -49,13 +49,17 @@ public class Constants {
     public static final int UPPER_LIMIT_CHANNEL = 1;
     public static final int TICKS_PER_REVOLUTION = 2048;
 
-    public static final double MAX_LENGTH = 63; // inches
-    public static final double MIN_LENGTH = 39; // inches
+    public static final double MAX_LENGTH = 71; // inches
+    public static final double MIN_LENGTH = 47; // inches
     public static final double MAX_ANGLE = 1.05; // radians
     public static final double MIN_ANGLE = -1.57; // raidans
+    public static final int SUPERSTRUCTURE_HEIGHT = 47;
 
     public static final double POT_MAX_ROTATION = 0.35;
     public static final double POT_MIN_ROTATION = 0.63;
+
+    public static final int kPIDSlot = 0;
+    public static final int kTimeoutMs = 30;
 
     public static final int CLAW_ID = 24;
 

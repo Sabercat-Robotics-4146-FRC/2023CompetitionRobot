@@ -14,6 +14,7 @@ import common.kinematics.SwerveOdometry;
 import common.math.RigidTransform2;
 import common.math.Rotation2;
 import common.math.Vector2;
+import common.robot.DriverReadout;
 import common.robot.UpdateManager;
 import common.util.*;
 import edu.wpi.first.math.controller.PIDController;
@@ -29,6 +30,9 @@ import java.util.*;
 public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   public boolean driveFlag = true;
 
+  public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
+
+
   // This value is used to turn the robot back to its initialPosition
 
   public ArrayList<Double> speeds;
@@ -36,6 +40,9 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   public Timer timer;
 
   public boolean fieldOriented = false;
+
+  public boolean locked = false;
+
 
   /* The following objects are used to create accurate trajectory for the specific robot
    *
@@ -50,12 +57,12 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
     new FeedforwardConstraint(
-        11.0,
+        11.0, //TODO: test 12
         FEEDFORWARD_CONSTANTS.getVelocityConstant(),
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
-        false),
+        true), //TODO: was false, want to test true
     new MaxAccelerationConstraint(12.5 * 12.0),
-    new CentripetalAccelerationConstraint(5.0 * 12.0)
+    new CentripetalAccelerationConstraint(5.0)
   };
 
   /** follower uses PID, feedforward control to create trajectories */
@@ -229,6 +236,13 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     tab.addNumber("Roll", () -> gyroscope.getRoll());
     tab.addNumber("Pitch", () -> gyroscope.getPitch());
     tab.addNumber("Yaw", () -> gyroscope.getYaw());
+
+    _driverInterface
+         .primaryLayout
+         .addBoolean("Field Oriented", () -> fieldOriented)
+         .withPosition(0, 3);
+     _driverInterface.primaryLayout.addBoolean("Drive Enabled", () -> driveFlag).withPosition(0, 2);
+     _driverInterface.primaryLayout.add("Drive Heading", gyroscope).withPosition(0, 0);
   }
 
   /** updates driveSignal with desired translational, rotational velocities */
@@ -284,7 +298,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
     SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1);
     for (int i = 0; i < moduleOutputs.length; i++) {
-      modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
+      if (locked) modules[i].set(-moduleOutputs[i].length * 12.0, 0);
+      else modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
     }
   }
 
@@ -313,6 +328,9 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     odometryYEntry.setDouble(pose.translation.y);
     odometryAngleEntry.setDouble(pose.rotation.toDegrees());
   }
+
+  public void toggleLocked(boolean l) {locked = l;}
+  public void toggleLocked() {locked = !locked;}
 
   public void lockWheelsAngle(double angle) {
     if (getAverageAbsoluteValueVelocity() < 5.0) {
@@ -349,18 +367,18 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         .toArray(Vector2[]::new);
   }
 
-  public void drift_correct(ChassisVelocity speeds) {
-    Vector2 trans = speeds.getTranslationalVelocity();
-    double xy = Math.abs(trans.x) + Math.abs(trans.y);
-    double ang_velocity = speeds.getAngularVelocity();
-    if (speeds.getAngularVelocity() <= 0.0 || pXY <= 0) {
-      desired_heading = getPose().rotation;
-    } else if (xy > 0) {
-      ang_velocity +=
-          drift_correction.calculate(getPose().rotation.toDegrees(), desired_heading.toDegrees());
-    }
-    pXY = xy;
-  }
+  // public void drift_correct(ChassisVelocity speeds) {
+  //   Vector2 trans = speeds.getTranslationalVelocity();
+  //   double xy = Math.abs(trans.x) + Math.abs(trans.y);
+  //   double ang_velocity = speeds.getAngularVelocity();
+  //   if (speeds.getAngularVelocity() <= 0.0 || pXY <= 0) {
+  //     desired_heading = getPose().rotation;
+  //   } else if (xy > 0) {
+  //     ang_velocity +=
+  //         drift_correction.calculate(getPose().rotation.toDegrees(), desired_heading.toDegrees());
+  //   }
+  //   pXY = xy;
+  // }
 
   public RigidTransform2 getPose() {
     return pose;
