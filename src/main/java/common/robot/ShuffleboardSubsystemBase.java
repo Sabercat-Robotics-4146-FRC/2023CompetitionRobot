@@ -1,6 +1,5 @@
 package common.robot;
 
-
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.GenericEntry;

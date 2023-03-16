@@ -11,7 +11,7 @@ public class Robot extends TimedRobot {
   private RobotContainer robotContainer = new RobotContainer();
   private UpdateManager updateManager = new UpdateManager(robotContainer.getDrivetrainSubsystem());
 
-  private Command autonomousCommand = robotContainer.getAutonomousCommand();
+  private Command autonomousCommand = null;
 
   public Robot() {
 
@@ -34,6 +34,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    // autonomousCommand = robotContainer.getAutonomousCommand();
     robotContainer.getDrivetrainSubsystem().resetPose(RigidTransform2.ZERO);
 
     if (autonomousCommand != null) {

@@ -28,10 +28,9 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.*;
 
 public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
-  public boolean driveFlag = true;
+  public boolean driveFlag = false;
 
   public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
-
 
   // This value is used to turn the robot back to its initialPosition
 
@@ -42,7 +41,6 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   public boolean fieldOriented = false;
 
   public boolean locked = false;
-
 
   /* The following objects are used to create accurate trajectory for the specific robot
    *
@@ -57,10 +55,10 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
     new FeedforwardConstraint(
-        11.0, //TODO: test 12
+        11.0, // TODO: test 12
         FEEDFORWARD_CONSTANTS.getVelocityConstant(),
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
-        true), //TODO: was false, want to test true
+        true), // TODO: was false, want to test true
     new MaxAccelerationConstraint(12.5 * 12.0),
     new CentripetalAccelerationConstraint(5.0)
   };
@@ -238,11 +236,11 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     tab.addNumber("Yaw", () -> gyroscope.getYaw());
 
     _driverInterface
-         .primaryLayout
-         .addBoolean("Field Oriented", () -> fieldOriented)
-         .withPosition(0, 3);
-     _driverInterface.primaryLayout.addBoolean("Drive Enabled", () -> driveFlag).withPosition(0, 2);
-     _driverInterface.primaryLayout.add("Drive Heading", gyroscope).withPosition(0, 0);
+        .primaryLayout
+        .addBoolean("Field Oriented", () -> fieldOriented)
+        .withPosition(0, 3);
+    _driverInterface.primaryLayout.addBoolean("Drive Enabled", () -> driveFlag).withPosition(0, 2);
+    _driverInterface.primaryLayout.add("Drive Heading", gyroscope).withPosition(0, 0);
   }
 
   /** updates driveSignal with desired translational, rotational velocities */
@@ -290,16 +288,19 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   /** sets module values, as read from drive signal */
   private void updateModules(HolonomicDriveSignal driveSignal, double dt) {
-    Rotation2 rotOffset =
-        (driveSignal.isFieldOriented()) ? getPose().rotation.inverse() : Rotation2.ZERO;
-    ChassisVelocity chassisVelocity =
-        new ChassisVelocity(
-            driveSignal.getTranslation().rotateBy(rotOffset), driveSignal.getRotation());
-    Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
-    SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1);
-    for (int i = 0; i < moduleOutputs.length; i++) {
-      if (locked) modules[i].set(-moduleOutputs[i].length * 12.0, 0);
-      else modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
+    if (driveFlag) {
+      Rotation2 rotOffset =
+          (driveSignal.isFieldOriented()) ? getPose().rotation.inverse() : Rotation2.ZERO;
+      ChassisVelocity chassisVelocity =
+          new ChassisVelocity(
+              driveSignal.getTranslation().rotateBy(rotOffset), driveSignal.getRotation());
+      Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
+      SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1);
+      for (int i = 0; i < moduleOutputs.length; i++) {
+        if (locked) modules[i].set(-moduleOutputs[i].length * 12.0, 0);
+        else
+          modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
+      }
     }
   }
 
@@ -310,10 +311,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     Optional<HolonomicDriveSignal> trajectorySignal =
         follower.update(getPose(), getVelocity(), getAngularVelocity(), time, dt);
     driveSignal = trajectorySignal.orElseGet(() -> this.driveSignal);
-    if (!driveFlag) {
-      driveSignal = new HolonomicDriveSignal(Vector2.ZERO, 0, false);
-    }
-    updateModules(driveSignal, dt);
+    if (driveFlag) updateModules(driveSignal, dt);
   }
 
   @Override
@@ -329,8 +327,13 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     odometryAngleEntry.setDouble(pose.rotation.toDegrees());
   }
 
-  public void toggleLocked(boolean l) {locked = l;}
-  public void toggleLocked() {locked = !locked;}
+  public void toggleLocked(boolean l) {
+    locked = l;
+  }
+
+  public void toggleLocked() {
+    locked = !locked;
+  }
 
   public void lockWheelsAngle(double angle) {
     if (getAverageAbsoluteValueVelocity() < 5.0) {
@@ -375,7 +378,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   //     desired_heading = getPose().rotation;
   //   } else if (xy > 0) {
   //     ang_velocity +=
-  //         drift_correction.calculate(getPose().rotation.toDegrees(), desired_heading.toDegrees());
+  //         drift_correction.calculate(getPose().rotation.toDegrees(),
+  // desired_heading.toDegrees());
   //   }
   //   pXY = xy;
   // }
