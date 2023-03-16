@@ -1,39 +1,53 @@
 package frc4146.robot;
 
-import common.drivers.Gyroscope;
+import common.robot.DriverReadout;
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc4146.robot.commands.drivetrain.DriveCommand;
+import frc4146.robot.commands.subsystems.AlignWithFiducial;
 import frc4146.robot.commands.autonomous.AlignRobotFiducial;
 import frc4146.robot.commands.autonomous.BalanceRobot;
+import frc4146.robot.commands.subsystems.ArmCommand;
+import frc4146.robot.commands.subsystems.ClawCommand;
+import frc4146.robot.commands.subsystems.PositionPiece;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.drivetrain.TestDriveCommand;
 import frc4146.robot.commands.gamepiece.ArmCommand;
 import frc4146.robot.commands.gamepiece.ClawCommand;
 import frc4146.robot.commands.gamepiece.PositionPiece;
+
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
+
+  public static DriverReadout driverInterface = new DriverReadout();
 
   private PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
   private final XboxController primaryController =
       new XboxController(Constants.PRIMARY_CONTROLLER_PORT);
-
   private final XboxController secondaryController =
       new XboxController(Constants.SECONDARY_CONTROLLER_PORT);
+
+  private final GenericHID secondaryRumble =
+      new GenericHID(Constants.SECONDARY_CONTROLLER_PORT);
 
   private final Pigeon gyroscope = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(gyroscope);
 
   private final Limelight limelight = new Limelight();
-
   private final Arm arm = new Arm();
   private final Claw claw = new Claw();
+
+  private final Trigger armState;
 
   public boolean testMode;
 
@@ -88,6 +102,8 @@ public class RobotContainer {
         .setDefaultCommand(
             claw, new ClawCommand(claw, secondaryController.getLeftXAxis(), testMode));
 
+    armState = new Trigger(() -> arm.safeToDrive());
+
     CameraServer.startAutomaticCapture();
 
     configureButtonBindings();
@@ -95,8 +111,13 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
 
+
     // re-centers robot orientation so that current heading = default heading
     primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
+    
+    primaryController
+        .getStartButton()
+        .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
 
     primaryController
         .getLeftBumperButton()
@@ -130,6 +151,14 @@ public class RobotContainer {
         .getLeftBumperButton()
         .and(secondaryController.getYButton())
         .toggleOnTrue(new PositionPiece(arm, "cone", "high"));
+
+    armState.onFalse(
+        new InstantCommand(
+            () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
+
+    armState.onTrue(
+        new InstantCommand(
+            () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
 
     // while holding RIGHT bumper, press other button to go to setpoint for CUBE
     secondaryController

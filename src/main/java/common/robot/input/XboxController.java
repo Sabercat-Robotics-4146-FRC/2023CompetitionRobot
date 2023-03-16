@@ -1,7 +1,6 @@
 package common.robot.input;
 
 import edu.wpi.first.wpilibj.Joystick;
-
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -41,7 +40,9 @@ public final class XboxController extends Controller {
 
   private final DPadButton[] dpadButtons;
 
-  /** @param port The port the controller is on */
+  /**
+   * @param port The port the controller is on
+   */
   public XboxController(int port) {
     joystick = new Joystick(port);
 

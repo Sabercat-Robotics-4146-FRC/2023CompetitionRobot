@@ -38,25 +38,34 @@ public class Constants {
   public static class ArmConstants {
     public static final int ROTATION_LEFT_ID = 21;
     public static final int ROTATION_RIGHT_ID = 22;
-    public static final int ROTATION_POT_CHANNEl = 0;
+    public static final int ROTATION_POT_CHANNEL = 0;
+
+    public static final int CLOSED_LIMIT_CHANNEL = 9;
+    public static final int OPEN_LIMIT_CHANNEL = 1;
 
     public static final int EXTENSION_ID = 23;
     public static final int LOWER_LIMIT_CHANNEL = 9;
     public static final int UPPER_LIMIT_CHANNEL = 1;
     public static final int TICKS_PER_REVOLUTION = 2048;
 
-    public static final double MAX_LENGTH = 63; // inches
-    public static final double MIN_LENGTH = 39; // inches
+    public static final double MAX_LENGTH = 71; // inches
+    public static final double MIN_LENGTH = 47; // inches
     public static final double MAX_ANGLE = 1.05; // radians
-    public static final double MIN_ANGLE = -1.57; // raidans
+    public static final double MIN_ANGLE = -1.57; // radians
+    public static final int SUPERSTRUCTURE_HEIGHT = 47;
 
     public static final double POT_MAX_ROTATION = 0.35;
     public static final double POT_MIN_ROTATION = 0.63;
 
     public static final int CLAW_ID = 24;
 
+
+    public static final int kPIDSlot = 0;
+    public static final int kTimeoutMs = 30;
+
     // hashmap for arm setpoints, {"gamepiece":{"position":{rotation,extension}}}, allows for easy access
     public static final Map<String, HashMap> SETPOINTS =
+
         new HashMap<String, HashMap>() {
           {
             put(
@@ -103,5 +112,17 @@ public class Constants {
 
     public static final double D_Z = 1.0; // Alligned forward backward
     public static final double D_X = 0.0; // Alligned left right
+  }
+
+  public static class Setpoints {
+    public static final double[] intake_cone = {0.58, 2.26}; // rotation, extension
+    public static final double[] cone_low = {0.55, 0.27};
+    public static final double[] cone_mid = {0.42, 11.42};
+    public static final double[] cone_high = {0.39, 52.99};
+    public static final double[] intake_cube = {0.61, 2.18};
+    public static final double[] cube_low = {0.54, 44.47}; // NOTE: must be 1ft back
+    public static final double[] cube_mid = {0.47, 25.84};
+    public static final double[] cube_high = {0.42, 52.99};
+    public static final double[] drive_pos = {0.58, 0.27};
   }
 }
