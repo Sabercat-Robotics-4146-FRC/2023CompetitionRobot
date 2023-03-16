@@ -135,7 +135,7 @@ public class Arm extends SubsystemBase {
         extPosMode = false;
         extend(0);
       } else {
-        extend(Math.copySign(MathUtils.clamp(0.15 * Math.abs(error), 0.05, 0.2), error));
+        extend(Math.copySign(MathUtils.clamp(0.15 * Math.abs(error), 0.05, 0.25), error));
       }
     }
     if (rotPosMode) {
@@ -144,7 +144,7 @@ public class Arm extends SubsystemBase {
         rotPosMode = false;
         rotate(0);
       } else {
-        rotate(Math.copySign(MathUtils.clamp(2 * Math.abs(error), 0.1, 0.15), error));
+        rotate(Math.copySign(MathUtils.clamp(2 * Math.abs(error), 0.125, 0.25), error));
       }
     }
     resetExtensionEncoder();

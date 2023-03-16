@@ -20,7 +20,6 @@ public class DriveJoysticks {
     joystick_right = new Joystick(port_right);
 
     leftXAxis = new JoystickAxis(joystick_left, 0);
-
     leftYAxis = new JoystickAxis(joystick_left, 1);
     leftYAxis.setInverted(true);
 

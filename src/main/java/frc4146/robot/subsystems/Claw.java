@@ -11,25 +11,26 @@ public class Claw extends SubsystemBase {
   public TalonSRX clawMotor;
   public AnalogPotentiometer pot;
 
+  public boolean manual_mode = true;
+
   public Claw() {
     clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
-
-    clawMotor.config_kP(3, 0.3, 30);
-    clawMotor.config_kI(3, 0, 30);
-    clawMotor.config_kD(3, 0, 30);
-
     Shuffleboard.getTab("Subsystems").addNumber("Claw", () -> getPos());
   }
 
-  public void manuallySetClaw(double p) {
+  public void setClaw(double p) {
     clawMotor.set(ControlMode.PercentOutput, p);
+  }
+
+  public void manuallySetClaw(double p) {
+    if (manual_mode) setClaw(p);
+  }
+
+  public void toggleManualMode(boolean m) {
+    manual_mode = m;
   }
 
   public double getPos() {
     return clawMotor.getSelectedSensorPosition() / 1024;
-  }
-
-  public void setPos(double d) {
-    clawMotor.set(ControlMode.Position, d * 1024);
   }
 }

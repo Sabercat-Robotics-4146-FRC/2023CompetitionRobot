@@ -3,11 +3,17 @@ package frc4146.robot;
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc4146.robot.commands.autonomous.AlignWithTarget;
+import frc4146.robot.commands.autonomous.BalanceRobot;
+import frc4146.robot.commands.autonomous.SimpleTrajectory;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.commands.subsystems.PositionPiece;
+import frc4146.robot.commands.subsystems.ScorePiece;
 import frc4146.robot.subsystems.*;
 
 public class RobotContainer {
@@ -63,22 +69,34 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    // primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::calibrate));
-    //
-    // primaryController
-    //     .getLeftBumperButton()
-    //     .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(false)));
-    // primaryController
-    //     .getRightBumperButton()
-    //     .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(true)));
 
-    // primaryController.getAButton().onTrue(new BalanceRobot(drivetrainSubsystem, gyroscope));
-    // primaryController
-    //     .getBButton()
-    //     .toggleOnTrue(new AlignRobotFiducial(drivetrainSubsystem, limelight));
+    primaryController.getStartButton().onTrue(Commands.runOnce(gyroscope::reset));
+
+    primaryController
+        .getLeftBumperButton()
+        .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(false)));
+    primaryController
+        .getRightBumperButton()
+        .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(true)));
+
+    primaryController.getAButton().onTrue(new BalanceRobot(drivetrainSubsystem, gyroscope));
+
+    primaryController
+        .getXButton()
+        .toggleOnTrue(new SimpleTrajectory(drivetrainSubsystem, gyroscope, arm, claw));
+
     // primaryController
     //     .getXButton()
-    //     .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
+    //     .toggleOnTrue(new StraightLine(drivetrainSubsystem, gyroscope, -200));
+    // // primaryController
+    // //     .getXButton()
+    // //     .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
+
+    primaryController
+        .getYButton()
+        .toggleOnTrue(new AlignWithTarget(drivetrainSubsystem, limelight));
+
+    secondaryController.getStartButton().toggleOnTrue(new ScorePiece(arm, claw, "cone", "high"));
 
     secondaryController
         .getLeftBumperButton()
@@ -125,5 +143,9 @@ public class RobotContainer {
 
   public Pigeon getGyroscope() {
     return gyroscope;
+  }
+
+  public Command getAutonomousCommand() {
+    return new SimpleTrajectory(drivetrainSubsystem, gyroscope, arm, claw);
   }
 }

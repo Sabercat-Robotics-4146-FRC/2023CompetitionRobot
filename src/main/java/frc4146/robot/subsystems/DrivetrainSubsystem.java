@@ -16,6 +16,7 @@ import common.math.Rotation2;
 import common.math.Vector2;
 import common.robot.UpdateManager;
 import common.util.*;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -34,7 +35,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public Timer timer;
 
-  public boolean fieldOriented;
+  public boolean fieldOriented = false;
 
   /* The following objects are used to create accurate trajectory for the specific robot
    *
@@ -60,9 +61,11 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   /** follower uses PID, feedforward control to create trajectories */
   private final HolonomicMotionProfiledTrajectoryFollower follower =
       new HolonomicMotionProfiledTrajectoryFollower(
-          new PidConstants(2.0, 0.0, 0.001),
-          new PidConstants(0.0005, 0.0, 0.01),
+          new PidConstants(2.0, 0.01, 0.001),
+          new PidConstants(2.0, 0.01, 0.001),
           new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
+
+  private PIDController drift_correction = new PIDController(0.07, 0, 0.004);
 
   /* swerveKinematics contains a set of vectors,
    *  each one corresponding to one swerve module,
@@ -106,6 +109,9 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private final GenericEntry odometryAngleEntry; // robot's heading/angle
 
   private boolean brake_mode = false;
+
+  public Rotation2 desired_heading;
+  public double pXY = 0;
 
   public DrivetrainSubsystem(Pigeon gyro) {
 
@@ -174,8 +180,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         };
 
     for (var talon : talons) {
-      talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 30, 0.5));
-      talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
+      talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 40, 0.5));
+      talon.configOpenloopRamp(0); // # seconds to reach peak throttle
     }
 
     // sets up Shuffleboard to receive odometry data
@@ -220,9 +226,9 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     tab.addBoolean("Drive Enabled", () -> driveFlag);
     tab.addBoolean("Field Oriented", () -> fieldOriented);
 
-    tab.addNumber("Pigeon Roll", () -> gyroscope.getRoll());
-    tab.addNumber("Pigeon Pitch", () -> gyroscope.getPitch());
-    tab.addNumber("Pigeon Yaw", () -> gyroscope.getYaw());
+    tab.addNumber("Roll", () -> gyroscope.getRoll());
+    tab.addNumber("Pitch", () -> gyroscope.getPitch());
+    tab.addNumber("Yaw", () -> gyroscope.getYaw());
   }
 
   /** updates driveSignal with desired translational, rotational velocities */
@@ -239,7 +245,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     }
     double mag = Math.hypot(tx, ty);
     double rotDeadband = 0.0025;
-    if (mag <= 0.005) rotDeadband = 0.005;
+    if (mag <= 0.005) rotDeadband = 0.004;
     if (Math.abs(rotationalVelocity) < rotDeadband) {
       rotationalVelocity = 0;
     }
@@ -341,6 +347,19 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
                 Vector2.fromAngle(Rotation2.fromRadians(m.getSteerAngle()))
                     .scale(m.getDriveVelocity() * 39.37008)) // inches in meter
         .toArray(Vector2[]::new);
+  }
+
+  public void drift_correct(ChassisVelocity speeds) {
+    Vector2 trans = speeds.getTranslationalVelocity();
+    double xy = Math.abs(trans.x) + Math.abs(trans.y);
+    double ang_velocity = speeds.getAngularVelocity();
+    if (speeds.getAngularVelocity() <= 0.0 || pXY <= 0) {
+      desired_heading = getPose().rotation;
+    } else if (xy > 0) {
+      ang_velocity +=
+          drift_correction.calculate(getPose().rotation.toDegrees(), desired_heading.toDegrees());
+    }
+    pXY = xy;
   }
 
   public RigidTransform2 getPose() {

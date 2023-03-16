@@ -15,8 +15,8 @@ public class DriveCommand extends CommandBase {
   private Axis strafe;
   private Axis rotation;
 
-  public SlewRateLimiter ff = new SlewRateLimiter(2.5);
-  public SlewRateLimiter sf = new SlewRateLimiter(2.5);
+  public SlewRateLimiter ff = new SlewRateLimiter(1.5);
+  public SlewRateLimiter sf = new SlewRateLimiter(1.5);
 
   public DriveCommand(DrivetrainSubsystem drivetrain, Axis forward, Axis strafe, Axis d) {
     this.forward = forward;
@@ -41,7 +41,7 @@ public class DriveCommand extends CommandBase {
                 -Math.copySign(Math.tan(Math.abs(f)) * (Math.sin(Math.abs(f)) + 0.5) / 3.25, f)),
             sf.calculate(
                 Math.copySign(Math.tan(Math.abs(s)) * (Math.sin(Math.abs(s)) + 0.5) / 3.25, s))),
-        Math.copySign(Math.tan(Math.abs(r)) * (Math.sin(Math.abs(r)) + 1) / 60.0, r),
+        Math.copySign(Math.tan(Math.abs(r)) * (Math.sin(Math.abs(r)) + 1) / 75.0, r),
         false);
   }
 

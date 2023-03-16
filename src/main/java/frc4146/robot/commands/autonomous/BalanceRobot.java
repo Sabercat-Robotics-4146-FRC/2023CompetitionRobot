@@ -12,12 +12,15 @@ public class BalanceRobot extends CommandBase {
   private final DrivetrainSubsystem drivetrain;
   public final Pigeon pigeon;
   // To be tuned
-  public double kP = -0.015;
-  public double kD = -0.0;
+  public double kP = 0.6 * 0.0125;
+  public double kI = 0;
+  public double kD = 3 * 0.0125 / 40.0;
+
+  public double integrator = 0;
 
   public double time = 10;
 
-  double min_amt = 0.0125;
+  double min_amt = 0.01;
   double max_amt = 0.135;
 
   int stage = 0;
@@ -36,6 +39,7 @@ public class BalanceRobot extends CommandBase {
     drivetrain.setMode(true);
     past_error = getError();
     stage = 0;
+    integrator = 0;
     drivetrain.resetPose(RigidTransform2.ZERO);
   }
 
@@ -43,7 +47,7 @@ public class BalanceRobot extends CommandBase {
 
     if (stage == 0) {
       double pos = drivetrain.getPose().translation.length;
-      if (pos < 40) drivetrain.drive(new Vector2(0, -0.35), 0);
+      if (pos < 40) drivetrain.drive(new Vector2(0, 0.35), 0);
       else {
         stage += 1;
         drivetrain.resetPose(RigidTransform2.ZERO);
@@ -51,29 +55,30 @@ public class BalanceRobot extends CommandBase {
     }
     if (stage == 1) {
 
+      integrator += getError();
+
       double p = kP * getError();
+      double i = MathUtil.clamp(kI * integrator, -max_amt / 2, max_amt / 2);
       double d = kD * getErrorRate();
       double output =
           Math.copySign(
               MathUtil.clamp(
-                  Math.abs(p + d),
+                  Math.abs(p + i + d),
                   min_amt,
-                  max_amt - Math.min(drivetrain.getPose().translation.length / 1350, 0.05)),
-              p + d);
+                  max_amt - Math.min(drivetrain.getPose().translation.length / 1350, 0.0525)),
+              p + i + d);
       drivetrain.drive(new Vector2(0, output), 0);
 
-      if ((Math.abs(getError()) <= 1) && Math.abs(getErrorRate()) < 0.02) { // || getErrorRate() <= -0.25)) {
+      if ((Math.abs(getError()) <= 1)
+          && Math.abs(getErrorRate()) < 0.02) { // || getErrorRate() <= -0.25)) {
         stage += 1;
         drivetrain.resetPose(RigidTransform2.ZERO);
       }
     }
-    if (stage == 2) {
-      drivetrain.drive(new Vector2(0, 0.082), 0);
-    }
   }
 
   public double getError() {
-    return -pigeon.getYaw();
+    return -pigeon.getRoll();
   }
 
   public double getErrorRate() {
@@ -81,7 +86,7 @@ public class BalanceRobot extends CommandBase {
   }
 
   public boolean isFinished() {
-    return stage == 2 && drivetrain.getPose().translation.length >= 0.5;
+    return stage == 2;
   }
 
   public void end(boolean interrupted) {
