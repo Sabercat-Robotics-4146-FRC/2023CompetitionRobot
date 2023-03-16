@@ -1,46 +1,53 @@
 package frc4146.robot.commands.drivetrain;
 
+import common.math.MathUtils;
 import common.math.Vector2;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc4146.robot.RobotContainer;
 import frc4146.robot.subsystems.DrivetrainSubsystem;
+import frc4146.robot.subsystems.Pigeon;
 
-public class TurnRobotCommand extends CommandBase {
+public class TurnRobotAbsolute extends CommandBase {
   DrivetrainSubsystem drivetrain;
-  RobotContainer container;
+  Pigeon gyroscope;
 
   PIDController rotate;
 
-  double speed = 0;
   double target = 0;
+  double initDegree = 0;
+  double direction = 1;
 
-  public TurnRobotCommand(RobotContainer container, double target) {
-    this.container = container;
+  public TurnRobotAbsolute(Pigeon gyroscope, DrivetrainSubsystem drivetrain, double target) {
+    this.gyroscope = gyroscope;
+    this.drivetrain = drivetrain;
     this.target = target;
   }
 
   @Override
   public void initialize() {
-    double initDegree = container.getGyroscope().getAngle().toDegrees();
-
+    gyroscope.reset();
+    initDegree = gyroscope.getAngle() % 360;
+    direction = Math.abs(target - initDegree) > 180 ? -1 : 1;
   }
 
   @Override
   public void execute() {
-    container.getDrivetrainSubsystem().drive(Vector2.ZERO, 0.01);
+    double mag = MathUtils.clamp((gyroscope.getAngle() - initDegree) / Math.abs(target - initDegree), 0.01, 0.05);
+    drivetrain.drive(Vector2.ZERO, mag * direction);
 
-    SmartDashboard.putNumber("Current Rotation", container.getGyroscope().getAngle().toDegrees());
+    SmartDashboard.putNumber("Current Rotation", gyroscope.getAngle());
   }
 
   @Override
   public void end(boolean interrupted) {
-    container.getDrivetrainSubsystem().drive(Vector2.ZERO, 0, false);
+    drivetrain.drive(Vector2.ZERO, 0, false);
   }
 
   @Override
   public boolean isFinished() {
-    return Math.abs(container.getGyroscope().getAngle().toDegrees() - target) < 10;
+    return Math.abs(gyroscope.getAngle() - target) < 10;
   }
 }
+
