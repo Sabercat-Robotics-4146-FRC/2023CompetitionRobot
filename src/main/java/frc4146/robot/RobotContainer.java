@@ -172,6 +172,10 @@ public class RobotContainer {
     return arm;
   }
 
+  public Claw getClawSubsystem() {
+    return claw;
+  }
+
   public DrivetrainSubsystem getDrivetrainSubsystem() {
     return drivetrainSubsystem;
   }
