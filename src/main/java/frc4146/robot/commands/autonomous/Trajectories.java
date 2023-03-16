@@ -10,6 +10,7 @@ import frc4146.robot.RobotContainer;
 import frc4146.robot.commands.drivetrain.StraightLine;
 import frc4146.robot.commands.drivetrain.TurnRobot;
 import frc4146.robot.commands.subsystems.ScorePiece;
+import frc4146.robot.subsystems.Pigeon;
 
 public class Trajectories {
     SendableChooser<Command> sendableChooser;
@@ -24,7 +25,7 @@ public class Trajectories {
             put("BlueEngageOne", EngageOne());
             put("BlueLeaveOne", LeaveOne());
 
-            put("RedEngageThree", ScoreEngageOne());
+            put("RedScoreEngageThree", ScoreEngageOne());
             put("RedScoreThree", ScoreOne());
             put("RedEngageThree", EngageOne());
             put("RedLeaveThree", LeaveOne());
@@ -39,10 +40,24 @@ public class Trajectories {
             put("RedScoreOne", ScoreOne());
             put("RedEngageOne", EngageThree());
             put("RedLeaveOne", LeaveOne());
+
+
+            put("BlueScoreEngageTwo", ScoreEngageTwo());
+            put("BlueScoreTwo", ScoreTwo());
+            put("BlueEngageTwo", EngageTwo());
+            
+            put("RedScoreEngageTwo", ScoreEngageTwo());
+            put("RedScoreTwo", ScoreTwo());
+            put("RedEngageTwo", EngageTwo());
+
+
+            put("BlueEngageNone", Engage());
+            put("RedEngageNone", Engage());
+
         }};
     }
 
-    public Map<String, Command> getTrajectory() {
+    public Map<String, Command> getTrajectories() {
         return commands;
     }
 
@@ -117,5 +132,9 @@ public class Trajectories {
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
             new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())
         );
+    }
+
+    public Command Engage() {
+        return new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope());
     }
 }
