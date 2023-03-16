@@ -63,7 +63,7 @@ public class Constants {
     public static final int CLAW_ID = 24;
 
     public static final Map<String, HashMap> SETPOINTS =
-        new HashMap<String, HashMap>() {
+        new HashMap<>() {
           {
             put(
                 "cone",

@@ -18,24 +18,24 @@ public class Trajectories {
 
     public Trajectories(RobotContainer container) {
         this.container = container;
-        commands = new HashMap<>();
-
-        commands.put("BlueScoreEngageOne", ScoreEngageOne());
-        commands.put("BlueScoreOne", ScoreOne());
-        commands.put("BlueEngageOne", EngageOne());
-        commands.put("BlueLeaveOne", LeaveOne());
-        commands.put("RedEngageThree", ScoreEngageOne());
-        commands.put("RedScoreThree", ScoreOne());
-        commands.put("RedEngageThree", EngageOne());
-        commands.put("RedLeaveThree", LeaveOne());
-        commands.put("BlueScoreEngageThree", ScoreEngageThree());
-        commands.put("BlueScoreThree", ScoreOne());
-        commands.put("BlueEngageThree", EngageThree());
-        commands.put("BlueLeaveThree", LeaveOne());
-        commands.put("RedEngageOne", ScoreEngageThree());
-        commands.put("RedScoreOne", ScoreOne());
-        commands.put("RedEngageOne", EngageThree());
-        commands.put("RedLeaveOne", LeaveOne());
+        commands = new HashMap<>() { {
+            put("BlueScoreEngageOne", ScoreEngageOne());
+            put("BlueScoreOne", ScoreOne());
+            put("BlueEngageOne", EngageOne());
+            put("BlueLeaveOne", LeaveOne());
+            put("RedEngageThree", ScoreEngageOne());
+            put("RedScoreThree", ScoreOne());
+            put("RedEngageThree", EngageOne());
+            put("RedLeaveThree", LeaveOne());
+            put("BlueScoreEngageThree", ScoreEngageThree());
+            put("BlueScoreThree", ScoreOne());
+            put("BlueEngageThree", EngageThree());
+            put("BlueLeaveThree", LeaveOne());
+            put("RedEngageOne", ScoreEngageThree());
+            put("RedScoreOne", ScoreOne());
+            put("RedEngageOne", EngageThree());
+            put("RedLeaveOne", LeaveOne());
+        }};
 
     }
 
@@ -44,78 +44,58 @@ public class Trajectories {
     }
 
     public Command ScoreEngageOne() {
-        SequentialCommandGroup command = new SequentialCommandGroup();
-
-        command.addCommands(
+        //Confirmed
+        return new SequentialCommandGroup(
             new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150),
             new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55),
             new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())
         );
-
-        return command;
     }
 
     public Command ScoreOne() {
-        SequentialCommandGroup command = new SequentialCommandGroup();
-
-        command.addCommands(
+        //Confirmed
+        return new SequentialCommandGroup(
             new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150)
         );
-
-        return command;
     }
 
     public Command EngageOne() {
-        SequentialCommandGroup command = new SequentialCommandGroup();
-
-        command.addCommands(
+        //Confirmed
+        return new SequentialCommandGroup(
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150),
             new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55),
             new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())
         );
-
-        return command;
     }
 
     public Command LeaveOne() {
-        SequentialCommandGroup command = new SequentialCommandGroup();
-
-        command.addCommands(
+        //Confirmed
+        return new SequentialCommandGroup(
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150)
         );
-
-        return command;
     }
 
     public Command ScoreEngageThree() {
-        SequentialCommandGroup command = new SequentialCommandGroup();
-
-        command.addCommands(
+        return new SequentialCommandGroup(
             new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150),
             new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
             new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())
         );
-
-        return command;
     }
 
 
     public Command EngageThree() {
-        SequentialCommandGroup command = new SequentialCommandGroup();
-
-        command.addCommands(
+        return new SequentialCommandGroup(
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150),
             new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
             new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
             new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())
         );
-
-        return command;
     }
 }
