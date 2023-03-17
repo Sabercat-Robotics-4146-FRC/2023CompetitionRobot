@@ -23,7 +23,7 @@ public class ScorePiece extends SequentialCommandGroup {
         new PositionPiece(arm, gamepiece, pos),
         new ParallelRaceGroup(
             new RepeatCommand(new InstantCommand(() -> claw.setClaw(-0.75), claw)),
-            new WaitCommand(0.25)),
+            new WaitCommand(0.3)),
         Commands.runOnce(
             () -> {
               arm.setRotationPos(arm.getRotation() - 0.1);
@@ -39,7 +39,7 @@ public class ScorePiece extends SequentialCommandGroup {
             },
             claw,
             arm),
-        new WaitCommand(0.25),
+        new WaitCommand(0.4),
         Commands.runOnce(
             () -> {
               arm.setRotationPos(0.62);

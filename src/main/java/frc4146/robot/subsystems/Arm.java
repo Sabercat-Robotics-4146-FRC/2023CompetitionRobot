@@ -68,7 +68,8 @@ public class Arm extends SubsystemBase {
     Shuffleboard.getTab("Subsystems").addNumber("Extension", () -> getExtension());
     Shuffleboard.getTab("Subsystems").addBoolean("ExtPosMode", () -> extPosMode);
     Shuffleboard.getTab("Subsystems").addNumber("ExtError", () -> getExtensionError());
-
+    Shuffleboard.getTab("Subsystems").addBoolean("LS Open", () -> openedLimit.get());
+    Shuffleboard.getTab("Subsystems").addBoolean("LS Close", () -> closedLimit.get());
     // extPosEntry = Shuffleboard.getTab("Subsystems").add("Extension SP",
     // extPosSetpoint).getEntry();
   }
@@ -169,11 +170,11 @@ public class Arm extends SubsystemBase {
 
     if (extPosMode) {
       double error = getExtensionError();
-      if (Math.abs(error) < 0.125) {
+      if (Math.abs(error) < 0.125 || (openedLimit.get() && error > 0)) {
         extPosMode = false;
         extend(0);
       } else {
-        extend(Math.copySign(MathUtils.clamp(0.25 * Math.abs(error), 0.15, 0.4), error));
+        extend(Math.copySign(MathUtils.clamp(0.05 * Math.abs(error), 0.125, 0.4), error));
       }
     }
     if (rotPosMode) {
