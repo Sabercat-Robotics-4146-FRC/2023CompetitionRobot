@@ -17,7 +17,7 @@ public class RobotContainer {
   private final XboxController secondaryController =
       new XboxController(Constants.SECONDARY_CONTROLLER_PORT);
       
-  private final Gyroscope gyroscope = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
+  private final Pigeon gyroscope = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(gyroscope);
   private final Arm arm = new Arm();
 

@@ -3,11 +3,9 @@ package frc4146.robot.autonomous;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc4146.robot.RobotContainer;
-import frc4146.robot.commands.BasicDriveCommand;
 import frc4146.robot.commands.FollowTrajectoryCommand;
 import frc4146.robot.subsystems.DrivetrainSubsystem;
 
@@ -40,63 +38,20 @@ public class AutonomousFactory {
     // create an object for trajectories folder
     File waypointsFile = root.listFiles((dir, name) -> name.contains(".path"))[0];
 
-    SmartDashboard.putString("Check 1", "true");
-
-
     // create the list of states from .json file
     List<List<State>> states = parseJson(waypointsFile.toPath());
 
     // Create trajectories from
     List<Trajectory> trajectories = getTrajectories(states);
 
-    List<List<Double>> waypointTimes = new ArrayList<>();
-
-    for(Trajectory trajectory : trajectories) {
-      waypointTimes.add(trajectory.getWaypointTimes());
-    }
-
-    SmartDashboard.putString("Check 3", "true");
-
-    // create a list of commands found in the middle of a trajectory (not at a breakpoint)
-    //List<SequentialCommandGroup> midCommands = getMidCommands(states);
-
-    SmartDashboard.putString("Check 4", "true");
-
-    // create a list of commands found at the end of a trajectory (at the breakpoint)
-   // List<SequentialCommandGroup> endCommands = getEndCommands(states);
-
-    SmartDashboard.putString("Check 5", "true");
-
     // compile a command that incorperates trajectory and subsystem commands
     for (int i = 0; i < trajectories.size(); i++) {
-      // Command mid = midCommands.get(i);
-      // Command endCommand = endCommands.get(i);
       Trajectory t = trajectories.get(i);
-      double rotation = trajectories.get(i)
-        .getPath()
-        .getSegments()[trajectories.get(i).getPath().getSegments().length-1]
-        .getEnd()
-        .getHeading()
-        .toRadians();
 
-      rotation -= trajectories.get(i).getPath().getSegments()[0].getStart().getHeading().toRadians();
-
-      // command.addCommands(
-      //     new ParallelCommandGroup(
-      //         new FollowTrajectoryCommand(this.container.getDrivetrainSubsystem(), t), 
-      //         mid),
-      //     endCommand);
       command.addCommands(
         new FollowTrajectoryCommand(container.getDrivetrainSubsystem(), t)
-        // new BasicDriveCommand(container.getDrivetrainSubsystem(), Vector2.ZERO, rotation, true)
       );
-
-      // 
-
-      SmartDashboard.putNumber("Rotation", rotation);
-
     }
-
 
     return command;
   }
@@ -157,14 +112,12 @@ public class AutonomousFactory {
           Vector2 end = new Vector2(waypoint2.x, waypoint2.y);
           Rotation2 r = new Rotation2(Math.cos(waypoint.heading), Math.sin(waypoint.heading), true);
 
-          SmartDashboard.putNumber("TesT", v1.x);
-
           splinePath.quinticHermite(start, v1, end, v2, r);
         }
         
         Path path = splinePath.build();
 
-        trajectory = new Trajectory(path, DrivetrainSubsystem.TRAJECTORY_CONSTRAINTS, 0.1, list);
+        trajectory = new Trajectory(path, DrivetrainSubsystem.TRAJECTORY_CONSTRAINTS, 0.1);
         trajectories.add(trajectory);
     }
 

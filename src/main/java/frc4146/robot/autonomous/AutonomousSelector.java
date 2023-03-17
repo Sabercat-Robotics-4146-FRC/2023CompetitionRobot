@@ -33,6 +33,7 @@ public class AutonomousSelector {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public SendableChooser<String>[] getChooser() {
     // configure path chooser
     pathChooser = new SendableChooser[4];
