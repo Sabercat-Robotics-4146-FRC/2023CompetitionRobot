@@ -1,4 +1,4 @@
-package frc4146.robot.commands.autonomous;
+package frc4146.robot.commands.fiducials;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
