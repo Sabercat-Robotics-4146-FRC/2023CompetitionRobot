@@ -22,7 +22,7 @@ public class ArmCommand extends CommandBase {
   @Override
   public void execute() {
     arm.manually_rotate(-rotate.get() / 2);
-    arm.manually_extend(extend.get() / 4 - retract.get() / 4);
+    arm.manually_extend(extend.get(true) / 3.25 - retract.get(true) / 3.25);
   }
 
   @Override

@@ -139,29 +139,6 @@ public class Arm extends SubsystemBase {
     rotPosMode = r;
   }
 
-  public boolean safeToDrive() {
-    boolean drive = true;
-
-    currentAngle = -(getRotation() * 2 * Math.PI) + 4.210;
-    currentLength =
-        (getExtension() * 2 * Math.PI * .75) / (25 / 2)
-            + ArmConstants.MIN_LENGTH; // C=2pi*r, gear_ratio=12.5
-
-    if (currentAngle >= maxAngle) {
-      drive = false;
-      maxLength = 55;
-    } else {
-      maxLength =
-          (ArmConstants.SUPERSTRUCTURE_HEIGHT / Math.cos(currentAngle))
-              - 1; // margin of error of 1 inch above ground
-    }
-    if (currentLength >= maxLength) {
-      drive = false;
-    }
-
-    return drive;
-  }
-
   @Override
   public void periodic() {
 
@@ -183,7 +160,7 @@ public class Arm extends SubsystemBase {
         rotPosMode = false;
         rotate(0);
       } else {
-        rotate(Math.copySign(MathUtils.clamp(4 * Math.abs(error), 0.15, 0.375), error));
+        rotate(Math.copySign(MathUtils.clamp(4.25 * Math.abs(error), 0.15, 0.425), error));
       }
     }
     resetExtensionEncoder();

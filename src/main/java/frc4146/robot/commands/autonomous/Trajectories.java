@@ -113,7 +113,10 @@ public class Trajectories {
         ScoreTwo(),
         new DriveOverBalance(
             container.getDrivetrainSubsystem(), container.getGyroscope()), // Test amt
-        new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
+        new TurnRobot(
+            container.getDrivetrainSubsystem(),
+            container.getGyroscope(),
+            -90 - container.getGyroscope().getAngle() % 360 - 180),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }
 

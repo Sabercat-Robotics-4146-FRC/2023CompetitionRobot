@@ -12,9 +12,9 @@ public class DriveOverBalance extends SequentialCommandGroup {
   public DriveOverBalance(DrivetrainSubsystem drivetrain, Pigeon pigeon) {
     addCommands(
         new ParallelRaceGroup(
-            new StraightLine(drivetrain, pigeon, -400),
+            new StraightLine(drivetrain, pigeon, -4000),
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> pigeon.getPitch() >= 5), // Driving backwards
-                new WaitCommand(1.5))));
+                new WaitCommand(3))));
   }
 }

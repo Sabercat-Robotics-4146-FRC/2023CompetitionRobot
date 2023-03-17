@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc4146.robot.commands.autonomous.AlignWithTarget;
 import frc4146.robot.commands.autonomous.BalanceRobot;
 import frc4146.robot.commands.drivetrain.DriveCommand;
@@ -36,13 +34,9 @@ public class RobotContainer {
 
   private final Pigeon gyroscope = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(gyroscope);
-
   private final Limelight limelight = new Limelight();
-
   private final Arm arm = new Arm();
   private final Claw claw = new Claw();
-
-  private final Trigger armState;
 
   private final AutonomousSelector autonomousSelector;
   private final AutonomousTab autonomousTab;
@@ -73,8 +67,6 @@ public class RobotContainer {
                 secondaryController.getRightYAxis()));
     CommandScheduler.getInstance()
         .setDefaultCommand(claw, new ClawCommand(claw, secondaryController.getLeftXAxis()));
-
-    armState = new Trigger(() -> arm.safeToDrive());
 
     CameraServer.startAutomaticCapture();
 
@@ -165,8 +157,6 @@ public class RobotContainer {
     //         new InstantCommand(
     //             () -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0.5)));
 
-    armState.onTrue(
-        new InstantCommand(() -> secondaryRumble.setRumble(GenericHID.RumbleType.kBothRumble, 0)));
   }
 
   public Arm getArmSubsystem() {
