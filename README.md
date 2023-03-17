@@ -9,10 +9,10 @@
 ## Drive
 (Swerve Modules = SM1-SM4; Pigeon 2.0 = P)
 
-Our drive code brilliantly combines gyroscope data, kinematics, and odometry.
+Our drive code brilliantly combines gyroscope data, kinematics, odometry, and useful driver features.
 
 <p align="center">
-  <img src="/img/DrivetrainSubsystem.png" width="300" title="hover text">
+  <img src="/img/DrivetrainSubsystem.jpg" width="300" title="hover text">
 </p>
 
 The most fundamental aspect of our drive code is our swerve odometry, which keeps track of the robot's pose over time. Pose includes both the robot's translational and angular velocities. The gyroscope (Pigeon 2.0) collects data about the robot's angular velocity. By integrating this data with respect to time, the SwerveOdometry class onverts the robot's angular velocity into the robot's total change in angular heading. Given an initial position, we now know the robot's heading. SwerveOdometry then makes use of SwerveKinematics (which profiles the robot's drive motion) to then give velocity data. The end result is knowledge of the robot's translational and rotational velocity, aka pose!
@@ -38,7 +38,13 @@ Sensor feedback was crucial for a reliable arm. We analyzed data relating to the
 
 We also added protective functionality to the sensors. An upper and lower limit switch allow us to prevent harmful extension beyond the range of the arm. Additionally, when the lower limit switch is enabled (and the arm is fully retracted), we reset the extension encoder value to 0, ensuring accurate sensor data. We also configured a software limit on max. rotation with similar reasoning. A bonus feature is joystick rumbling to alert the drivers when the robot is driving with the arm either dangerously high or at risk of dragging on the ground.
 
-PID control systems provide efficiency to our pickup and scoring methods. Proportional gain ensures we quickly reach our setpoint, and derivative gain reduces oscillations around that setpoint. With the help of a new Shuffleboard PID-testing method, we implemented our own PID in record time this season. We also sought to profile the arm motion to reduce fast, jerky motions observed in preliminary testing. To this effect, we added max. acceleration constraints and current limits. We considered adding a feedforward element to offset the effect of gravity, but our concern was that a constant voltage being applied would be harmful to battery life.
+PID control systems provide efficiency to our pickup and scoring methods. Proportional gain ensures we quickly reach our setpoint, and derivative gain reduces oscillations around that setpoint. With the help of a new Shuffleboard PID-testing method, we implemented our own PID in record time this season. We also sought to profile the arm motion to reduce fast, jerky motions observed in preliminary testing. To this effect, we added max. acceleration constraints and current limits. 
+
+<p align="center">
+  <img src="/img/Arm2.jpg" width="300" title="hover text">
+</p>
+
+We considered adding a feedforward element to offset the effect of gravity, but our concern was that a constant voltage being applied would be harmful to battery life.
 
 \* To detect whether the claw is gripping on an object, analyzing current draw proved more reliable than potentiometer data. The claw experiences additional torque when experiencing resistance from a gamepiece, which is detectable through current.
 
