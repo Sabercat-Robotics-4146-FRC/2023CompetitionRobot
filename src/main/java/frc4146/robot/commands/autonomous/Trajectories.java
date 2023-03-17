@@ -61,14 +61,15 @@ public class Trajectories {
   public Command ScoreOne() {
     return new SequentialCommandGroup(
         new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200));
+        new StraightLine(
+            container.getDrivetrainSubsystem(), container.getGyroscope(), -200, false));
   }
 
   public Command EngageOne() {
     return new SequentialCommandGroup(
         Leave(),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55, false),
         Engage());
   }
 
@@ -82,7 +83,7 @@ public class Trajectories {
     return new SequentialCommandGroup(
         Leave(),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55, false),
         Engage());
   }
 
@@ -99,7 +100,7 @@ public class Trajectories {
 
   public Command EngageTwo() {
     return new SequentialCommandGroup(
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -10),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -10, false),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), 90),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }
@@ -113,10 +114,7 @@ public class Trajectories {
         ScoreTwo(),
         new DriveOverBalance(
             container.getDrivetrainSubsystem(), container.getGyroscope()), // Test amt
-        new TurnRobot(
-            container.getDrivetrainSubsystem(),
-            container.getGyroscope(),
-            -90 - container.getGyroscope().getAngle() % 360 - 180),
+        new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }
 
@@ -126,6 +124,7 @@ public class Trajectories {
 
   public Command Leave() {
     return new SequentialCommandGroup(
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200));
+        new StraightLine(
+            container.getDrivetrainSubsystem(), container.getGyroscope(), -200, false));
   }
 }

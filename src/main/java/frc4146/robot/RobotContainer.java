@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc4146.robot.commands.autonomous.AlignWithTarget;
 import frc4146.robot.commands.autonomous.BalanceRobot;
 import frc4146.robot.commands.drivetrain.DriveCommand;
+import frc4146.robot.commands.fiducials.AlignWithTarget;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.commands.subsystems.PositionPiece;
@@ -150,6 +150,11 @@ public class RobotContainer {
         .getRightBumperButton()
         .and(secondaryController.getYButton())
         .toggleOnTrue(new PositionPiece(arm, "cube", "high"));
+
+    secondaryController
+        .getRightBumperButton()
+        .and(secondaryController.getLeftBumperButton())
+        .toggleOnTrue(new ScorePiece(arm, claw, "cube", "high"));
 
     // armState
     //     .and(() -> drivetrainSubsystem.getAverageAbsoluteValueVelocity() > 0.5)

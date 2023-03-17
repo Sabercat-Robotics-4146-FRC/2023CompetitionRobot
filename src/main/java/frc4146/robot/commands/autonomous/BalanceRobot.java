@@ -14,22 +14,33 @@ public class BalanceRobot extends CommandBase {
   public double kP = .7 * 0.0125;
   public double kD = 3 * 0.0125 / 40.0;
 
-  double min_amt = 0.025;
-  double max_amt = 0.175;
+  public double min_amt = 0.025;
+  public double max_amt = 0.175;
 
-  int stage = 0;
+  public double thresh;
+
+  public int stage = 0;
+
+  boolean shortenPos;
 
   public double past_error;
 
-  public BalanceRobot(DrivetrainSubsystem drivetrain, Pigeon pigeon) {
+  public BalanceRobot(DrivetrainSubsystem drivetrain, Pigeon pigeon, boolean shortenPos) {
     this.drivetrain = drivetrain;
     this.pigeon = pigeon;
+    this.shortenPos = shortenPos;
     // Shuffleboard.getTab("Drivetrain").addNumber("StageB", () -> stage);
 
     addRequirements(drivetrain);
   }
 
+  public BalanceRobot(DrivetrainSubsystem drivetrain, Pigeon pigeon) {
+    this(drivetrain, pigeon, false);
+  }
+
   public void initialize() {
+
+    thresh = shortenPos ? 60 : 75;
     drivetrain.setMode(true);
     past_error = getError();
     stage = 0;
@@ -40,7 +51,7 @@ public class BalanceRobot extends CommandBase {
 
     if (stage == 0) {
       double pos = drivetrain.getPose().translation.length;
-      if (pos < 75) drivetrain.drive(new Vector2(0, 0.45), 0);
+      if (pos < thresh) drivetrain.drive(new Vector2(0, 0.45), 0);
       else {
         stage += 1;
         drivetrain.resetPose(RigidTransform2.ZERO);

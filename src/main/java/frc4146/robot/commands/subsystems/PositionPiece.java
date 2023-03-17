@@ -21,7 +21,7 @@ public class PositionPiece extends SequentialCommandGroup {
               arm.toggleRotationMode(true);
             },
             arm),
-        new ParallelRaceGroup(new WaitUntilCommand(() -> !arm.rotPosMode), new WaitCommand(5)),
+        new ParallelRaceGroup(new WaitUntilCommand(() -> !arm.rotPosMode), new WaitCommand(3.5)),
         new InstantCommand(
             () -> {
               arm.setExtensionPos(ext_setpoint);

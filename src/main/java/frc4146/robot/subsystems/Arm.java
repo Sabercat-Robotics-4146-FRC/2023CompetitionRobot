@@ -160,7 +160,7 @@ public class Arm extends SubsystemBase {
         rotPosMode = false;
         rotate(0);
       } else {
-        rotate(Math.copySign(MathUtils.clamp(4.25 * Math.abs(error), 0.15, 0.425), error));
+        rotate(Math.copySign(MathUtils.clamp(5 * Math.abs(error), 0.15, 0.45), error));
       }
     }
     resetExtensionEncoder();

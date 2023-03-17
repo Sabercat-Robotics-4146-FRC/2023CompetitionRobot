@@ -50,7 +50,7 @@ public class TurnRobot extends CommandBase {
     drivetrainSubsystem.drive(
         Vector2.ZERO,
         Math.copySign(
-            MathUtil.clamp(0.025 * driveTurn + 0.08 * (old_driveturn - driveTurn), 0.01, 0.075),
+            MathUtil.clamp(0.025 * driveTurn + 0.08 * (old_driveturn - driveTurn), 0.01, 0.085),
             driveTurn));
     old_driveturn = driveTurn;
   }
