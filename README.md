@@ -25,6 +25,10 @@ The beauty of our drive code comes from the DriveSignal, an object which stores 
 
 The final piece in the puzzle is updateModules(). This method reads DriveSignal in order to generate a ChassisVelocity, which describes the motion of the entire robot. Using kinematics, it then converts ChassisVelocity into individual ModuleVelocities, describing the motion of each individual module. Then, it's as easy as setting the module.
 
+<p align="center">
+  <img src="/img/centric.png" width="300" title="hover text">
+</p>
+
 DrivetrainSubsystem is registered as an Updatable so that this data is constantly being updated. A few final features relate to driver preference. The driver can toggle fieldOriented mode, or he/she can press a button to "zero" the gyroscope. This sets the robot's current heading as the default heading for future driving. A slew rate limiter prevents rapid acceleration due to joystick input, and a deadzone prevents "straight" motion from moving astray.
 
 
