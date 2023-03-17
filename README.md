@@ -31,7 +31,7 @@ DrivetrainSubsystem is registered as an Updatable so that this data is constantl
 Given the rapid-paced, highly variable nature of this year's game, we knew that arm controls had to combine reliability and efficiency. 
 
 <p align="center">
-  <img src="/img/Arm1.png" width="300" title="hover text">
+  <img src="/img/Arm1.jpg" width="300" title="hover text">
 </p>
 
 Sensor feedback was crucial for a reliable arm. We analyzed data relating to the arm's rotation from both the potentiometer and encoder. Because the potentiometer measured the rotation of the shaft closest to the actual arm, it gave us more precise data than the encoder, located at the driving shaft of the motor. Thus, it better reflected the arm's actual position. We also use the built-in Talon FX encoder for arm extension and a potentiometer for claw position*. Pre-recorded setpoints for each of these sensors allow us to trigger a command that moves the arm to the same position, every time. 
