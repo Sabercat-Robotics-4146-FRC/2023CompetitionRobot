@@ -72,13 +72,13 @@ public class Trajectories {
     // Confirmed
     return new SequentialCommandGroup(
         new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150));
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200));
   }
 
   public Command EngageOne() {
     // Confirmed
     return new SequentialCommandGroup(
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
         new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
@@ -87,7 +87,7 @@ public class Trajectories {
   public Command LeaveOne() {
     // Confirmed
     return new SequentialCommandGroup(
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150));
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200));
   }
 
   public Command ScoreEngageTwo() {
@@ -104,7 +104,7 @@ public class Trajectories {
   public Command EngageTwo() {
     // Confirmed
     return new SequentialCommandGroup(
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -50),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -15),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), 90),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }
@@ -112,7 +112,7 @@ public class Trajectories {
   public Command ScoreEngageThree() {
     return new SequentialCommandGroup(
         new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
         new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
@@ -120,7 +120,7 @@ public class Trajectories {
 
   public Command EngageThree() {
     return new SequentialCommandGroup(
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -150),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
         new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));

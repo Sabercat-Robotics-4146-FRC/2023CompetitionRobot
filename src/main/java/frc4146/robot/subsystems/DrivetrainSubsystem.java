@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.*;
 
 public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
-  public boolean driveFlag = false;
+  public boolean driveFlag = true;
 
   public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
 
@@ -288,12 +288,17 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   /** sets module values, as read from drive signal */
   private void updateModules(HolonomicDriveSignal driveSignal, double dt) {
+
     if (driveFlag) {
       Rotation2 rotOffset =
-          (driveSignal.isFieldOriented()) ? getPose().rotation.inverse() : Rotation2.ZERO;
+          (driveSignal.isFieldOriented())
+              ? Rotation2.fromDegrees(gyroscope.getAngle())
+              : Rotation2.ZERO;
+
       ChassisVelocity chassisVelocity =
           new ChassisVelocity(
               driveSignal.getTranslation().rotateBy(rotOffset), driveSignal.getRotation());
+
       Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
       SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1);
       for (int i = 0; i < moduleOutputs.length; i++) {

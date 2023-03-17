@@ -169,11 +169,11 @@ public class Arm extends SubsystemBase {
 
     if (extPosMode) {
       double error = getExtensionError();
-      if (Math.abs(error) < 0.1) {
+      if (Math.abs(error) < 0.125) {
         extPosMode = false;
         extend(0);
       } else {
-        extend(Math.copySign(MathUtils.clamp(0.15 * Math.abs(error), 0.05, 0.25), error));
+        extend(Math.copySign(MathUtils.clamp(0.25 * Math.abs(error), 0.15, 0.4), error));
       }
     }
     if (rotPosMode) {
@@ -182,7 +182,7 @@ public class Arm extends SubsystemBase {
         rotPosMode = false;
         rotate(0);
       } else {
-        rotate(Math.copySign(MathUtils.clamp(2 * Math.abs(error), 0.125, 0.25), error));
+        rotate(Math.copySign(MathUtils.clamp(4 * Math.abs(error), 0.15, 0.375), error));
       }
     }
     resetExtensionEncoder();

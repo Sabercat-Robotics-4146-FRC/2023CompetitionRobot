@@ -10,12 +10,9 @@ public class AutonomousTab {
     ShuffleboardTab tab = Shuffleboard.getTab("Autonomous Chooser");
 
     SendableChooser<String>[] chooser = container.getAutonomousSelector().getChooser();
-    String[] titles = {"Team", "Score", "Engage", "Only Leave"};
-    for(int i = 0; i < chooser.length; i++) {
-      tab.add(titles[i], chooser[i])
-        .withSize(1, 2)
-        .withPosition(i, 0);
-
-    }    
+    String[] titles = {"Team", "Score", "Engage", "Only Leave", "Position"};
+    for (int i = 0; i < chooser.length; i++) {
+      tab.add(titles[i], chooser[i]).withSize(1, 2).withPosition(i, 0);
+    }
   }
 }

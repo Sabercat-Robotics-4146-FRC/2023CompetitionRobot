@@ -30,17 +30,10 @@ public class TurnRobot extends CommandBase {
     addRequirements(drivetrainSubsystem);
   }
 
-  public TurnRobot(
-      DrivetrainSubsystem drivetrainSubsystem, Pigeon gyroscope, double degrees, boolean sweep) {
-    this(drivetrainSubsystem, gyroscope, degrees);
-    this.sweep = true;
-  }
-
   @Override
   public void initialize() {
     degrees =
         Rotation2.fromDegrees(initChange).rotateBy(Rotation2.fromDegrees(gyroscope.getAngle()));
-    multiplier = 1;
   }
 
   @Override
@@ -49,20 +42,22 @@ public class TurnRobot extends CommandBase {
     driveTurn =
         -Rotation2.fromDegrees(0).rotateBy(degrees).rotateBy(currDegrees.inverse()).toDegrees();
 
-    driveTurn /= 180;
+    if (driveTurn < -180) driveTurn += 360;
+    else if (driveTurn > 180) driveTurn -= 360;
+
+    driveTurn /= -180;
 
     drivetrainSubsystem.drive(
         Vector2.ZERO,
         Math.copySign(
-            MathUtil.clamp(0.02 * driveTurn + 0.1 * (old_driveturn - driveTurn), 0.008, 0.05),
-            driveTurn),
-        false);
+            MathUtil.clamp(0.025 * driveTurn + 0.08 * (old_driveturn - driveTurn), 0.01, 0.075),
+            driveTurn));
     old_driveturn = driveTurn;
   }
 
   @Override
   public boolean isFinished() {
-    return Math.abs(degrees.toDegrees() - currDegrees.toDegrees()) <= 1;
+    return Math.abs(degrees.toDegrees() - currDegrees.toDegrees()) <= 1.5;
   }
 
   @Override
