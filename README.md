@@ -70,7 +70,7 @@ We considered adding a feedforward element to offset the effect of gravity, but 
 (Limelight = L)
 
 <p align="center">
-  <img src="/img/limelight.jpg" width="400" title="hover text">
+  <img src="/img/limelight.jpg" width="250" title="hover text">
 </p>
 
 Limelight is our best friend when it comes to vision this year. The robot is configured to self-align itself with fiducials and retroreflective markers. Once it has detected a fiducial, the robot can identify its unique ID. PID control centers the robot left-right, allowing us to pinpoint the robot's exact position. From here, auto takes over.
