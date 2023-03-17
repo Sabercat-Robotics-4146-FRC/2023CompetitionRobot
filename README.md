@@ -5,7 +5,7 @@
 ## Code Organization
 
 <p align="center">
-  <img src="/img/diagram.png" width="400" title="hover text">
+  <img src="/img/diagram.png" width="600" title="hover text">
 </p>
 
 Command-based structure allows our code to reach its full potential. Our team separates functionality into subsystems (which interact with the hardware) and commands (which implement subsystem methods at a higher-level). RobotContainer runs commands, either by configuring button bindings or scheduling autonomous commands. Autonomous and DriverReadout also provide abstractions.
