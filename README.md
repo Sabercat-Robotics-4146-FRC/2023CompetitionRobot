@@ -19,6 +19,10 @@ The most fundamental aspect of our drive code is our swerve odometry, which keep
 
 The beauty of our drive code comes from the DriveSignal, an object which stores data on the robot's desired pose. Drive commands update the DriveSignal with the desired translational and angular velocities. By storing this data in a separate public object, it can be accessed instantaneously by updateModules() and updated instantaneously by drive() without interference. If we are following a trajectory (as in autonomous), we also update the DriveSignal periodically using SwerveOdometry data on the robot's position. It's all coming together...
 
+<p align="center">
+  <img src="/img/chassis.png" width="300" title="hover text">
+</p>
+
 The final piece in the puzzle is updateModules(). This method reads DriveSignal in order to generate a ChassisVelocity, which describes the motion of the entire robot. Using kinematics, it then converts ChassisVelocity into individual ModuleVelocities, describing the motion of each individual module. Then, it's as easy as setting the module.
 
 DrivetrainSubsystem is registered as an Updatable so that this data is constantly being updated. A few final features relate to driver preference. The driver can toggle fieldOriented mode, or he/she can press a button to "zero" the gyroscope. This sets the robot's current heading as the default heading for future driving. A slew rate limiter prevents rapid acceleration due to joystick input, and a deadzone prevents "straight" motion from moving astray.
@@ -61,7 +65,7 @@ Limelight is our best friend when it comes to vision this year. The robot is con
 
 Looking to the future, we hope to use an Intel RealSense camera to enhance our vision capabilites. The RealSense would also enable us to detect the difference between a cone and a cube upon pickup, as well as information about the orientation of the gamepiece. One of our largest present challenges is picking up and maneuvering a gamepiece with a non-upright orientation. Once we have identified the ideal orientation and position from which to pick up each gamepiece, we can automate this intake process. 
 
-Because the RealSense will runs on Python, separate from the rest of our robot code, it will require an offboard computing unit such as a Raspberry Pi. 
+Because the RealSense will run on Python, separate from the rest of our robot code, it will require an offboard computing unit such as a Raspberry Pi. 
 
 
 
