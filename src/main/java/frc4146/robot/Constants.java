@@ -69,7 +69,7 @@ public class Constants {
                 "cone",
                 new HashMap<String, double[]>() {
                   {
-                    put("intake", new double[] {0.58, 2.26});
+                    put("intake", new double[] {0.42, 0});
                     put("low", new double[] {0.55, 0.27});
                     put("mid", new double[] {0.42, 11.42});
                     put("high", new double[] {0.39, 52.99});
@@ -79,7 +79,7 @@ public class Constants {
                 "cube",
                 new HashMap<String, double[]>() {
                   {
-                    put("intake", new double[] {0.61, 2.18});
+                    put("intake", new double[] {0.43, 0});
                     put("low", new double[] {0.54, 44.47});
                     put("mid", new double[] {0.47, 25.84});
                     put("high", new double[] {0.42, 52.99});
