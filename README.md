@@ -2,6 +2,14 @@
 
 ------------
 
+## Code Organization
+
+<p align="center">
+  <img src="/img/diagram.png" width="400" title="hover text">
+</p>
+
+Command-based structure allows our code to reach its full potential. Our team separates functionality into subsystems (which interact with the hardware) and commands (which implement subsystem methods at a higher-level). RobotContainer runs commands, either by configuring button bindings or scheduling autonomous commands. Autonomous and DriverReadout also provide abstractions.
+
 <p align="center">
   <img src="/img/robot.png" width="400" title="hover text">
 </p>
@@ -15,7 +23,7 @@ Our drive code brilliantly combines gyroscope data, kinematics, odometry, and us
   <img src="/img/DrivetrainSubsystem.jpg" width="450" title="hover text">
 </p>
 
-The most fundamental aspect of our drive code is our swerve odometry, which keeps track of the robot's pose over time. Pose includes both the robot's translational and angular velocities. The gyroscope (Pigeon 2.0) collects data about the robot's angular velocity. By integrating this data with respect to time, the SwerveOdometry class onverts the robot's angular velocity into the robot's total change in angular heading. Given an initial position, we now know the robot's heading. SwerveOdometry then makes use of SwerveKinematics (which profiles the robot's drive motion) to then give velocity data. The end result is knowledge of the robot's translational and rotational velocity, aka pose!
+The most fundamental aspect of our drive code is our swerve odometry, which keeps track of the robot's pose over time. Pose includes both the robot's translational and angular velocities. The gyroscope (Pigeon 2.0) collects data about the robot's angular velocity. By integrating this data with respect to time, the SwerveOdometry class converts the robot's angular velocity into the robot's total change in angular heading. Given an initial position, we now know the robot's heading. SwerveOdometry then makes use of SwerveKinematics (which profiles the robot's drive motion) to then give velocity data. The end result is knowledge of the robot's translational and rotational velocity, aka pose!
 
 The beauty of our drive code comes from the DriveSignal, an object which stores data on the robot's desired pose. Drive commands update the DriveSignal with the desired translational and angular velocities. By storing this data in a separate public object, it can be accessed instantaneously by updateModules() and updated instantaneously by drive() without interference. If we are following a trajectory (as in autonomous), we also update the DriveSignal periodically using SwerveOdometry data on the robot's position. It's all coming together...
 
@@ -44,7 +52,7 @@ Given the rapid-paced, highly variable nature of this year's game, we knew that 
 
 Sensor feedback was crucial for a reliable arm. We analyzed data relating to the arm's rotation from both the potentiometer and encoder. Because the potentiometer measured the rotation of the shaft closest to the actual arm, it gave us more precise data than the encoder, located at the driving shaft of the motor. Thus, it better reflected the arm's actual position. We also use the built-in Talon FX encoder for arm extension and a potentiometer for claw position*. Pre-recorded setpoints for each of these sensors allow us to trigger a command that moves the arm to the same position, every time. 
 
-We also added protective functionality to the sensors. An upper and lower limit switch allow us to prevent harmful extension beyond the range of the arm. Additionally, when the lower limit switch is enabled (and the arm is fully retracted), we reset the extension encoder value to 0, ensuring accurate sensor data. We also configured a software limit on max. rotation with similar reasoning. A bonus feature is joystick rumbling to alert the drivers when the robot is driving with the arm either dangerously high or at risk of dragging on the ground.
+We also added protective functionality to the sensors. An upper and lower limit switch allow us to prevent harmful extension beyond the range of the arm. Additionally, when the lower limit switch is enabled (and the arm is fully retracted), we reset the extension encoder value to 0, ensuring accurate sensor data. We also configured a software limit on maximum rotation with similar reasoning. A bonus feature is joystick rumbling to alert the drivers when the robot is driving with the arm either dangerously high or at risk of dragging on the ground.
 
 PID control systems provide efficiency to our pickup and scoring methods. Proportional gain ensures we quickly reach our setpoint, and derivative gain reduces oscillations around that setpoint. With the help of a new Shuffleboard PID-testing method, we implemented our own PID in record time this season. We also sought to profile the arm motion to reduce fast, jerky motions observed in preliminary testing. To this effect, we added max. acceleration constraints and current limits. 
 
