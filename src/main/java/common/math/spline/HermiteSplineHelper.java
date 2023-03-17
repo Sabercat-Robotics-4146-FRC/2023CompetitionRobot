@@ -18,9 +18,12 @@ class HermiteSplineHelper {
       Vector2 start, Vector2 startTangent, Vector2 end, Vector2 endTangent, int degree) {
     // The basis weight matrix for hermite quintic splines is the following:
     // [x0  y0 ]
-    // [x1  y1 ]
     // [dx0 dy0]
+    // [ddx0, ddy0]
+    // [x1  y1 ]
     // [dx1 dy1]
+    // [ddx1 ddy1]
+    
     return
       (degree == 3) ? new SimpleMatrix(
         new double[][] {

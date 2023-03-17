@@ -29,10 +29,6 @@ public final class SplinePathBuilder {
     segmentList.add(segment);
     lastState = segment.getEnd();
     length += segment.getLength();
-
-    SmartDashboard.putString("Last State", lastState.getPosition().x + " " + lastState.getPosition().y);
-    SmartDashboard.putString("First State", segment.getStart().getPosition().x + " " +  segment.getStart().getPosition().y);
-
   }
 
   public Path build() {
@@ -63,10 +59,16 @@ public final class SplinePathBuilder {
     return this;
   }
 
-  public SplinePathBuilder quinticHermite(Vector2 v1, Vector2 position, Vector2 v2) {
+  public SplinePathBuilder quinticHermite(Vector2 start, Vector2 v1, Vector2 end, Vector2 v2) {
     addSpline(
-      new QuinticHermiteSpline(lastState.getPosition(), v1, position, v2)
+      new QuinticHermiteSpline(start, v1, end, v2)
     );
+    return this;
+  }
+
+  public SplinePathBuilder quinticHermite(Vector2 start, Vector2 v1, Vector2 end, Vector2 v2, Rotation2 rotation) {
+    quinticHermite(start, v1, end, v2);
+    rotationMap.put(length, rotation);
     return this;
   }
 }

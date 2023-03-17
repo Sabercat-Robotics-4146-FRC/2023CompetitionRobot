@@ -1,11 +1,9 @@
 package common.control;
 
-import common.math.MathUtils;
 import common.math.RigidTransform2;
 import common.math.Vector2;
 import common.util.HolonomicDriveSignal;
 import common.util.HolonomicFeedforward;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class HolonomicMotionProfiledTrajectoryFollower
@@ -14,19 +12,11 @@ public class HolonomicMotionProfiledTrajectoryFollower
   private PidController strafeController;
   private PidController rotationController;
 
+  private HolonomicFeedforward feedforward;
+
   private Trajectory.State lastState = null;
-  private Trajectory.State previousState = null;
 
   private boolean finished = false;
-
-  private double lastTime = 0;
-
-  private double scale;
-  private double maxSpeed = .5;
-  private double reduction = 0;
-
-  private double lastTranslationx = 0;
-  private double lastTranslationy = 0;
 
   public HolonomicMotionProfiledTrajectoryFollower(
       PidConstants translationConstants,
@@ -38,7 +28,7 @@ public class HolonomicMotionProfiledTrajectoryFollower
     this.rotationController.setContinuous(true);
     this.rotationController.setInputRange(0.0, 2.0 * Math.PI);
 
-    this.scale = 1;
+    this.feedforward = feedforward;
   }
 
   @Override
@@ -49,62 +39,33 @@ public class HolonomicMotionProfiledTrajectoryFollower
       Trajectory trajectory,
       double time,
       double dt) {
-
-    if(lastTime == 0) lastTime = time;
-
-    time -= reduction;
-
     if (time > trajectory.getDuration()) {
       finished = true;
       return new HolonomicDriveSignal(Vector2.ZERO, 0.0, false);
     }
 
     lastState = trajectory.calculate(time);
-    if(previousState == null) {
-      previousState = trajectory.calculate(0.0);
-    }
 
-    double translationx = (lastState.getPathState().getPosition().x - previousState.getPathState().getPosition().x) * 100;
-    double translationy = (lastState.getPathState().getPosition().y - previousState.getPathState().getPosition().y) * 100;
+    Vector2 segmentVelocity =
+        Vector2.fromAngle(lastState.getPathState().getHeading()).scale(lastState.getVelocity());
+    Vector2 segmentAcceleration =
+        Vector2.fromAngle(lastState.getPathState().getHeading()).scale(lastState.getAcceleration());
 
+    Vector2 feedforwardVector =
+        feedforward.calculateFeedforward(segmentVelocity, segmentAcceleration);
 
-    if(translationx > maxSpeed || translationx < -maxSpeed) {
-      scale = Math.abs(translationx / maxSpeed);
-      translationx = maxSpeed * (translationx/Math.abs(translationx));
-      translationy /= scale;
-      reduction += (time - lastTime) - (time - lastTime) / scale;
-    }
+    forwardController.setSetpoint(lastState.getPathState().getPosition().x);
+    strafeController.setSetpoint(lastState.getPathState().getPosition().y);
+    rotationController.setSetpoint(lastState.getPathState().getRotation().toRadians());
 
-    if(translationy > maxSpeed || translationy < -maxSpeed) {
-      scale = Math.abs(translationy / maxSpeed);
-      translationy = maxSpeed * (translationy/Math.abs(translationy));
-      translationx /= scale;
-      reduction += (time - lastTime) - (time - lastTime) / scale;
-    }
-
-    if(Math.abs(translationx - lastTranslationx) > maxSpeed/1.25) {
-      translationx = lastTranslationx;
-    }
-
-    if(Math.abs(translationy - lastTranslationy) > maxSpeed/1.25) {
-      translationy = lastTranslationy;
-    }
-
-
-
-    SmartDashboard.putNumber("X", translationx);
-    SmartDashboard.putString("TESTTTTT", time + reduction + " " + trajectory.getDuration());
-    
-    lastTime = time;
-    previousState = lastState;
-    lastTranslationx = translationx;
-    lastTranslationy = translationy;
+    SmartDashboard.putNumber("Feedforward Vector X", feedforwardVector.x);
 
     return new HolonomicDriveSignal(
         new Vector2(
-           0, 0),
-        0,
-        false);
+            forwardController.calculate(currentPose.translation.x, dt) + feedforwardVector.x,
+            strafeController.calculate(currentPose.translation.y, dt) + feedforwardVector.y),
+        rotationController.calculate(currentPose.rotation.toRadians(), dt),
+        true);
   }
 
   public Trajectory.State getLastState() {

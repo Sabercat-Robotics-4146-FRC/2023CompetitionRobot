@@ -151,14 +151,15 @@ public class AutonomousFactory {
         for(int j = 0; j < list.size()-1; j++) {
           State waypoint = list.get(j);
           State waypoint2 = list.get(j+1);
+          Vector2 start = new Vector2(waypoint.x, waypoint.y);
           Vector2 v1 = new Vector2(waypoint.tx, waypoint.ty);
           Vector2 v2 = new Vector2(waypoint2.tx, waypoint2.ty);
           Vector2 end = new Vector2(waypoint2.x, waypoint2.y);
-          // Rotation2 r = new Rotation2(Math.cos(waypoint.heading), Math.sin(waypoint.heading), true);
+          Rotation2 r = new Rotation2(Math.cos(waypoint.heading), Math.sin(waypoint.heading), true);
 
           SmartDashboard.putNumber("TesT", v1.x);
 
-          splinePath.quinticHermite(v1, end, v2);
+          splinePath.quinticHermite(start, v1, end, v2, r);
         }
         
         Path path = splinePath.build();
@@ -223,7 +224,6 @@ public class AutonomousFactory {
     private double tx;
     private double ty;
     private double heading;
-    private double time;
     private boolean isBreak;
     private String action;
 
@@ -241,9 +241,7 @@ public class AutonomousFactory {
           + "break = "
           + isBreak
           + " action = "
-          + action
-          + "time = "
-          + time;
+          + action;
     }
   }
 }

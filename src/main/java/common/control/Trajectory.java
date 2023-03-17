@@ -18,6 +18,8 @@ public class Trajectory {
   private List<AutonomousFactory.State> waypoints;
   private List<Double> waypointTimes = new ArrayList<>();
 
+  private double maxVelocity;
+
   public Trajectory(
     Path path, TrajectoryConstraint[] trajectoryConstraints, double sampleDistance, List<AutonomousFactory.State> waypoints) {
       this(path, trajectoryConstraints, sampleDistance, waypoints, 0.0, 0.0);
@@ -268,7 +270,7 @@ public class Trajectory {
               + pathState.getDistance();
 
       return new State(
-          path.calculate(distance), acceleration * time + startingVelocity, acceleration);
+          path.calculate(distance), MathUtils.clamp(acceleration * time + startingVelocity, 0, maxVelocity), acceleration);
     }
   }
 

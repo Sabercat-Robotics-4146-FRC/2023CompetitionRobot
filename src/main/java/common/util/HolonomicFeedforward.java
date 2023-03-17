@@ -31,8 +31,7 @@ public class HolonomicFeedforward {
     Vector2 feedforwardVector = new Vector2(forwardFeedforward, strafeFeedforward);
 
     // Apply the kS constant proportionally to the forward and strafe feedforwards based on their
-    // relative
-    // magnitudes
+    // relative magnitudes
     Vector2 feedforwardUnitVector = feedforwardVector.normal();
     forwardFeedforward +=
         Math.copySign(
