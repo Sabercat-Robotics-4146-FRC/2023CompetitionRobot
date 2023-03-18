@@ -51,7 +51,7 @@ public class BalanceRobot extends CommandBase {
 
     if (stage == 0) {
       double pos = drivetrain.getPose().translation.length;
-      if (pos < thresh) drivetrain.drive(new Vector2(0, 0.45), 0);
+      if (pos < thresh) drivetrain.drive(new Vector2(0, 0.425), 0);
       else {
         stage += 1;
         drivetrain.resetPose(RigidTransform2.ZERO);
