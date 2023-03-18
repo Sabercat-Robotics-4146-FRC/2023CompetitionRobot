@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc4146.robot.RobotContainer;
+import frc4146.robot.commands.drivetrain.DriveOverBalance;
 import frc4146.robot.commands.drivetrain.StraightLine;
 import frc4146.robot.commands.drivetrain.TurnRobot;
 import frc4146.robot.commands.subsystems.ScorePiece;
@@ -111,8 +112,9 @@ public class Trajectories {
   public Command ScoreLeaveEngageTwo() {
     return new SequentialCommandGroup(
         ScoreTwo(),
-        new DriveOverBalance(
-            container.getDrivetrainSubsystem(), container.getGyroscope()), // Test amt
+        new DriveOverBalance(container.getDrivetrainSubsystem(), container.getGyroscope()),
+        // new DriveOverBalance(
+        //     container.getDrivetrainSubsystem(), container.getGyroscope()), // Test amt
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -80),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }
