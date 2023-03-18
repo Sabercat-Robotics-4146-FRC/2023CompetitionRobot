@@ -24,7 +24,7 @@ public class Claw extends SubsystemBase {
   }
 
   public void setClaw(double p) {
-    if (enabled) clawMotor.set(ControlMode.PercentOutput, p);
+    clawMotor.set(ControlMode.PercentOutput, p);
   }
 
   public void manuallySetClaw(double p) {

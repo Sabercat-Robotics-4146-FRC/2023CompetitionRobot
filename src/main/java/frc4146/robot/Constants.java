@@ -13,7 +13,7 @@ public class Constants {
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_MOTOR = 3;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_ENCODER = 12;
     public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET =
-        -Math.toRadians(283.184 + 180 + 0.7 + 0.9);
+        -Math.toRadians(283.184 + 180 + 0.7 + 0.9 - 1.4);
 
     public static final int DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR = 4;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_MOTOR = 5;
@@ -24,7 +24,7 @@ public class Constants {
     public static final int DRIVETRAIN_BACK_LEFT_STEER_MOTOR = 7;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_ENCODER = 16;
     public static final double DRIVETRAIN_BACK_LEFT_STEER_OFFSET =
-        -Math.toRadians(329.59 + 180 - 0.5);
+        -Math.toRadians(329.59 + 180 - 0.5 + 0.4);
 
     public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 8;
     public static final int DRIVETRAIN_BACK_RIGHT_STEER_MOTOR = 9;

@@ -15,14 +15,17 @@ public class DriveCommand extends CommandBase {
   private Axis strafe;
   private Axis rotation;
 
-  public SlewRateLimiter ff = new SlewRateLimiter(1.5);
-  public SlewRateLimiter sf = new SlewRateLimiter(1.5);
+  public SlewRateLimiter ff = new SlewRateLimiter(1);
+  public SlewRateLimiter sf = new SlewRateLimiter(1);
   public SlewRateLimiter rf = new SlewRateLimiter(1.25);
 
   public DriveCommand(DrivetrainSubsystem drivetrain, Axis forward, Axis strafe, Axis d) {
     this.forward = forward;
     this.strafe = strafe;
     this.rotation = d;
+
+    ff.calculate(0);
+    sf.calculate(0);
 
     drivetrainSubsystem = drivetrain;
 

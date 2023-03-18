@@ -17,6 +17,7 @@ import common.math.Vector2;
 import common.robot.DriverReadout;
 import common.robot.UpdateManager;
 import common.util.*;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotController;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.*;
 
@@ -70,8 +72,6 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
           new PidConstants(2.0, 0.01, 0.001),
           new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
 
-  private PIDController drift_correction = new PIDController(0.07, 0, 0.004);
-
   /* swerveKinematics contains a set of vectors,
    *  each one corresponding to one swerve module,
    *  in the direction of that wheel's projected motion
@@ -116,9 +116,12 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private boolean brake_mode = false;
 
   public Rotation2 desired_heading;
-  public double pXY = 0;
+
+  public PIDController drift_correction = new PIDController(0.2, 0, 0.1);
 
   public DrivetrainSubsystem(Pigeon gyro) {
+
+    drift_correction.setSetpoint(0);
 
     gyroscope = gyro;
 
@@ -261,6 +264,13 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     if (Math.abs(rotationalVelocity) < rotDeadband) {
       rotationalVelocity = 0;
     }
+    double adjustment_mag =
+        -MathUtil.clamp(drift_correction.calculate(gyroscope.getRate() / 360), -0.03, 0.03);
+    adjustment_mag = Math.abs(adjustment_mag) < 0.004 ? 0 : adjustment_mag;
+    SmartDashboard.putNumber("Calculated Adjustment Mag", adjustment_mag);
+
+    // if (rotationalVelocity == 0 && Math.abs(tx) + Math.abs(ty) > 0)
+    //  rotationalVelocity = adjustment_mag;
 
     driveSignal =
         new HolonomicDriveSignal(new Vector2(tx, ty), rotationalVelocity, isFieldOriented);
@@ -423,6 +433,6 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   }
 
   public void resetGyroAngle(Rotation2 angle) {
-    gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle().rotateBy(angle.inverse()));
+    gyroscope.reset();
   }
 }

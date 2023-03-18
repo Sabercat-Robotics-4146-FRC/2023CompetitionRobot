@@ -15,7 +15,7 @@ public class BalanceRobot extends CommandBase {
   public double kD = 3 * 0.0125 / 40.0;
 
   public double min_amt = 0.025;
-  public double max_amt = 0.175;
+  public double max_amt = 0.1775;
 
   public double thresh;
 
@@ -40,7 +40,7 @@ public class BalanceRobot extends CommandBase {
 
   public void initialize() {
 
-    thresh = shortenPos ? 60 : 75;
+    thresh = 75;
     drivetrain.setMode(true);
     past_error = getError();
     stage = 0;
