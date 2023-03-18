@@ -61,15 +61,14 @@ public class Trajectories {
   public Command ScoreOne() {
     return new SequentialCommandGroup(
         new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
-        new StraightLine(
-            container.getDrivetrainSubsystem(), container.getGyroscope(), -200, false));
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200));
   }
 
   public Command EngageOne() {
     return new SequentialCommandGroup(
         Leave(),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55, false),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55),
         Engage());
   }
 
@@ -83,7 +82,7 @@ public class Trajectories {
     return new SequentialCommandGroup(
         Leave(),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55, false),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
         Engage());
   }
 
@@ -100,7 +99,7 @@ public class Trajectories {
 
   public Command EngageTwo() {
     return new SequentialCommandGroup(
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -10, false),
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -10),
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), 90),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }
@@ -124,7 +123,6 @@ public class Trajectories {
 
   public Command Leave() {
     return new SequentialCommandGroup(
-        new StraightLine(
-            container.getDrivetrainSubsystem(), container.getGyroscope(), -200, false));
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200));
   }
 }

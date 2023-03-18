@@ -12,24 +12,17 @@ public class StraightLine extends CommandBase {
   public DrivetrainSubsystem drivetrain;
   public double distance;
 
-  public boolean faster;
+  public double min = 0.1;
+  public double max = 0.375;
 
-  public double min;
-  public double max;
-
-  public StraightLine(
-      DrivetrainSubsystem drivetrain, Pigeon pigeon, double distance, boolean faster) {
+  public StraightLine(DrivetrainSubsystem drivetrain, Pigeon pigeon, double distance) {
     this.pigeon = pigeon;
     this.drivetrain = drivetrain;
     this.distance = distance;
-    this.faster = faster;
     addRequirements(drivetrain);
   }
 
   public void initialize() {
-    min = faster ? 0.125 : 0.1;
-    max = faster ? 0.375 * 1.15 : 0.375;
-
     drivetrain.resetPose(RigidTransform2.ZERO);
     pigeon.reset();
   }

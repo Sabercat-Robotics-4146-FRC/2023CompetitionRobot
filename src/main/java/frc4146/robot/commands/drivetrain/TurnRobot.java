@@ -18,10 +18,6 @@ public class TurnRobot extends CommandBase {
 
   public double initChange;
 
-  public double multiplier = 1;
-
-  public boolean sweep = true; // = true;
-
   public TurnRobot(DrivetrainSubsystem drivetrainSubsystem, Pigeon gyroscope, double degrees) {
     this.drivetrainSubsystem = drivetrainSubsystem;
     this.initChange = degrees;
