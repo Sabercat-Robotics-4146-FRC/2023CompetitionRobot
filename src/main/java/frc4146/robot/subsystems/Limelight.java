@@ -41,6 +41,7 @@ public class Limelight implements Subsystem {
 
   public double[] getTargetPose() {
     // X, Y, Z, Roll, Pitch, Yaw. The important ones are the first 3
+    setPipelineType(0);
     return mLime.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
   }
 

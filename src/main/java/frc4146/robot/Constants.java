@@ -12,22 +12,25 @@ public class Constants {
     public static final int DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR = 2;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_MOTOR = 3;
     public static final int DRIVETRAIN_FRONT_RIGHT_STEER_ENCODER = 12;
-    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET = -Math.toRadians(283.184 + 180);
+    public static final double DRIVETRAIN_FRONT_RIGHT_STEER_OFFSET =
+        -Math.toRadians(283.184 + 180 + 0.7 + 0.9 - 1.4);
 
     public static final int DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR = 4;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_MOTOR = 5;
     public static final int DRIVETRAIN_FRONT_LEFT_STEER_ENCODER = 14;
-    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(278.789 + 180);
+    public static final double DRIVETRAIN_FRONT_LEFT_STEER_OFFSET = -Math.toRadians(60.210);
 
     public static final int DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR = 6;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_MOTOR = 7;
     public static final int DRIVETRAIN_BACK_LEFT_STEER_ENCODER = 16;
-    public static final double DRIVETRAIN_BACK_LEFT_STEER_OFFSET = -Math.toRadians(329.59 + 180);
+    public static final double DRIVETRAIN_BACK_LEFT_STEER_OFFSET =
+        -Math.toRadians(329.59 + 180 - 0.5 + 0.4);
 
     public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 8;
     public static final int DRIVETRAIN_BACK_RIGHT_STEER_MOTOR = 9;
     public static final int DRIVETRAIN_BACK_RIGHT_STEER_ENCODER = 18;
-    public static final double DRIVETRAIN_BACK_RIGHT_STEER_OFFSET = -Math.toRadians(153.8964 + 180);
+    public static final double DRIVETRAIN_BACK_RIGHT_STEER_OFFSET =
+        -Math.toRadians(153.8964 + 180 + 0.7);
 
     public static final int PIGEON_PORT = 20;
 
@@ -51,7 +54,7 @@ public class Constants {
     public static final double MAX_LENGTH = 71; // inches
     public static final double MIN_LENGTH = 47; // inches
     public static final double MAX_ANGLE = 1.05; // radians
-    public static final double MIN_ANGLE = -1.57; // radians
+    public static final double MIN_ANGLE = -1.57; // raidans
     public static final int SUPERSTRUCTURE_HEIGHT = 47;
 
     public static final double POT_MAX_ROTATION = 0.35;
@@ -65,14 +68,13 @@ public class Constants {
 
     // hashmap for arm setpoints, {"gamepiece":{"position":{rotation,extension}}}, allows for easy access
     public static final Map<String, HashMap> SETPOINTS =
-
-        new HashMap<String, HashMap>() {
+        new HashMap<>() {
           {
             put(
                 "cone",
                 new HashMap<String, double[]>() {
                   {
-                    put("intake", new double[] {0.58, 2.26});
+                    put("intake", new double[] {0.42, 0});
                     put("low", new double[] {0.55, 0.27});
                     put("mid", new double[] {0.42, 11.42});
                     put("high", new double[] {0.39, 52.99});
@@ -82,7 +84,7 @@ public class Constants {
                 "cube",
                 new HashMap<String, double[]>() {
                   {
-                    put("intake", new double[] {0.61, 2.18});
+                    put("intake", new double[] {0.43, 0});
                     put("low", new double[] {0.54, 44.47});
                     put("mid", new double[] {0.47, 25.84});
                     put("high", new double[] {0.42, 52.99});

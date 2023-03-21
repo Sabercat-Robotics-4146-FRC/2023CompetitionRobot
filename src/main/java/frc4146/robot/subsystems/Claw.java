@@ -12,35 +12,28 @@ public class Claw extends SubsystemBase {
   public TalonSRX clawMotor;
   public AnalogPotentiometer pot;
   public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
-  public boolean enabled;
+  public boolean enabled = true;
+  public boolean manual_mode = true;
 
   public Claw() {
     enabled = _driverInterface.m_ClawSubsystemEnabled.getBoolean(true);
 
-    clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
     Shuffleboard.getTab("Subsystems").addNumber("Claw Position", () -> getPos());
     Shuffleboard.getTab("Subsystems").addNumber("Claw Current", () -> clawMotor.getStatorCurrent());
-    
-    Shuffleboard.getTab("Test Mode").addNumber("Claw Pot", () -> getPos());
-  
     Shuffleboard.getTab("DriverReadout").addBoolean("Holding Object?", () -> hasObject());
-    
-    clawMotor.config_kP(3,0.3, 30);
-    clawMotor.config_kI(3,0, 30);
-    clawMotor.config_kD(3,0, 30);
-  
   }
 
-  @Override
-  public void periodic() {
-    enabled = _driverInterface.m_ClawSubsystemEnabled.getBoolean(true);
+  public void setClaw(double p) {
+    clawMotor.set(ControlMode.PercentOutput, p);
   }
 
   /* percent output control mode */
   public void manuallySetClaw(double p) {
-    if (enabled) {
-      clawMotor.set(ControlMode.PercentOutput, p);
-    }
+    if (manual_mode) setClaw(p);
+  }
+
+  public void toggleManualMode(boolean m) {
+    manual_mode = m;
   }
 
   /* in full potentiometer revolutions */
@@ -50,5 +43,10 @@ public class Claw extends SubsystemBase {
 
   public boolean hasObject() {
     return (clawMotor.getStatorCurrent() > 12 && getPos() > 1);
+  }
+
+  @Override
+  public void periodic() {
+    enabled = _driverInterface.m_ClawSubsystemEnabled.getBoolean(true);
   }
 }

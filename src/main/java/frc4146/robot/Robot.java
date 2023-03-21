@@ -11,7 +11,7 @@ public class Robot extends TimedRobot {
   private RobotContainer robotContainer = new RobotContainer();
   private UpdateManager updateManager = new UpdateManager(robotContainer.getDrivetrainSubsystem());
 
-  private Command autonomousCommand;
+  private Command autonomousCommand = null;
 
   public Robot() {
 
@@ -34,6 +34,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    autonomousCommand = robotContainer.getAutonomousCommand();
     robotContainer.getDrivetrainSubsystem().resetPose(RigidTransform2.ZERO);
 
     if (autonomousCommand != null) {
@@ -48,6 +49,11 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {}
 
   @Override
+  public void disabledInit() {
+    autonomousCommand = robotContainer.getAutonomousCommand();
+  }
+
+  @Override
   public void disabledPeriodic() {}
 
   @Override
@@ -56,5 +62,7 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    // Brake mode on wasn't a problem, so we may be able to keep it.
+    robotContainer.getDrivetrainSubsystem().setMode(false);
   }
 }

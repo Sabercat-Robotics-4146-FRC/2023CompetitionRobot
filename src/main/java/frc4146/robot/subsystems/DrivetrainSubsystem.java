@@ -18,12 +18,15 @@ import common.math.Vector2;
 import common.robot.DriverReadout;
 import common.robot.UpdateManager;
 import common.util.*;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.*;
 
@@ -32,11 +35,13 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
 
+  // This value is used to turn the robot back to its initialPosition
+
   public ArrayList<Double> speeds;
 
   public Timer timer;
 
-  public boolean fieldOriented;
+  public boolean fieldOriented = false;
 
   public boolean locked = false;
 
@@ -53,10 +58,10 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
     new FeedforwardConstraint(
-        11.0,
+        11.0, // TODO: test 12
         FEEDFORWARD_CONSTANTS.getVelocityConstant(),
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
-        false),
+        true), // TODO: was false, want to test true
     new MaxAccelerationConstraint(12.5 * 12.0),
     new CentripetalAccelerationConstraint(5.0)
   };
@@ -64,8 +69,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   /** follower uses PID, feedforward control to create trajectories */
   private final HolonomicMotionProfiledTrajectoryFollower follower =
       new HolonomicMotionProfiledTrajectoryFollower(
-          new PidConstants(2.0, 0.0, 0.001),
-          new PidConstants(0.0005, 0.0, 0.01),
+          new PidConstants(2.0, 0.01, 0.001),
+          new PidConstants(2.0, 0.01, 0.001),
           new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
 
   /* swerveKinematics contains a set of vectors,
@@ -110,10 +115,17 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   private boolean brake_mode = false;
 
+  public Rotation2 desired_heading;
+
+  public PIDController drift_correction = new PIDController(0.2, 0, 0.1);
+
   public DrivetrainSubsystem(Pigeon gyro) {
+
+    drift_correction.setSetpoint(0);
 
     this.gyroscope = gyro;
 
+    // gyroscope.setInverted(false);
     driveSignal = new HolonomicDriveSignal(new Vector2(0, 0), 0.0, true);
 
     timer = new Timer();
@@ -176,8 +188,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         };
 
     for (var talon : talons) {
-      talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 30, 0.5));
-      talon.configOpenloopRamp(.5); // # seconds to reach peak throttle
+      talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 40, 0.5));
+      talon.configOpenloopRamp(0); // # seconds to reach peak throttle
     }
 
     // sets up Shuffleboard to receive odometry data
@@ -222,6 +234,10 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     tab.addBoolean("Drive Enabled", () -> driveFlag);
     tab.addBoolean("Field Oriented", () -> fieldOriented);
 
+    tab.addNumber("Roll", () -> gyroscope.getRoll());
+    tab.addNumber("Pitch", () -> gyroscope.getPitch());
+    tab.addNumber("Yaw", () -> gyroscope.getYaw());
+
     _driverInterface
         .primaryLayout
         .addBoolean("Field Oriented", () -> fieldOriented)
@@ -244,10 +260,17 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     }
     double mag = Math.hypot(tx, ty);
     double rotDeadband = 0.0025;
-    if (mag <= 0.005) rotDeadband = 0.005;
+    if (mag <= 0.005) rotDeadband = 0.004;
     if (Math.abs(rotationalVelocity) < rotDeadband) {
       rotationalVelocity = 0;
     }
+    double adjustment_mag =
+        -MathUtil.clamp(drift_correction.calculate(gyroscope.getRate() / 360), -0.03, 0.03);
+    adjustment_mag = Math.abs(adjustment_mag) < 0.004 ? 0 : adjustment_mag;
+    SmartDashboard.putNumber("Calculated Adjustment Mag", adjustment_mag);
+
+    // if (rotationalVelocity == 0 && Math.abs(tx) + Math.abs(ty) > 0)
+    //  rotationalVelocity = adjustment_mag;
 
     driveSignal =
         new HolonomicDriveSignal(new Vector2(tx, ty), rotationalVelocity, isFieldOriented);
@@ -260,7 +283,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   /** updates odometry data, to be posted and read by drive functions */
   private void updateOdometry(double time, double dt) {
     Vector2[] moduleVelocities = getModuleVelocities();
-    Rotation2 angle = gyroscope.getAdjustedAngle();
+    Rotation2 angle = Rotation2.fromDegrees(gyroscope.getAngle());
     double angularVelocity = gyroscope.getRate();
 
     ChassisVelocity velocity =
@@ -275,18 +298,23 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   /** sets module values, as read from drive signal */
   private void updateModules(HolonomicDriveSignal driveSignal, double dt) {
-    Rotation2 rotOffset =
-        (driveSignal.isFieldOriented()) ? getPose().rotation.inverse() : Rotation2.ZERO;
-    ChassisVelocity chassisVelocity =
-        new ChassisVelocity(
-            driveSignal.getTranslation().rotateBy(rotOffset), driveSignal.getRotation());
-    Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
-    SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1);
-    for (int i = 0; i < moduleOutputs.length; i++) {
-      if (locked) {
-        modules[i].set(-moduleOutputs[i].length * 12.0, 0);
-      } else {
-        modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
+
+    if (driveFlag) {
+      Rotation2 rotOffset =
+          (driveSignal.isFieldOriented())
+              ? Rotation2.fromDegrees(gyroscope.getAngle())
+              : Rotation2.ZERO;
+
+      ChassisVelocity chassisVelocity =
+          new ChassisVelocity(
+              driveSignal.getTranslation().rotateBy(rotOffset), driveSignal.getRotation());
+
+      Vector2[] moduleOutputs = swerveKinematics.toModuleVelocities(chassisVelocity);
+      SwerveKinematics.normalizeModuleVelocities(moduleOutputs, 1);
+      for (int i = 0; i < moduleOutputs.length; i++) {
+        if (locked) modules[i].set(-moduleOutputs[i].length * 12.0, 0);
+        else
+          modules[i].set(moduleOutputs[i].length * 12.0, moduleOutputs[i].getAngle().toRadians());
       }
     }
   }
@@ -298,10 +326,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     Optional<HolonomicDriveSignal> trajectorySignal =
         follower.update(getPose(), getVelocity(), getAngularVelocity(), time, dt);
     driveSignal = trajectorySignal.orElseGet(() -> this.driveSignal);
-    if (!driveFlag) {
-      driveSignal = new HolonomicDriveSignal(Vector2.ZERO, 0, false);
-    }
-    updateModules(driveSignal, dt);
+    if (driveFlag) updateModules(driveSignal, dt);
   }
 
   @Override
@@ -317,8 +342,14 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
     odometryAngleEntry.setDouble(pose.rotation.toDegrees());
   }
 
+  public void toggleLocked(boolean l) {
+    locked = l;
+  }
 
-  /* allows robot to drive in only one direction while self-leveling */
+  public void toggleLocked() {
+    locked = !locked;
+  }
+
   public void lockWheelsAngle(double angle) {
     if (getAverageAbsoluteValueVelocity() < 5.0) {
       frontLeftModule.set(0, angle * 2 * Math.PI / 180);
@@ -356,9 +387,23 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
         .map(
             m ->
                 Vector2.fromAngle(Rotation2.fromRadians(m.getSteerAngle()))
-                    .scale(m.getDriveVelocity() * 39.37008))
+                    .scale(m.getDriveVelocity() * 39.37008)) // inches in meter
         .toArray(Vector2[]::new);
   }
+
+  // public void drift_correct(ChassisVelocity speeds) {
+  //   Vector2 trans = speeds.getTranslationalVelocity();
+  //   double xy = Math.abs(trans.x) + Math.abs(trans.y);
+  //   double ang_velocity = speeds.getAngularVelocity();
+  //   if (speeds.getAngularVelocity() <= 0.0 || pXY <= 0) {
+  //     desired_heading = getPose().rotation;
+  //   } else if (xy > 0) {
+  //     ang_velocity +=
+  //         drift_correction.calculate(getPose().rotation.toDegrees(),
+  // desired_heading.toDegrees());
+  //   }
+  //   pXY = xy;
+  // }
 
   public RigidTransform2 getPose() {
     return pose;
@@ -398,7 +443,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   }
 
   public void resetGyroAngle(Rotation2 angle) {
-    gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle().rotateBy(angle.inverse()));
+    gyroscope.reset();
   }
 
   public WPI_Pigeon2 getGyroscope() {

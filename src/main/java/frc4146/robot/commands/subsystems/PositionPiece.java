@@ -1,4 +1,4 @@
-package frc4146.robot.commands.gamepiece;
+package frc4146.robot.commands.subsystems;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -21,14 +21,14 @@ public class PositionPiece extends SequentialCommandGroup {
               arm.toggleRotationMode(true);
             },
             arm),
-        new ParallelRaceGroup(new WaitUntilCommand(() -> !arm.rotPosMode), new WaitCommand(5)),
+        new ParallelRaceGroup(new WaitUntilCommand(() -> !arm.rotPosMode), new WaitCommand(3.5)),
         new InstantCommand(
             () -> {
               arm.setExtensionPos(ext_setpoint);
               arm.toggleExtensionMode(true);
             },
             arm),
-        new ParallelRaceGroup(new WaitUntilCommand(() -> !arm.extPosMode), new WaitCommand(5)),
+        new ParallelRaceGroup(new WaitUntilCommand(() -> !arm.extPosMode), new WaitCommand(2.5)),
         new InstantCommand(() -> arm.toggleExtensionMode(false)));
   }
 }

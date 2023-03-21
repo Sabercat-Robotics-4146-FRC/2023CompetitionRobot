@@ -1,8 +1,9 @@
 package common.drivers;
 
 import common.math.Rotation2;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class Gyroscope {
+public abstract class Gyroscope extends SubsystemBase {
   private Rotation2 adjustmentAngle = Rotation2.ZERO;
   private boolean inverted;
 
