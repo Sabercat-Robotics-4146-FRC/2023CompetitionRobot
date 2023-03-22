@@ -6,41 +6,31 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class DriveJoysticks {
 
-  private final Joystick joystick_left;
-  private final Joystick joystick_right;
+  private final Joystick joystick;
 
-  private final Axis leftXAxis;
-  private final Axis leftYAxis;
+  private final Axis xAxis;
+  private final Axis yAxis;
+  private final Axis rAxis;
 
-  private final Axis rightXAxis;
-  private final Axis rightYAxis;
+  public DriveJoysticks(int port) {
+    joystick = new Joystick(port);
 
-  public DriveJoysticks(int port_left, int port_right) {
-    joystick_left = new Joystick(port_left);
-    joystick_right = new Joystick(port_right);
+    xAxis = new JoystickAxis(joystick, 0);
+    yAxis = new JoystickAxis(joystick, 1);
+    rAxis = new JoystickAxis(joystick, 2);
 
-    leftXAxis = new JoystickAxis(joystick_left, 0);
-    leftYAxis = new JoystickAxis(joystick_left, 1);
-    leftYAxis.setInverted(true);
-
-    rightXAxis = new JoystickAxis(joystick_right, 0);
-    rightYAxis = new JoystickAxis(joystick_right, 1);
-    rightYAxis.setInverted(true);
+    yAxis.setInverted(true);
   }
 
-  public Axis getLeftXAxis() {
-    return leftXAxis;
+  public Axis getXAxis() {
+    return xAxis;
   }
 
-  public Axis getLeftYAxis() {
-    return leftYAxis;
+  public Axis getYAxis() {
+    return yAxis;
   }
 
-  public Axis getRightXAxis() {
-    return rightXAxis;
-  }
-
-  public Axis getRightYAxis() {
-    return rightYAxis;
+  public Axis getRAxis() {
+    return rAxis;
   }
 }

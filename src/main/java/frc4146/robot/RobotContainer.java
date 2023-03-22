@@ -3,13 +3,13 @@ package frc4146.robot;
 import common.robot.DriverReadout;
 import common.robot.input.XboxController;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc4146.robot.commands.autonomous.BalanceRobot;
 import frc4146.robot.commands.drivetrain.DriveCommand;
+import frc4146.robot.commands.drivetrain.DriveOverBalance;
+import frc4146.robot.commands.drivetrain.StraightLine;
 import frc4146.robot.commands.fiducials.AlignWithTarget;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
@@ -25,12 +25,13 @@ public class RobotContainer {
 
   private PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
+  private final DriveJoysticks joysticks = new DriveJoysticks(0);
+
   private final XboxController primaryController =
       new XboxController(Constants.PRIMARY_CONTROLLER_PORT);
 
   private final XboxController secondaryController =
       new XboxController(Constants.SECONDARY_CONTROLLER_PORT);
-  private final GenericHID secondaryRumble = new GenericHID(Constants.SECONDARY_CONTROLLER_PORT);
 
   private final Pigeon gyroscope = new Pigeon(Constants.DriveConstants.PIGEON_PORT);
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(gyroscope);
@@ -53,6 +54,9 @@ public class RobotContainer {
             drivetrainSubsystem,
             new DriveCommand(
                 drivetrainSubsystem,
+                // joysticks.getYAxis(),
+                // joysticks.getXAxis(),
+                // joysticks.getRAxis()));
                 primaryController.getLeftYAxis(),
                 primaryController.getLeftXAxis(),
                 primaryController.getRightXAxis()));
@@ -87,14 +91,23 @@ public class RobotContainer {
         .getRightBumperButton()
         .onTrue(Commands.runOnce(() -> drivetrainSubsystem.setMode(true)));
 
-    primaryController.getAButton().toggleOnTrue(new BalanceRobot(drivetrainSubsystem, gyroscope));
-    primaryController.getBButton().onTrue(Commands.runOnce(drivetrainSubsystem::toggleLocked));
+    primaryController
+        .getAButton()
+        .toggleOnTrue(new DriveOverBalance(drivetrainSubsystem, gyroscope));
+    primaryController
+        .getBButton()
+        .toggleOnTrue(new StraightLine(drivetrainSubsystem, gyroscope, 10000));
     primaryController
         .getXButton()
         .toggleOnTrue(new AlignWithTarget(drivetrainSubsystem, limelight));
     primaryController
         .getYButton()
-        .onTrue(Commands.runOnce(drivetrainSubsystem::toggleFieldOriented));
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  drivetrainSubsystem.toggleFieldOriented();
+                  gyroscope.reset();
+                }));
 
     // primaryController
     //     .getXButton()

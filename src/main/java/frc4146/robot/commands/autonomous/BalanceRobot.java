@@ -66,7 +66,7 @@ public class BalanceRobot extends CommandBase {
               MathUtil.clamp(
                   Math.abs(p + d),
                   min_amt,
-                  max_amt - Math.min(drivetrain.getPose().translation.length / 1350, 0.045)),
+                  max_amt - Math.min(drivetrain.getPose().translation.length / 1250, 0.045)),
               p + d);
       drivetrain.drive(new Vector2(0, output), 0);
 

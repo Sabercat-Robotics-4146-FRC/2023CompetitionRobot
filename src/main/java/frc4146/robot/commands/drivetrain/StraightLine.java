@@ -13,8 +13,8 @@ public class StraightLine extends CommandBase {
   public DrivetrainSubsystem drivetrain;
   public double distance;
 
-  public double min = 0.22;
-  public double max = 0.24; // 75;
+  public double min = 0.1;
+  public double max = 0.25;
 
   public SlewRateLimiter ff = new SlewRateLimiter(0.7);
 

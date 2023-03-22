@@ -113,8 +113,6 @@ public class Trajectories {
     return new SequentialCommandGroup(
         ScoreTwo(),
         new DriveOverBalance(container.getDrivetrainSubsystem(), container.getGyroscope()),
-        // new DriveOverBalance(
-        //     container.getDrivetrainSubsystem(), container.getGyroscope()), // Test amt
         new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -80),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }

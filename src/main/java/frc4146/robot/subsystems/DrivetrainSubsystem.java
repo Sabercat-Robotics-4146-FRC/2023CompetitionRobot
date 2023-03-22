@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.*;
 
@@ -57,7 +56,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
     new FeedforwardConstraint(
-        11.0, // TODO: test 12
+        12.0, // TODO: test 12
         FEEDFORWARD_CONSTANTS.getVelocityConstant(),
         FEEDFORWARD_CONSTANTS.getAccelerationConstant(),
         true), // TODO: was false, want to test true
@@ -104,6 +103,8 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
   private Vector2 velocity = Vector2.ZERO;
   private double angularVelocity = 0.0;
 
+  private double last_pigeon_angle = 0.0;
+
   /** driveSignal holds "live" data on pose, which determines how robot drives */
   private HolonomicDriveSignal driveSignal;
 
@@ -117,11 +118,11 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
   public Rotation2 desired_heading;
 
-  public PIDController drift_correction = new PIDController(0.2, 0, 0.1);
+  public PIDController drift_correction = new PIDController(0.005, 0, 0);
 
   public DrivetrainSubsystem(Pigeon gyro) {
 
-    drift_correction.setSetpoint(0);
+    drift_correction.enableContinuousInput(-180, 180);
 
     gyroscope = gyro;
 
@@ -236,7 +237,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
 
     tab.addNumber("Roll", () -> gyroscope.getRoll());
     tab.addNumber("Pitch", () -> gyroscope.getPitch());
-    tab.addNumber("Yaw", () -> gyroscope.getYaw());
+    tab.addNumber("Yaw", () -> gyroscope.getRate());
 
     _driverInterface
         .primaryLayout
@@ -259,19 +260,22 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
       ty = 0;
     }
     double mag = Math.hypot(tx, ty);
-    double rotDeadband = 0.0025;
-    if (mag <= 0.005) rotDeadband = 0.004;
+    double rotDeadband = 0.002;
+    if (mag <= 0.005) rotDeadband = 0.003;
     if (Math.abs(rotationalVelocity) < rotDeadband) {
       rotationalVelocity = 0;
     }
-    double adjustment_mag =
-        -MathUtil.clamp(drift_correction.calculate(gyroscope.getRate() / 360), -0.03, 0.03);
-    adjustment_mag = Math.abs(adjustment_mag) < 0.004 ? 0 : adjustment_mag;
-    SmartDashboard.putNumber("Calculated Adjustment Mag", adjustment_mag);
 
-    // if (rotationalVelocity == 0 && Math.abs(tx) + Math.abs(ty) > 0)
-    //  rotationalVelocity = adjustment_mag;
-
+    if (rotationalVelocity == 0 && Math.abs(tx) + Math.abs(ty) > 0.1) {
+      double adjustment_mag =
+          MathUtil.clamp(
+              drift_correction.calculate(gyroscope.getAngle() % 360, last_pigeon_angle),
+              -0.05,
+              0.05);
+      adjustment_mag = Math.abs(adjustment_mag) < 0.0007 ? 0 : adjustment_mag;
+      rotationalVelocity = adjustment_mag;
+    }
+    last_pigeon_angle = gyroscope.getAngle() % 360;
     driveSignal =
         new HolonomicDriveSignal(new Vector2(tx, ty), rotationalVelocity, isFieldOriented);
   }

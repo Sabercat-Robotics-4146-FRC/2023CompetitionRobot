@@ -45,6 +45,12 @@ public class Limelight implements Subsystem {
     return mLime.getEntry("targetpose_robotspace").getDoubleArray(new double[6]);
   }
 
+  public double[] getRobotPose() {
+    // X, Y, Z, Roll, Pitch, Yaw. The important ones are the first 3
+    setPipelineType(0);
+    return mLime.getEntry("robotpose_targetspace").getDoubleArray(new double[6]);
+  }
+
   public void setPipelineType(int t) {
     // 0 - fiducial detection, 1 - retroreflective tape detection
 
