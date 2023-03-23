@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.drivetrain.DriveOverBalance;
-import frc4146.robot.commands.drivetrain.StraightLine;
 import frc4146.robot.commands.fiducials.AlignWithTarget;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.commands.subsystems.PositionPiece;
 import frc4146.robot.commands.subsystems.ScorePiece;
 import frc4146.robot.subsystems.*;
+import frc4146.robot.util.AutonomousGenerator;
 import frc4146.robot.util.AutonomousSelector;
 import frc4146.robot.util.AutonomousTab;
 
@@ -41,6 +41,8 @@ public class RobotContainer {
 
   private final AutonomousSelector autonomousSelector;
   private final AutonomousTab autonomousTab;
+
+  private final AutonomousGenerator autonomousGenerator;
 
   public RobotContainer() {
     pdh.setSwitchableChannel(true);
@@ -76,6 +78,7 @@ public class RobotContainer {
 
     autonomousSelector = new AutonomousSelector(this);
     autonomousTab = new AutonomousTab(this);
+    autonomousGenerator = new AutonomousGenerator(this);
 
     configureButtonBindings();
   }
@@ -96,7 +99,12 @@ public class RobotContainer {
         .toggleOnTrue(new DriveOverBalance(drivetrainSubsystem, gyroscope));
     primaryController
         .getBButton()
-        .toggleOnTrue(new StraightLine(drivetrainSubsystem, gyroscope, 10000));
+        .toggleOnTrue(
+            autonomousGenerator.getAutonomousCommand(
+                new double[][] {
+                  {0, 0}, {-155, 0}, {0, 75},
+                }, // {-50, 0}, {0, -50}},
+                -80)); // new StraightLine2(drivetrainSubsystem, gyroscope, 270, 10000));
     primaryController
         .getXButton()
         .toggleOnTrue(new AlignWithTarget(drivetrainSubsystem, limelight));
@@ -127,6 +135,8 @@ public class RobotContainer {
     // primaryController
     //     .getBButton()
     //     .onTrue(new InstantCommand(() -> drivetrainSubsystem.lockWheelsAngle(0)));
+
+    secondaryController.getAButton().onTrue(Commands.runOnce(() -> claw.clamp = !claw.clamp));
 
     secondaryController.getStartButton().toggleOnTrue(new ScorePiece(arm, claw, "cone", "high"));
 

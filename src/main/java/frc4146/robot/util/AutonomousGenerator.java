@@ -3,6 +3,8 @@ package frc4146.robot.util;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc4146.robot.RobotContainer;
+import frc4146.robot.commands.drivetrain.StraightLine2;
+import frc4146.robot.commands.drivetrain.TurnRobot;
 
 public class AutonomousGenerator {
   public RobotContainer robotContainer;
@@ -26,12 +28,21 @@ public class AutonomousGenerator {
       double disp_x = x - px;
       double disp_y = y - py;
 
-      double angle = Math.atan2(disp_y, disp_x);
-      double distance = Math.hypot(disp_x, disp_y);
+      double angle = Math.atan2(y, x);
+      double distance = Math.hypot(y, x);
 
-      // autonomousCommand.addCommands(
-      //    new StraightLineCommand(robotContainer.getDrivetrainSubsystem(), distance, angle));
+      autonomousCommand.addCommands(
+          new StraightLine2(
+              robotContainer.getDrivetrainSubsystem(),
+              robotContainer.getGyroscope(),
+              angle * 180 / Math.PI,
+              distance));
     }
+    autonomousCommand.addCommands(
+        new TurnRobot(
+            robotContainer.getDrivetrainSubsystem(),
+            robotContainer.getGyroscope(),
+            final_rotation));
 
     return autonomousCommand;
   }

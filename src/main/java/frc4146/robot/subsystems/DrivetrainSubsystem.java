@@ -272,7 +272,7 @@ public class DrivetrainSubsystem implements Subsystem, UpdateManager.Updatable {
               drift_correction.calculate(gyroscope.getAngle() % 360, last_pigeon_angle),
               -0.05,
               0.05);
-      adjustment_mag = Math.abs(adjustment_mag) < 0.0007 ? 0 : adjustment_mag;
+      adjustment_mag = Math.abs(adjustment_mag) < 0.0003 ? 0 : adjustment_mag;
       rotationalVelocity = adjustment_mag;
     }
     last_pigeon_angle = gyroscope.getAngle() % 360;

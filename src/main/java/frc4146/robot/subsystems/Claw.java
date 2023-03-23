@@ -1,6 +1,7 @@
 package frc4146.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import common.robot.DriverReadout;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -14,9 +15,15 @@ public class Claw extends SubsystemBase {
   public DriverReadout _driverInterface = frc4146.robot.RobotContainer.driverInterface;
   public boolean enabled = true;
   public boolean manual_mode = true;
+  public boolean clamp = false;
+
+  public double setpoint;
 
   public Claw() {
     clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
+    clawMotor.setInverted(true);
+
+    clawMotor.setNeutralMode(NeutralMode.Brake);
 
     Shuffleboard.getTab("Subsystems").addNumber("Claw Position", () -> getPos());
     Shuffleboard.getTab("Subsystems").addNumber("Claw Current", () -> clawMotor.getStatorCurrent());
@@ -24,11 +31,18 @@ public class Claw extends SubsystemBase {
   }
 
   public void setClaw(double p) {
+    if (getPos() <= 0.54 && p < 0) p = 0; //
+    if (getPos() >= 0.955 && p > 0) p = 0;
+
     clawMotor.set(ControlMode.PercentOutput, p);
   }
 
   public void manuallySetClaw(double p) {
-    if (manual_mode) setClaw(p);
+    if (manual_mode) {
+      if (Math.abs(p) >= 0.01) clamp = false;
+      if (clamp) p = 0.4;
+      setClaw(p);
+    }
   }
 
   public void toggleManualMode(boolean m) {
@@ -36,11 +50,11 @@ public class Claw extends SubsystemBase {
   }
 
   public double getPos() {
-    return clawMotor.getSelectedSensorPosition() / 1024;
+    return -clawMotor.getSelectedSensorPosition() / 1024;
   }
 
   public boolean hasObject() {
-    return (clawMotor.getStatorCurrent() > 12 && getPos() > 1);
+    return (clawMotor.getStatorCurrent() > 12);
   }
 
   @Override

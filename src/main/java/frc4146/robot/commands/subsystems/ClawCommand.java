@@ -17,7 +17,8 @@ public class ClawCommand extends CommandBase {
 
   @Override
   public void execute() {
-    claw.manuallySetClaw(axis.get());
+    double val = axis.get();
+    claw.manuallySetClaw(val);
   }
 
   @Override
