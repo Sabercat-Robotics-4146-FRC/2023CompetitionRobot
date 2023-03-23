@@ -42,7 +42,7 @@ public class RobotContainer {
   private final AutonomousSelector autonomousSelector;
   private final AutonomousTab autonomousTab;
 
-  private final AutonomousGenerator autonomousGenerator;
+
 
   public RobotContainer() {
     pdh.setSwitchableChannel(true);
@@ -78,7 +78,6 @@ public class RobotContainer {
 
     autonomousSelector = new AutonomousSelector(this);
     autonomousTab = new AutonomousTab(this);
-    autonomousGenerator = new AutonomousGenerator(this);
 
     configureButtonBindings();
   }
@@ -97,14 +96,14 @@ public class RobotContainer {
     primaryController
         .getAButton()
         .toggleOnTrue(new DriveOverBalance(drivetrainSubsystem, gyroscope));
-    primaryController
-        .getBButton()
-        .toggleOnTrue(
-            autonomousGenerator.getAutonomousCommand(
-                new double[][] {
-                  {0, 0}, {-155, 0}, {0, 75},
-                }, // {-50, 0}, {0, -50}},
-                -80)); // new StraightLine2(drivetrainSubsystem, gyroscope, 270, 10000));
+    // primaryController
+    //     .getBButton()
+    //     .toggleOnTrue(
+    //         autonomousGenerator.getAutonomousCommand(
+    //             new double[][] {
+    //               {0, 0}, {-155, 0}, {0, 75},
+    //             }, // {-50, 0}, {0, -50}},
+    //             -80)); // new StraightLine2(drivetrainSubsystem, gyroscope, 270, 10000));
     primaryController
         .getXButton()
         .toggleOnTrue(new AlignWithTarget(drivetrainSubsystem, limelight));

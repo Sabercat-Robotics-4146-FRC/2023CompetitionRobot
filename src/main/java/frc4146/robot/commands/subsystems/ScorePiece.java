@@ -16,7 +16,8 @@ public class ScorePiece extends SequentialCommandGroup {
         Commands.runOnce(
             () -> {
               claw.toggleManualMode(false);
-              claw.setClaw(0.95);
+              claw.clamp = true;
+
             },
             claw),
         new WaitCommand(0.2),

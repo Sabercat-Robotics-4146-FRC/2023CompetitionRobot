@@ -3,12 +3,17 @@ package frc4146.robot.commands.autonomous;
 import common.math.RigidTransform2;
 import common.math.Vector2;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc4146.robot.subsystems.DrivetrainSubsystem;
 import frc4146.robot.subsystems.Pigeon;
 
 public class BalanceRobot extends CommandBase {
   private final DrivetrainSubsystem drivetrain;
+
+  public SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0,0.8198, 0.27975);
   public final Pigeon pigeon;
   // To be tuned
   public double kP = .7 * 0.0125;
@@ -45,6 +50,8 @@ public class BalanceRobot extends CommandBase {
     past_error = getError();
     stage = 0;
     drivetrain.resetPose(RigidTransform2.ZERO);
+
+    Shuffleboard.getTab("Drivetrain").addNumber("feedforward", ()->feedforward.calculate(getErrorRate(), getError()));
   }
 
   public void execute() {
@@ -61,6 +68,8 @@ public class BalanceRobot extends CommandBase {
 
       double p = kP * getError();
       double d = kD * getErrorRate();
+      double ff = feedforward.calculate(getErrorRate(), getError());
+      SmartDashboard.putNumber("ff", ff);
       double output =
           Math.copySign(
               MathUtil.clamp(

@@ -31,16 +31,17 @@ public class Claw extends SubsystemBase {
   }
 
   public void setClaw(double p) {
-    if (getPos() <= 0.54 && p < 0) p = 0; //
+    if (getPos() <= 0.54 && p < 0) p = 0;
     if (getPos() >= 0.955 && p > 0) p = 0;
+
+    if (Math.abs(p) >= 0.01) clamp = false;
+    if (clamp) p = 0.4;
 
     clawMotor.set(ControlMode.PercentOutput, p);
   }
 
   public void manuallySetClaw(double p) {
     if (manual_mode) {
-      if (Math.abs(p) >= 0.01) clamp = false;
-      if (clamp) p = 0.4;
       setClaw(p);
     }
   }

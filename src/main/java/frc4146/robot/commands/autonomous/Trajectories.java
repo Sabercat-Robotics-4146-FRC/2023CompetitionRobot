@@ -8,6 +8,8 @@ import frc4146.robot.commands.drivetrain.DriveOverBalance;
 import frc4146.robot.commands.drivetrain.StraightLine;
 import frc4146.robot.commands.drivetrain.TurnRobot;
 import frc4146.robot.commands.subsystems.ScorePiece;
+import frc4146.robot.util.AutonomousGenerator;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,8 +18,11 @@ public class Trajectories {
   RobotContainer container;
   Map<String, Command> commands;
 
+  AutonomousGenerator autonomousGenerator;
+
   public Trajectories(RobotContainer container) {
     this.container = container;
+    autonomousGenerator = new AutonomousGenerator(this.container);
     commands =
         new HashMap<>() {
           {
@@ -47,7 +52,7 @@ public class Trajectories {
 
             put("RedScoreEngageTwo", ScoreLeaveEngageTwo());
             put("RedScoreTwo", ScoreTwo());
-            put("RedEngageTwo", EngageTwo());
+            put("RedEngageTwo", ScoreDriveOverEngageTwo());
 
             put("BlueEngageNone", Engage());
             put("RedEngageNone", Engage());
@@ -111,10 +116,24 @@ public class Trajectories {
 
   public Command ScoreLeaveEngageTwo() {
     return new SequentialCommandGroup(
-        ScoreTwo(),
-        new DriveOverBalance(container.getDrivetrainSubsystem(), container.getGyroscope()),
-        new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -80),
-        new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
+      new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cube", "high"),
+      autonomousGenerator.getAutonomousCommand(new double[][] {{-155, 0}, {0, 75}}, -80),
+      new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())  
+    );
+  }
+  public Command ScoreDriveOverEngageTwo() {
+    return new SequentialCommandGroup(
+      new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cube", "high"),
+      new DriveOverBalance(container.getDrivetrainSubsystem(), container.getGyroscope()),
+      new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
+      new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())  
+    );
+
+    // return new SequentialCommandGroup(
+    //     ScoreTwo(),
+    //     new DriveOverBalance(container.getDrivetrainSubsystem(), container.getGyroscope()),
+    //     new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -80),
+    //     new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }
 
   public Command Engage() {
