@@ -14,8 +14,8 @@ public class StraightLine2 extends CommandBase {
   public double distance;
   public double angle;
 
-  public double min = 0.25;
-  public double max = 0.45;
+  public double min = 0.3;
+  public double max = 0.5;
 
   public SlewRateLimiter ff = new SlewRateLimiter(0.7);
 

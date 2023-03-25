@@ -21,7 +21,7 @@ public class Claw extends SubsystemBase {
 
   public Claw() {
     clawMotor = new TalonSRX(ClawConstants.CLAW_ID);
-    clawMotor.setInverted(true);
+    // clawMotor.setInverted(true);
 
     clawMotor.setNeutralMode(NeutralMode.Brake);
 
@@ -31,18 +31,16 @@ public class Claw extends SubsystemBase {
   }
 
   public void setClaw(double p) {
-    if (getPos() <= 0.54 && p < 0) p = 0;
-    if (getPos() >= 0.955 && p > 0) p = 0;
-
-    if (Math.abs(p) >= 0.01) clamp = false;
-    if (clamp) p = 0.4;
+    // if (getPos() <= 0.46 && p < 0) p = 0;
+    // if (getPos() >= 0.94 && p > 0) p = 0;
 
     clawMotor.set(ControlMode.PercentOutput, p);
   }
 
   public void manuallySetClaw(double p) {
     if (manual_mode) {
-      setClaw(p);
+      if (Math.abs(p) >= 0.01) clamp = false;
+      if (!clamp) setClaw(p);
     }
   }
 
@@ -61,5 +59,6 @@ public class Claw extends SubsystemBase {
   @Override
   public void periodic() {
     enabled = _driverInterface.m_ClawSubsystemEnabled.getBoolean(true);
+    if (clamp) setClaw(0.75);
   }
 }

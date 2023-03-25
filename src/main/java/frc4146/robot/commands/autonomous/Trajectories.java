@@ -6,10 +6,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc4146.robot.RobotContainer;
 import frc4146.robot.commands.drivetrain.DriveOverBalance;
 import frc4146.robot.commands.drivetrain.StraightLine;
-import frc4146.robot.commands.drivetrain.TurnRobot;
 import frc4146.robot.commands.subsystems.ScorePiece;
 import frc4146.robot.util.AutonomousGenerator;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,36 +24,31 @@ public class Trajectories {
     commands =
         new HashMap<>() {
           {
-            put("BlueScoreEngageOne", ScoreEngageOne());
-            put("BlueScoreOne", ScoreOne());
-            put("BlueEngageOne", EngageOne());
-            put("BlueLeaveOne", Leave());
+            put("BlueScoreSide", ScoreSide());
+            put("RedScoreSide", ScoreSide());
 
-            put("RedScoreEngageThree", ScoreEngageOne());
-            put("RedScoreThree", ScoreOne());
-            put("RedEngageThree", EngageOne());
-            put("RedLeaveThree", Leave());
+            put("BlueScoreLeaveSide", ScoreLeaveSide());
+            put("BlueLeaveSide", LeaveSide());
+            put("RedScoreLeaveSide", ScoreLeaveSide());
+            put("RedLeaveSide", LeaveSide());
 
-            put("BlueScoreEngageThree", ScoreEngageThree());
-            put("BlueScoreThree", ScoreOne());
-            put("BlueEngageThree", EngageThree());
-            put("BlueLeaveThree", Leave());
+            put("BlueScoreEngageSide", BlueScoreEngageSide());
+            put("BlueEngageSide", BlueEngageSide());
 
-            put("RedScoreEngageOne", ScoreEngageThree());
-            put("RedScoreOne", ScoreOne());
-            put("RedEngageOne", EngageThree());
-            put("RedLeaveOne", Leave());
+            put("RedScoreEngageSide", RedScoreEngageSide());
+            put("RedEngageSide", RedEngageSide());
 
-            put("BlueScoreEngageTwo", ScoreEngageTwo());
-            put("BlueScoreTwo", ScoreTwo());
-            put("BlueEngageTwo", EngageTwo());
+            put("BlueScoreEngageCenter", ScoreEngageCenter());
+            put("BlueScoreCenter", ScoreCenter());
+            put("BlueEngageCenter", EngageCenter());
+            put("RedScoreEngageCenter", ScoreEngageCenter());
+            put("RedScoreCenter", ScoreCenter());
+            put("RedEngageCenter", EngageCenter());
 
-            put("RedScoreEngageTwo", ScoreLeaveEngageTwo());
-            put("RedScoreTwo", ScoreTwo());
-            put("RedEngageTwo", ScoreDriveOverEngageTwo());
-
-            put("BlueEngageNone", Engage());
-            put("RedEngageNone", Engage());
+            put("BlueScoreEngageLeaveCenter", ScoreEngageLeaveCenter());
+            put("BlueEngageLeaveCenter", EngageLeaveCenter());
+            put("RedScoreEngageLeaveCenter", ScoreEngageLeaveCenter());
+            put("RedEngageLeaveCenter", EngageLeaveCenter());
           }
         };
   }
@@ -64,84 +57,73 @@ public class Trajectories {
     return commands;
   }
 
-  public Command ScoreOne() {
+  public Command ScoreSide() {
+    return new ScorePiece(
+        container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high");
+  }
+
+  public Command LeaveSide() {
+    return new SequentialCommandGroup(
+        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200));
+  }
+
+  public Command ScoreLeaveSide() {
     return new SequentialCommandGroup(
         new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
         new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200));
   }
 
-  public Command EngageOne() {
+  public Command RedEngageSide() {
     return new SequentialCommandGroup(
-        Leave(),
-        new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), 55),
+        autonomousGenerator.getAutonomousCommand(new double[][] {{-140, 0}, {0, -75}}, -80),
         Engage());
   }
 
-  public Command ScoreEngageOne() {
+  public Command RedScoreEngageSide() {
     return new SequentialCommandGroup(
         new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
-        EngageOne());
+        RedEngageSide());
   }
 
-  public Command EngageThree() {
+  public Command BlueEngageSide() {
     return new SequentialCommandGroup(
-        Leave(),
-        new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -55),
+        autonomousGenerator.getAutonomousCommand(new double[][] {{-140, 0}, {0, 75}}, 80),
         Engage());
   }
 
-  public Command ScoreEngageThree() {
+  public Command BlueScoreEngageSide() {
     return new SequentialCommandGroup(
         new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cone", "high"),
-        EngageThree());
+        BlueEngageSide());
   }
 
-  public Command ScoreTwo() {
+  public Command ScoreCenter() {
     return new SequentialCommandGroup(
         new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cube", "high"));
   }
 
-  public Command EngageTwo() {
+  public Command EngageCenter() {
     return new SequentialCommandGroup(
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -10),
-        new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), 90),
+        autonomousGenerator.getAutonomousCommand(new double[][] {{-10, 0}}, 80),
         new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }
 
-  public Command ScoreEngageTwo() {
-    return new SequentialCommandGroup(ScoreTwo(), EngageTwo());
+  public Command EngageLeaveCenter() {
+    return new SequentialCommandGroup(
+        autonomousGenerator.getAutonomousCommand(new double[][] {{-10, 0}}, -80),
+        new DriveOverBalance(container.getDrivetrainSubsystem(), container.getGyroscope()),
+        new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
   }
 
-  public Command ScoreLeaveEngageTwo() {
-    return new SequentialCommandGroup(
-      new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cube", "high"),
-      autonomousGenerator.getAutonomousCommand(new double[][] {{-155, 0}, {0, 75}}, -80),
-      new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())  
-    );
+  public Command ScoreEngageCenter() {
+    return new SequentialCommandGroup(ScoreCenter(), EngageCenter());
   }
-  public Command ScoreDriveOverEngageTwo() {
-    return new SequentialCommandGroup(
-      new ScorePiece(container.getArmSubsystem(), container.getClawSubsystem(), "cube", "high"),
-      new DriveOverBalance(container.getDrivetrainSubsystem(), container.getGyroscope()),
-      new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -90),
-      new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope())  
-    );
 
-    // return new SequentialCommandGroup(
-    //     ScoreTwo(),
-    //     new DriveOverBalance(container.getDrivetrainSubsystem(), container.getGyroscope()),
-    //     new TurnRobot(container.getDrivetrainSubsystem(), container.getGyroscope(), -80),
-    //     new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope()));
+  public Command ScoreEngageLeaveCenter() {
+    return new SequentialCommandGroup(ScoreCenter(), EngageLeaveCenter());
   }
 
   public Command Engage() {
     return new BalanceRobot(container.getDrivetrainSubsystem(), container.getGyroscope());
-  }
-
-  public Command Leave() {
-    return new SequentialCommandGroup(
-        new StraightLine(container.getDrivetrainSubsystem(), container.getGyroscope(), -200));
   }
 }

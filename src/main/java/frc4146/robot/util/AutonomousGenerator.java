@@ -25,8 +25,6 @@ public class AutonomousGenerator {
       double x = points[i][0];
       double y = points[i][1];
 
-      double disp_x = x - px;
-      double disp_y = y - py;
 
       double angle = Math.atan2(y, x);
       double distance = Math.hypot(y, x);

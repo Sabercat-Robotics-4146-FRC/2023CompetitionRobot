@@ -46,14 +46,14 @@ public class TurnRobot extends CommandBase {
     drivetrainSubsystem.drive(
         Vector2.ZERO,
         Math.copySign(
-            MathUtil.clamp(0.025 * driveTurn + 0.08 * (old_driveturn - driveTurn), 0.01, 0.085),
+            MathUtil.clamp(0.055 * driveTurn + 0.08 * (old_driveturn - driveTurn), 0.025, 0.15),
             driveTurn));
     old_driveturn = driveTurn;
   }
 
   @Override
   public boolean isFinished() {
-    return Math.abs(degrees.toDegrees() - currDegrees.toDegrees()) <= 1.5;
+    return Math.abs(degrees.toDegrees() - currDegrees.toDegrees()) <= 12.5;
   }
 
   @Override

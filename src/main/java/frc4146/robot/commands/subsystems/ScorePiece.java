@@ -15,15 +15,16 @@ public class ScorePiece extends SequentialCommandGroup {
     addCommands(
         Commands.runOnce(
             () -> {
+              // claw.setClaw(0.4);
               claw.toggleManualMode(false);
               claw.clamp = true;
-
             },
             claw),
         new WaitCommand(0.2),
         new PositionPiece(arm, gamepiece, pos),
+        new InstantCommand(() -> claw.clamp = false),
         new ParallelRaceGroup(
-            new RepeatCommand(new InstantCommand(() -> claw.setClaw(-0.85), claw)),
+            new RepeatCommand(new InstantCommand(() -> claw.setClaw(-0.5), claw)),
             new WaitCommand(0.3)),
         Commands.runOnce(
             () -> {

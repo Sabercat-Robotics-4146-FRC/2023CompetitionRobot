@@ -7,15 +7,15 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc4146.robot.commands.autonomous.BalanceRobot;
+import frc4146.robot.commands.autonomous.BalanceRobotGradient;
 import frc4146.robot.commands.drivetrain.DriveCommand;
 import frc4146.robot.commands.drivetrain.DriveOverBalance;
-import frc4146.robot.commands.fiducials.AlignWithTarget;
 import frc4146.robot.commands.subsystems.ArmCommand;
 import frc4146.robot.commands.subsystems.ClawCommand;
 import frc4146.robot.commands.subsystems.PositionPiece;
 import frc4146.robot.commands.subsystems.ScorePiece;
 import frc4146.robot.subsystems.*;
-import frc4146.robot.util.AutonomousGenerator;
 import frc4146.robot.util.AutonomousSelector;
 import frc4146.robot.util.AutonomousTab;
 
@@ -41,8 +41,6 @@ public class RobotContainer {
 
   private final AutonomousSelector autonomousSelector;
   private final AutonomousTab autonomousTab;
-
-
 
   public RobotContainer() {
     pdh.setSwitchableChannel(true);
@@ -95,7 +93,13 @@ public class RobotContainer {
 
     primaryController
         .getAButton()
-        .toggleOnTrue(new DriveOverBalance(drivetrainSubsystem, gyroscope));
+        .toggleOnTrue(new BalanceRobotGradient(drivetrainSubsystem, gyroscope));
+    // new TurnRobot(
+    //     drivetrainSubsystem,
+    //     gyroscope,
+    //     80)); // new DriveOverBalance(drivetrainSubsystem, gyroscope));
+
+    primaryController.getBButton().toggleOnTrue(new BalanceRobot(drivetrainSubsystem, gyroscope));
     // primaryController
     //     .getBButton()
     //     .toggleOnTrue(
@@ -106,7 +110,10 @@ public class RobotContainer {
     //             -80)); // new StraightLine2(drivetrainSubsystem, gyroscope, 270, 10000));
     primaryController
         .getXButton()
-        .toggleOnTrue(new AlignWithTarget(drivetrainSubsystem, limelight));
+        .toggleOnTrue(
+            new DriveOverBalance(
+                drivetrainSubsystem,
+                gyroscope)); // new AlignWithTarget(drivetrainSubsystem, limelight));
     primaryController
         .getYButton()
         .onTrue(
